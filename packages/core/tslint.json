@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "tslint-config-standard",
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "await-promise": [
+      true,
+      "Bluebird"
+    ]
+  }
+}

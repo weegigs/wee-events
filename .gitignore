@@ -1,0 +1,21 @@
+.DS_Store
+
+coverage
+dist
+node_modules
+.vscode
+lib
+*.log
+typings
+.idea
+
+# Generated
+.cache
+nohup.out
+
+# Environment Files
+.env
+/.local
+.yalc
+yalc.lock
+yalc.sig
