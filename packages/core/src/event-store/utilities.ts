@@ -5,7 +5,7 @@ import { Observable, Subscription } from "rxjs";
 import { monotonicFactory, decodeTime } from "ulid";
 
 import { Event, PublishedEvent } from "../types";
-import { EventStore, EventListenerOptions, EventListener } from "../event-store";
+import { EventStore, EventStreamOptions, EventListener } from "../event-store";
 
 const ulid = monotonicFactory();
 
@@ -36,7 +36,7 @@ const FLUSH_INTERVAL = 15 * 60 * 1000; // 15 minutes
 export function subscribe(
   store: EventStore,
   subscriber: EventListener,
-  options: EventListenerOptions = {}
+  options: EventStreamOptions = {}
 ): Subscription {
   return store
     .stream(options)

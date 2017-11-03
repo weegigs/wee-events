@@ -5,7 +5,7 @@ import { ReplaySubject, Observable } from "rxjs";
 import { Event, PublishedEvent } from "../types";
 import { AggregateId } from "../aggregate";
 
-import { EventStore, EventListenerOptions, SnapshotOptions } from "./types";
+import { EventStore, EventStreamOptions, EventSnapshotOptions } from "./types";
 import { stampEvent } from "./utilities";
 
 export class MemoryEventStore implements EventStore {
@@ -25,14 +25,14 @@ export class MemoryEventStore implements EventStore {
     return published;
   }
 
-  async snapshot(aggregateId: AggregateId, options: SnapshotOptions = {}): Promise<PublishedEvent[]> {
+  async snapshot(aggregateId: AggregateId, options: EventSnapshotOptions = {}): Promise<PublishedEvent[]> {
     const { after } = options;
 
     const events = this.events.filter(e => R.equals(e.aggregateId, aggregateId));
     return after ? events.filter(e => e.id > after) : events;
   }
 
-  stream(options: EventListenerOptions = {}): Observable<PublishedEvent> {
+  stream(options: EventStreamOptions = {}): Observable<PublishedEvent> {
     let observable = this.updates.asObservable();
     const { after } = options;
 

@@ -1,4 +1,5 @@
 import { Dictionary, Event, EventId, PublishedEvent } from "../types";
+import { Result } from "../result";
 
 export type AggregateType = string;
 export type AggregateId = { id: string; type: AggregateType };
@@ -10,13 +11,13 @@ export interface AggregateVersion {
 
 export type CommandType = string;
 export interface Command {
-  type: CommandType;
+  command: CommandType;
   aggregateId: AggregateId;
   data?: Dictionary;
 }
 
 export interface CommandHandler {
-  type: CommandType;
+  command: CommandType;
   action: <T extends AggregateVersion>(aggregate: T, command: Command) => CommandResult;
 }
 
@@ -25,6 +26,5 @@ export interface CommandError {
   error: Error;
 }
 
-export type ErrorResult = { errors: CommandError[] };
-export type CommandResult = ErrorResult | { events: Event[] };
-export type ExecuteResult = ErrorResult | { events: PublishedEvent[]; version: AggregateVersion };
+export type CommandResult = Result<Event[], CommandError[]>;
+export type ExecuteResult = Result<{ events: PublishedEvent[]; version: AggregateVersion }, CommandError[]>;

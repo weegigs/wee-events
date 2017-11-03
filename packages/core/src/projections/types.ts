@@ -1,14 +1,9 @@
-import { Observable, Subscription } from "rxjs";
+import { Subscription } from "rxjs";
 
 import { EventId, PublishedEvent } from "../types";
 import { EventStore } from "../event-store";
 
-export type ProjectionConsistency = "strong" | "eventual";
-
 export interface Projection {
-  readonly consistency: ProjectionConsistency;
-  readonly position: Observable<ProjectionPosition>;
-
   attach(store: EventStore): Subscription;
 }
 

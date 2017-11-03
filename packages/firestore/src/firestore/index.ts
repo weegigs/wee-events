@@ -6,8 +6,8 @@ import {
   PublishedEvent,
   AggregateId,
   EventStore,
-  EventListenerOptions,
-  SnapshotOptions,
+  EventStreamOptions,
+  EventSnapshotOptions,
   stampEvent,
 } from "@weegigs/events-core";
 
@@ -41,7 +41,7 @@ export class FirestoreEventStore implements EventStore {
     return normalized;
   }
 
-  stream(options: EventListenerOptions = {}): Observable<PublishedEvent> {
+  stream(options: EventStreamOptions = {}): Observable<PublishedEvent> {
     return Observable.create((subscriber: Subscriber<PublishedEvent>) => {
       let query = this.events;
 
@@ -62,7 +62,10 @@ export class FirestoreEventStore implements EventStore {
     });
   }
 
-  async snapshot(aggregateId: AggregateId, options?: SnapshotOptions | undefined): Promise<PublishedEvent[]> {
+  async snapshot(
+    aggregateId: AggregateId,
+    options?: EventSnapshotOptions | undefined
+  ): Promise<PublishedEvent[]> {
     const query = this.collection
       .orderBy("id")
       .where("aggregateId.id", "==", aggregateId.id)
