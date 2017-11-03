@@ -1,23 +1,24 @@
 {
   "name": "@weegigs/events-core",
-  "version": "1.0.0",
+  "version": "0.0.1-alpha.0",
   "description": "Core components for the wee gigs event sourcing system",
-  "license": "ISC",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
   "scripts": {
-    "build": "yarn run compile && yarn run test",
-    "prebuild": "yarn run clean && yarn run lint",
+    "build": "yarn run lint && yarn run compile && yarn run test",
+    "prebuild": "yarn run clean",
     "clean": "rimraf lib",
     "compile:tsc": "tsc -p .",
     "compile": "yarn run compile:tsc",
     "lint": "tslint -c tslint.json --project . \"src/**/*.ts\"",
-    "watch:tsc": "tsc -p . --watch",
-    "watch": "yarn run watch:tsc",
     "test:unit": "jest \"tests/*\" --env=node --coverage",
-    "test:watch": "jest \"tests/*\" --env=node --coverage --watch",
-    "test": "yarn run test:unit"
+    "test": "yarn run test:unit",
+    "watch:tsc": "tsc -p . --watch",
+    "watch:test": "jest \"tests/*\" --env=node --coverage --watch",
+    "watch": "yarn run watch:tsc & yarn run watch:test",
+    "prepublishOnly": "yarn run clean && yarn run lint && yarn run compile"
   },
   "devDependencies": {
     "@types/faker": "4.1.1",
@@ -51,7 +52,7 @@
   },
   "jest": {
     "transform": {
-      ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
+      ".(ts|tsx)": "../../node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
     "moduleFileExtensions": [
@@ -65,13 +66,16 @@
   "files": [
     "lib",
     "package.json",
-    "yarn.lock"
+    "yarn.lock",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

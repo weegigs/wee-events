@@ -6,13 +6,6 @@ import { EventStore, EventStreamOptions } from "../event-store";
 import { Projection, ProjectionFunction, ProjectionPosition } from "./types";
 import { timeout } from "../utilities";
 
-export function createSerialProjection(
-  projection: ProjectionFunction,
-  options?: EventStreamOptions
-): Projection {
-  return new SerialProjection(projection, options);
-}
-
 export class SerialProjection implements Projection {
   private readonly versions = new BehaviorSubject<ProjectionPosition>(undefined);
 
@@ -47,6 +40,13 @@ export class SerialProjection implements Projection {
       })
     );
   };
+}
+
+export function createSerialProjection(
+  projection: ProjectionFunction,
+  options?: EventStreamOptions
+): Projection {
+  return new SerialProjection(projection, options);
 }
 
 function newer(current?: ProjectionPosition, update?: ProjectionPosition): boolean {

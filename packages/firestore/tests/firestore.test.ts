@@ -33,6 +33,10 @@ describe("adding events", () => {
   const all = events.collection("all");
   const store = new FirestoreEventStore(all);
 
+  beforeAll(async () => {
+    const docs = await clear(all);
+  });
+
   afterEach(async () => {
     const docs = await clear(all);
   });
@@ -208,8 +212,7 @@ async function clear(collection: CollectionReference, count: number = 0): Promis
     batch.delete(doc.ref);
   });
 
-  const { writeResults } = (await batch.commit()) as any;
-
+  const writeResults = await batch.commit();
   return clear(collection, count + writeResults.length);
 }
 

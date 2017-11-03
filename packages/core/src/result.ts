@@ -26,14 +26,6 @@ export interface Result<R, E> {
 //   return (v: t) => b(a(v));
 // }
 
-export function success<T, E = Error>(value: T): Result<T, E> {
-  return new Success(value);
-}
-
-export function failure<T, E = Error>(value: E): Result<T, E> {
-  return new Failure(value);
-}
-
 class Success<R, E> implements Result<R, E> {
   constructor(private r: R) {}
 
@@ -127,4 +119,12 @@ class Failure<R, E> implements Result<R, E> {
     f(this.e);
     return this;
   }
+}
+
+export function success<T, E = Error>(value: T): Result<T, E> {
+  return new Success(value);
+}
+
+export function failure<T, E = Error>(value: E): Result<T, E> {
+  return new Failure(value);
 }

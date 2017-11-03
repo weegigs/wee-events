@@ -1,35 +1,34 @@
 {
   "name": "@weegigs/events-firestore",
-  "version": "1.0.0",
+  "version": "0.0.1-alpha.0",
   "description": "Core components for the wee gigs event sourcing system",
-  "license": "ISC",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
   "scripts": {
-    "cz": "git-cz",
-    "build": "yarn run compile && yarn run test",
-    "prebuild": "yarn run clean && yarn run lint",
+    "build": "yarn run lint && yarn run compile && yarn run test",
+    "prebuild": "yarn run clean",
     "clean": "rimraf lib",
-    "compile:tsc": "tsc --pretty -p .",
+    "compile:tsc": "tsc -p .",
     "compile": "yarn run compile:tsc",
     "lint": "tslint -c tslint.json --project . \"src/**/*.ts\"",
-    "watch:tsc": "tsc -p . --watch --pretty",
-    "watch": "yarn run watch:tsc",
     "test:unit": "jest \"tests/*\" --env=node --coverage",
-    "test:watch": "jest \"tests/*\" --env=node --coverage --watch",
     "test": "yarn run test:unit",
-    "release": "yarn run build && corp-semantic-release -b master -v"
+    "watch:tsc": "tsc -p . --watch",
+    "watch:test": "jest \"tests/*\" --env=node --coverage --watch",
+    "watch": "yarn run watch:tsc & yarn run watch:test",
+    "prepublishOnly": "yarn run clean && yarn run lint && yarn run compile"
   },
   "devDependencies": {
-    "@google-cloud/firestore": "0.8.2",
+    "@google-cloud/firestore": "0.9.0",
     "@types/dotenv": "4.0.2",
     "@types/faker": "4.1.1",
     "@types/jest": "21.1.5",
     "@types/mz": "0.0.32",
     "@types/node": "8.0.47",
     "@types/ramda": "0.25.0",
-    "@weegigs/events-core": "1.0.0",
+    "@weegigs/events-core": "0.0.1-alpha.0",
     "dotenv": "4.0.0",
     "faker": "4.1.0",
     "jest": "21.2.1",
@@ -44,15 +43,14 @@
     "tslint-config-standard": "7.0.0",
     "typescript": "2.6.1"
   },
-  "dependencies": {},
   "peerDependencies": {
     "@google-cloud/firestore": "~0.8.2",
-    "@weegigs/events-core": "~1.0.0",
+    "@weegigs/events-core": "0.0.1-alpha.0",
     "rxjs": "~5.5.2"
   },
   "jest": {
     "transform": {
-      ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
+      ".(ts|tsx)": "../../node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
     "moduleFileExtensions": [
@@ -67,13 +65,16 @@
   "files": [
     "lib",
     "package.json",
-    "yarn.lock"
+    "yarn.lock",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

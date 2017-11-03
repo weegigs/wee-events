@@ -2,6 +2,7 @@ import { Subscription } from "rxjs";
 
 import { EventId, PublishedEvent } from "../types";
 import { EventStore } from "../event-store";
+import { AggregateId } from "../aggregate";
 
 export interface Projection {
   attach(store: EventStore): Subscription;
@@ -9,3 +10,5 @@ export interface Projection {
 
 export type ProjectionPosition = EventId | undefined;
 export type ProjectionFunction = (event: PublishedEvent) => void | Promise<void>;
+
+export type RepresentationFunction = <T>(id: AggregateId) => Promise<T>;

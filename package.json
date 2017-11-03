@@ -1,15 +1,16 @@
 {
   "name": "@weegigs/events",
   "private": true,
+  "license": "MIT",
   "scripts": {
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap --hoist",
     "test": "lerna run test",
     "clean": "lerna run clean",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "release": "lerna publish --exact --cd-version=prerelease --preid=alpha --npm-tag=alpha"
   },
   "devDependencies": {
-    "lerna": "2.4.0",
-    "rxjs": "5.5.2"
+    "lerna": "2.5.1"
   },
   "version": "1.0.0",
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
