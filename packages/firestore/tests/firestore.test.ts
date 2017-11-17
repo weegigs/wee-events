@@ -31,7 +31,7 @@ describe("adding events", () => {
   const db = new Firestore();
   const events = db.collection("test").doc("events");
   const all = events.collection("all");
-  const store = new FirestoreEventStore(all);
+  const store = new FirestoreEventStore(events);
 
   beforeAll(async () => {
     const docs = await clear(all);
@@ -74,7 +74,7 @@ describe("listening for events", () => {
   const db = new Firestore();
   const events = db.collection("test").doc("events");
   const all = events.collection("all");
-  const store = new FirestoreEventStore(all);
+  const store = new FirestoreEventStore(events);
   store.stream();
 
   afterEach(async () => {
@@ -114,7 +114,7 @@ describe("streaming events", () => {
   const db = new Firestore();
   const events = db.collection("test").doc("events");
   const all = events.collection("all");
-  const store = new FirestoreEventStore(all);
+  const store = new FirestoreEventStore(events);
 
   const take1 = take(store, 1);
   const take2 = take(store, 3);
