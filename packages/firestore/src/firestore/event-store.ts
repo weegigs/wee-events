@@ -82,7 +82,9 @@ export class FirestoreEventStore implements EventStore {
     return streamStartingAfter(position).catch(error => {
       if (reconnect) {
         console.log(`[WARN] FirestoreStream: Reconnecting after connection failure: ${error.message}`);
-        return streamStartingAfter(position);
+        return Observable.of(position)
+          .delay(100)
+          .flatMap(streamStartingAfter);
       } else {
         throw error;
       }
