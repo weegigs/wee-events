@@ -1,8 +1,8 @@
 import * as path from "path";
 import * as R from "ramda";
 
-import { Event, PublishedEvent, EventListenerOptions, subscribe } from "@weegigs/events-core";
-import { Firestore, CollectionReference } from "@google-cloud/firestore";
+import { Event, PublishedEvent, subscribe } from "@weegigs/events-core";
+import { Firestore, CollectionReference, FirestoreStreamOptions } from "@google-cloud/firestore";
 import { Subscription } from "rxjs";
 import { config } from "dotenv";
 
@@ -31,7 +31,7 @@ describe("adding events", () => {
   const db = new Firestore();
   const events = db.collection("test").doc("events");
   const all = events.collection("all");
-  const store = new FirestoreEventStore(events);
+  const store = new FirestoreEventStore(all);
 
   beforeAll(async () => {
     const docs = await clear(all);
@@ -74,7 +74,7 @@ describe("listening for events", () => {
   const db = new Firestore();
   const events = db.collection("test").doc("events");
   const all = events.collection("all");
-  const store = new FirestoreEventStore(events);
+  const store = new FirestoreEventStore(all);
   store.stream();
 
   afterEach(async () => {
@@ -114,7 +114,7 @@ describe("streaming events", () => {
   const db = new Firestore();
   const events = db.collection("test").doc("events");
   const all = events.collection("all");
-  const store = new FirestoreEventStore(events);
+  const store = new FirestoreEventStore(all);
 
   const take1 = take(store, 1);
   const take2 = take(store, 3);
@@ -217,7 +217,7 @@ async function clear(collection: CollectionReference, count: number = 0): Promis
 }
 
 function take(store: FirestoreEventStore, count: number) {
-  return (subscription: (value: any) => void, options: EventListenerOptions = {}) => {
+  return (subscription: (value: any) => void, options: FirestoreStreamOptions = {}) => {
     return store
       .stream(options)
       .take(count)

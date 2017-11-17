@@ -1,2 +1,3 @@
 export * from "./event-store";
-export * from "./projection";
+export * from "./projections";
+export * from "./types";
