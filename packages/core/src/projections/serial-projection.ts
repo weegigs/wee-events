@@ -3,37 +3,46 @@ import * as R from "ramda";
 import { BehaviorSubject, Observable, Subscription } from "rxjs";
 
 import { EventStore, EventStreamOptions } from "../event-store";
-import { Projection, ProjectionFunction, ProjectionPosition } from "./types";
+import { Projection, ProjectionFunction, ProjectionListenerFunction, ProjectionPosition } from "./types";
 import { timeout } from "../utilities";
+import { PublishedEvent } from "../index";
 
 export class SerialProjection implements Projection {
-  private readonly versions = new BehaviorSubject<ProjectionPosition>(undefined);
+  private readonly latest = new BehaviorSubject<PublishedEvent | undefined>(undefined);
 
   constructor(private projection: ProjectionFunction, private options: EventStreamOptions = {}) {}
 
   attach = (store: EventStore): Subscription => {
     const stream = store.stream(this.options);
 
-    return Observable.zip(stream, this.versions).subscribe(async ([event, last]) => {
+    return Observable.zip(stream, this.latest).subscribe(async ([event, last]) => {
       const next = event.id;
-      const current: ProjectionPosition | undefined = R.propOr(undefined, "version", last);
+      const current: ProjectionPosition | undefined = R.propOr(undefined, "id", last);
       if (undefined === current || next > current) {
         try {
           await this.projection(event);
-          this.versions.next(next);
+          this.latest.next(event);
         } catch (e) {
-          this.versions.next(last);
+          this.latest.next(last);
         }
       }
     });
+  };
+
+  listen = (listener: ProjectionListenerFunction) => {
+    return this.latest
+      .distinctUntilChanged(R.equals)
+      .filter((e): e is PublishedEvent => e !== undefined)
+      .subscribe(async event => listener(event as PublishedEvent));
   };
 
   waitFor = async (position: ProjectionPosition, duration: number = 5000): Promise<ProjectionPosition> => {
     return timeout(
       duration,
       new Promise<ProjectionPosition>((resolve, reject) => {
-        this.versions
-          .distinctUntilChanged()
+        this.latest
+          .distinctUntilChanged(R.equals)
+          .map(e => (e === undefined ? e : e.id))
           .filter(current => newer(current, position))
           .take(1)
           .subscribe(p => resolve(p));
