@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@types/faker": "4.1.2",
-    "@types/jest": "21.1.6",
+    "@types/jest": "21.1.8",
     "@types/mz": "0.0.32",
     "@types/node": "8.0.53",
     "@types/ramda": "0.25.6",
@@ -33,11 +33,11 @@
     "prettier": "1.8.2",
     "rimraf": "2.6.2",
     "rxjs": "5.5.2",
-    "ts-jest": "21.2.2",
+    "ts-jest": "21.2.3",
     "tslint": "5.8.0",
     "tslint-config-prettier": "1.6.0",
     "tslint-config-standard": "7.0.0",
-    "typescript": "2.6.1"
+    "typescript": "2.6.2"
   },
   "dependencies": {
     "immutable": "4.0.0-rc.7",
