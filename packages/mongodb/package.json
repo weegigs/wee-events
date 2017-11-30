@@ -1,0 +1,74 @@
+{
+  "name": "@weegigs/events-redis",
+  "version": "0.1.0",
+  "description": "A redis event store for @weegigs/events",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "author": "Kevin O'Neill <kevin@oneill.id.au>",
+  "scripts": {
+    "build": "yarn run clean && yarn run lint && yarn run compile",
+    "clean": "rimraf lib",
+    "compile:tsc": "tsc -p .",
+    "compile": "yarn run compile:tsc",
+    "lint": "tslint -c tslint.json --project . \"src/**/*.ts\"",
+    "test:unit": "jest \"tests/*\" --env=node --coverage",
+    "test": "yarn run test:unit",
+    "watch:tsc": "tsc -p . --watch",
+    "watch:test": "jest \"tests/*\" --env=node --coverage --watch",
+    "watch": "yarn run watch:tsc & yarn run watch:test",
+    "prepublishOnly": "yarn run clean && yarn run lint && yarn run compile"
+  },
+  "devDependencies": {
+    "@google-cloud/firestore": "0.10.0",
+    "@types/dotenv": "4.0.2",
+    "@types/faker": "4.1.2",
+    "@types/jest": "21.1.8",
+    "@types/mongodb": "2.2.16",
+    "@types/mz": "0.0.32",
+    "@types/node": "8.0.53",
+    "@types/ramda": "0.25.6",
+    "@weegigs/events-core": "0.1.0",
+    "dotenv": "4.0.0",
+    "faker": "4.1.0",
+    "jest": "21.2.1",
+    "jest-cli": "21.2.1",
+    "jest-environment-node-debug": "2.0.0",
+    "prettier": "1.8.2",
+    "rimraf": "2.6.2",
+    "rxjs": "5.5.2",
+    "ts-jest": "21.2.3",
+    "tslint": "5.8.0",
+    "tslint-config-prettier": "1.6.0",
+    "tslint-config-standard": "7.0.0",
+    "typescript": "2.6.2"
+  },
+  "dependencies": {
+    "@weegigs/concurrent": "1.0.0",
+    "handy-redis": "1.1.2",
+    "mongodb": "2.2.33"
+  },
+  "peerDependencies": {
+    "@weegigs/events-core": "0.1.0",
+    "rxjs": "~5.5.2"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
+    "moduleFileExtensions": ["ts", "js", "json"],
+    "mapCoverage": true
+  },
+  "engines": {
+    "node": "8.x"
+  },
+  "files": ["lib", "package.json", "yarn.lock", "README.md", "CHANGELOG.md", "LICENCE"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevinoneill/wee-events.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
