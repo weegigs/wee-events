@@ -1,5 +1,4 @@
 import * as moment from "moment";
-import * as R from "ramda";
 
 import { Observable, Subscription } from "rxjs";
 import { monotonicFactory, decodeTime } from "ulid";
@@ -23,8 +22,7 @@ export function stampEvent(source: Event | Event[]): PublishedEvent[] {
       publishedAt,
     };
 
-    const key = (event as any).key || event.id;
-    return R.isNil(key) ? published : { ...published, key };
+    return published;
   });
 }
 

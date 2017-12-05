@@ -1,7 +1,7 @@
 import { Subscription } from "rxjs";
 
 import { subscribe, MemoryEventStore } from "../src/event-store";
-import { PublishedEvent, EventListenerOptions } from "../src";
+import { PublishedEvent } from "../src";
 
 describe("creating a memory store", () => {
   it("can be created", () => {
@@ -33,17 +33,6 @@ describe("publishing events", () => {
     expect(event.publishedAt).toBeDefined();
     expect(event.aggregateId).toEqual(testOne);
   });
-
-  it("respects explicit external ids", async () => {
-    const [id] = await store.publish({ type: "test", aggregateId: testOne, id: "a" });
-    const events = await store.snapshot(testOne);
-
-    expect(events).toHaveLength(1);
-
-    const event = events[0];
-    expect(event).toEqual(id);
-    expect(event.key).toEqual("a");
-  });
 });
 
 describe("streaming events", () => {
@@ -57,16 +46,18 @@ describe("streaming events", () => {
   beforeEach(() => {
     store = new MemoryEventStore();
     take1 = take(store, 1);
-    take2 = take(store, 3);
+    take2 = take(store, 2);
     take3 = take(store, 3);
   });
 
-  afterEach(() => {
+  afterEach(done => {
     store = null;
     if (subscription) {
       subscription.unsubscribe();
       subscription = null;
     }
+
+    done();
   });
 
   it("can be subscribed to", async () => {
