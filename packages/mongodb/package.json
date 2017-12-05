@@ -1,7 +1,7 @@
 {
-  "name": "@weegigs/events-redis",
+  "name": "@weegigs/events-mongo",
   "version": "0.1.0",
-  "description": "A redis event store for @weegigs/events",
+  "description": "Mongo event store and projections for @weegigs/events",
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -20,10 +20,10 @@
     "prepublishOnly": "yarn run clean && yarn run lint && yarn run compile"
   },
   "devDependencies": {
-    "@google-cloud/firestore": "0.10.0",
     "@types/dotenv": "4.0.2",
     "@types/faker": "4.1.2",
     "@types/jest": "21.1.8",
+    "@types/lodash": "4.14.87",
     "@types/mongodb": "2.2.16",
     "@types/mz": "0.0.32",
     "@types/node": "8.0.53",
@@ -46,6 +46,7 @@
   "dependencies": {
     "@weegigs/concurrent": "1.0.0",
     "handy-redis": "1.1.2",
+    "lodash": "4.17.4",
     "mongodb": "2.2.33"
   },
   "peerDependencies": {
@@ -57,13 +58,24 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": ["ts", "js", "json"],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ],
     "mapCoverage": true
   },
   "engines": {
     "node": "8.x"
   },
-  "files": ["lib", "package.json", "yarn.lock", "README.md", "CHANGELOG.md", "LICENCE"],
+  "files": [
+    "lib",
+    "package.json",
+    "yarn.lock",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"

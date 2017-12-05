@@ -1,11 +1,12 @@
 import { PublishedEvent, AggregateId } from "@weegigs/events-core";
 import { Collection } from "mongodb";
+import * as _ from "lodash";
 
 import { DocumentProjectionFunction, DocumentProjectionOptions } from "../types";
 
 import { MongoProjection } from "./mongo-projection";
 import { ProjectionDocument, ProjectionMetadata } from "./types";
-import { findProjectionMetadata } from "./utilities";
+import { findProjectionMetadata, aggregateFilter } from "./utilities";
 
 export class MongoDocumentProjection<T> extends MongoProjection {
   private collection: Collection<ProjectionDocument<T>>;
@@ -16,18 +17,20 @@ export class MongoDocumentProjection<T> extends MongoProjection {
     projection: DocumentProjectionFunction<T>,
     options: DocumentProjectionOptions = {}
   ) {
-    const { type, preload } = {
+    const { type, preload, merge } = {
       preload: false,
+      merge: false,
       ...options,
     } as DocumentProjectionOptions;
 
     const documentProjection = async (event: PublishedEvent): Promise<void> => {
       const { aggregateId: id } = event;
       if (type === undefined || type === id.type) {
-        const current = preload ? await this.get(id) : undefined;
+        const current = preload || merge ? await this.get(id) : undefined;
         const data = await projection(event, current);
         if (data) {
-          await this.updateProjection(event, data);
+          const content = merge === true ? _.merge(current, data) : data;
+          await this.updateProjection(event, content);
         } else {
           await this.deleteProjection(event.aggregateId);
         }
@@ -44,7 +47,7 @@ export class MongoDocumentProjection<T> extends MongoProjection {
   }
 
   private async updateProjection(event: PublishedEvent, content: T) {
-    return this.collection.update(
+    return this.collection.updateOne(
       aggregateFilter(event.aggregateId),
       { id: event.aggregateId, version: event.id, content },
       { upsert: true }
@@ -69,8 +72,4 @@ export async function createDocumentProjection<T>(
 ) {
   const metadata = await findProjectionMetadata(collection as any, name);
   return new MongoDocumentProjection<T>(collection, metadata, projection, options);
-}
-
-function aggregateFilter(id: AggregateId) {
-  return { "id.id": id.id, "id.type": id.type };
 }
