@@ -7,25 +7,23 @@ import {
   CommandResult,
   CommandHandler,
   Event,
-  createLoggingProjection,
   MemoryEventStore,
-  SerialProjection,
   success,
+  ProjectionFunction,
+  serialize,
+  LoggingProjection,
+  attach,
 } from "@weegigs/events-core";
 
-class CounterProjection extends SerialProjection {
-  count: number = 0;
-  constructor(counter: string = "default") {
-    super(event => {
-      if (event.type === "incremented" && counter === event.aggregateId.id) {
-        this.count++;
-      }
-    });
-  }
-}
+const counters: Record<string, number> = {};
 
-function createCounter(counter?: string) {
-  return new CounterProjection(counter);
+function createCounter(counter: string = "default"): ProjectionFunction {
+  return serialize(event => {
+    if (event.type === "incremented" && counter === event.aggregateId.id) {
+      const current = counters[counter] || 0;
+      counters[counter] = current + 1;
+    }
+  });
 }
 
 const INCREMENT_COMMAND = "increment";
@@ -63,9 +61,9 @@ const dispatcher = new CommandDispatcher(store, handlers);
 
 const odd = createCounter("odd");
 const even = createCounter("even");
-const logger = createLoggingProjection();
+const logger = LoggingProjection.create();
 
-[odd, even, logger].forEach(s => s.attach(store));
+[odd, even, logger].forEach(s => attach(store, s));
 
 Observable.timer(0, 701).subscribe(async count => {
   const tick = count + 1;
@@ -77,9 +75,9 @@ Observable.timer(0, 701).subscribe(async count => {
 
   result.withResult(result => {
     const version = result.version;
-    const oddcount = odd.count;
-    const evencount = even.count;
+    const oddCount = counters["odd"];
+    const evenCount = counters["even"];
 
-    console.log(`[${tick} = ${oddcount}:${evencount}] ${JSON.stringify(version)}`);
+    console.log(`[${tick} = ${oddCount}:${evenCount}] ${JSON.stringify(version)}`);
   });
 });

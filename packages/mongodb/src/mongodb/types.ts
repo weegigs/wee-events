@@ -9,4 +9,6 @@ export interface DocumentProjectionOptions extends EventStreamOptions {
   preload?: boolean;
   /** Merge projected data with existing data? Defaults to true */
   merge?: boolean;
+  /** Delete document if projection returns undefined */
+  remove?: boolean;
 }

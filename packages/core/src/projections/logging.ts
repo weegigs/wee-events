@@ -1,11 +1,31 @@
+import { config } from "../config";
 import { PublishedEvent } from "../types";
+import { ProjectionFunction, serialize } from "./";
 
-import { Projection } from "./types";
-import { createSerialProjection } from "./serial-projection";
-
-export function createLoggingProjection(): Projection {
-  return createSerialProjection((event: PublishedEvent) => {
-    const { id, publishedAt, type } = event;
-    console.log(`${publishedAt}: [${type}] ${id}`);
-  });
+export interface EventLogger {
+  (event: PublishedEvent, message?: string, namespace?: string): void;
 }
+
+const defaultLogger: EventLogger = (event, message, namespace) => {
+  const { id, publishedAt, type } = event;
+  const prefix = namespace === undefined ? "" : `${namespace}: `;
+  const suffix = message === undefined ? "" : ` - ${message}`;
+  config.logger.debug(`${prefix}[${type}] ${id} ${publishedAt}${suffix}`);
+};
+
+export const LoggingProjection = {
+  create: (logger: EventLogger = defaultLogger): ProjectionFunction => {
+    return serialize((event: PublishedEvent) => logger(event));
+  },
+  wrap: <T>(
+    name: string,
+    projection: ProjectionFunction<T>,
+    logger: EventLogger = defaultLogger
+  ): ProjectionFunction => {
+    return serialize(async (event: PublishedEvent) => {
+      logger(event, "starting projection", name);
+      await projection(event);
+      logger(event, "completed projection", name);
+    });
+  },
+};

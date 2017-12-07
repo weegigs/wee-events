@@ -13,7 +13,7 @@ export function timeout<T>(duration: number, action: Promise<T>): Promise<"timeo
 
 export function latest(events: PublishedEvent[], sorted: boolean = false): PublishedEvent | undefined {
   return sorted && events.length > 0
-    ? R.last(events) as PublishedEvent
+    ? (R.last(events) as PublishedEvent)
     : events.reduce<PublishedEvent | undefined>((result, event) => {
         return result === undefined || result.id < event.id ? event : result;
       }, undefined);

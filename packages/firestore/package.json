@@ -24,57 +24,51 @@
     "@google-cloud/firestore": "0.10.0",
     "@types/dotenv": "4.0.2",
     "@types/faker": "4.1.2",
-    "@types/jest": "21.1.6",
+    "@types/jest": "21.1.8",
     "@types/mz": "0.0.32",
-    "@types/node": "8.0.53",
-    "@types/ramda": "0.25.6",
+    "@types/node": "8.0.56",
+    "@types/ramda": "0.25.7",
+    "@types/winston": "2.3.7",
     "@weegigs/events-core": "0.1.0",
     "dotenv": "4.0.0",
     "faker": "4.1.0",
     "jest": "21.2.1",
     "jest-cli": "21.2.1",
     "jest-environment-node-debug": "2.0.0",
-    "prettier": "1.8.2",
+    "prettier": "1.9.1",
+    "ramda": "0.25.0",
     "rimraf": "2.6.2",
-    "rxjs": "5.5.2",
-    "ts-jest": "21.2.2",
+    "rxjs": "5.5.5",
+    "ts-jest": "21.2.4",
     "tslint": "5.8.0",
     "tslint-config-prettier": "1.6.0",
     "tslint-config-standard": "7.0.0",
-    "typescript": "2.6.1"
+    "typescript": "2.6.2",
+    "winston": "2.4.0"
   },
   "peerDependencies": {
     "@google-cloud/firestore": "~0.10.0",
     "@weegigs/events-core": "0.1.0",
-    "rxjs": "~5.5.2"
+    "rxjs": "^5.5.5",
+    "winston": "^2.4.0"
   },
   "jest": {
     "transform": {
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ]
+    "moduleFileExtensions": ["ts", "js", "json"]
   },
   "engines": {
     "node": "8.x"
   },
-  "files": [
-    "lib",
-    "package.json",
-    "yarn.lock",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENCE"
-  ],
+  "files": ["lib", "package.json", "yarn.lock", "README.md", "CHANGELOG.md", "LICENCE"],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "dependencies": {}
 }

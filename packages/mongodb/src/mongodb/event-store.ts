@@ -88,6 +88,8 @@ export class MongoEventStore implements EventStore {
       return () => cursor.close();
     });
 
+    // subscribe into buffer
+
     const updates = Observable.defer(() => this.events.filter(e => e.id > latest));
     return existing.concat(updates);
   }

@@ -2,7 +2,7 @@ import * as path from "path";
 import * as R from "ramda";
 
 import { Event, PublishedEvent, subscribe } from "@weegigs/events-core";
-import { Firestore, CollectionReference, FirestoreStreamOptions } from "@google-cloud/firestore";
+import { Firestore, CollectionReference } from "@google-cloud/firestore";
 import { Subscription } from "rxjs";
 import { config } from "dotenv";
 
@@ -77,8 +77,9 @@ describe("listening for events", () => {
   const store = new FirestoreEventStore(all);
   store.stream();
 
-  afterEach(async () => {
+  afterEach(async done => {
     const docs = await clear(all);
+    done();
   });
 
   it("can add an event", async () => {
@@ -117,7 +118,7 @@ describe("streaming events", () => {
   const store = new FirestoreEventStore(all);
 
   const take1 = take(store, 1);
-  const take2 = take(store, 3);
+  const take2 = take(store, 2);
   const take3 = take(store, 3);
 
   let subscription: Subscription;
