@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-mongo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Mongo event store and projections for @weegigs/events",
   "license": "MIT",
   "main": "lib/index.js",
@@ -29,7 +29,7 @@
     "@types/node": "8.0.56",
     "@types/ramda": "0.25.7",
     "@types/winston": "2.3.7",
-    "@weegigs/events-core": "0.1.0",
+    "@weegigs/events-core": "0.2.0",
     "dotenv": "4.0.0",
     "faker": "4.1.0",
     "jest": "21.2.1",
@@ -52,7 +52,7 @@
     "mongodb": "3.0.0-rc0"
   },
   "peerDependencies": {
-    "@weegigs/events-core": "0.1.0",
+    "@weegigs/events-core": "0.2.0",
     "rxjs": "^5.5.5"
   },
   "jest": {
@@ -60,13 +60,24 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": ["ts", "js", "json"],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ],
     "mapCoverage": true
   },
   "engines": {
     "node": "8.x"
   },
-  "files": ["lib", "package.json", "yarn.lock", "README.md", "CHANGELOG.md", "LICENCE"],
+  "files": [
+    "lib",
+    "package.json",
+    "yarn.lock",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
