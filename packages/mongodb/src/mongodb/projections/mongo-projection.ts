@@ -1,9 +1,10 @@
 import * as _ from "lodash";
 
-import { PublishedEvent, EventStore, ProjectionFunction, serialize } from "@weegigs/events-core";
+import { PublishedEvent, ProjectionFunction, serialize } from "@weegigs/events-core";
 import { Collection } from "mongodb";
 import { Subscription } from "rxjs";
 
+import { MongoEventStore } from "../";
 import { DocumentProjectionFunction, DocumentProjectionOptions } from "../types";
 import { config } from "../config";
 
@@ -72,7 +73,7 @@ function create<T>(
 }
 
 export async function attach<T>(
-  store: EventStore,
+  store: MongoEventStore,
   name: string,
   collection: Collection<ProjectionDocument<T>>,
   projection: DocumentProjectionFunction<T>,
