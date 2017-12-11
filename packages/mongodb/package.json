@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-mongo",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Mongo event store and projections for @weegigs/events",
   "license": "MIT",
   "main": "lib/index.js",
