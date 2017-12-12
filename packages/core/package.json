@@ -60,22 +60,12 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ]
+    "moduleFileExtensions": ["ts", "js"]
   },
   "engines": {
-    "node": "8.x"
+    "node": ">=8.9"
   },
-  "files": [
-    "lib",
-    "package.json",
-    "yarn.lock",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENCE"
-  ],
+  "files": ["lib", "package.json", "yarn.lock", "README.md", "CHANGELOG.md", "LICENCE"],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
