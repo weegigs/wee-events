@@ -56,6 +56,7 @@ function project<T>(
 }
 
 function create<T>(
+  name: string,
   collection: Collection<ProjectionDocument<T>>,
   projection: DocumentProjectionFunction<T>,
   options?: DocumentProjectionOptions
@@ -81,7 +82,7 @@ export async function attach<T>(
 ): Promise<Subscription> {
   const after = await position(name, collection);
   const subscriptionOptions = { after, ...options };
-  const mongoProjection = create(collection, projection, subscriptionOptions);
+  const mongoProjection = create(name, collection, projection, subscriptionOptions);
 
   return store.stream(subscriptionOptions).subscribe(
     event => mongoProjection(event),
