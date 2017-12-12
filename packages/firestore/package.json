@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-firestore",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Core components for the wee gigs event sourcing system",
   "license": "MIT",
   "main": "lib/index.js",
@@ -29,7 +29,7 @@
     "@types/node": "8.0.56",
     "@types/ramda": "0.25.7",
     "@types/winston": "2.3.7",
-    "@weegigs/events-core": "0.2.0",
+    "@weegigs/events-core": "0.3.0",
     "dotenv": "4.0.0",
     "faker": "4.1.0",
     "jest": "21.2.1",
@@ -48,7 +48,7 @@
   },
   "peerDependencies": {
     "@google-cloud/firestore": "~0.10.0",
-    "@weegigs/events-core": "0.2.0",
+    "@weegigs/events-core": "0.3.0",
     "rxjs": "^5.5.5",
     "winston": "^2.4.0"
   },
@@ -57,12 +57,23 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": ["ts", "js", "json"]
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ]
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": ["lib", "package.json", "yarn.lock", "README.md", "CHANGELOG.md", "LICENCE"],
+  "files": [
+    "lib",
+    "package.json",
+    "yarn.lock",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"

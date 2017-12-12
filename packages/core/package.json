@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Core components for the wee gigs event sourcing system",
   "license": "MIT",
   "main": "lib/index.js",
@@ -60,12 +60,22 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": ["ts", "js"]
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": ["lib", "package.json", "yarn.lock", "README.md", "CHANGELOG.md", "LICENCE"],
+  "files": [
+    "lib",
+    "package.json",
+    "yarn.lock",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
