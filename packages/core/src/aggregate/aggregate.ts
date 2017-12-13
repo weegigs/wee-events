@@ -2,10 +2,11 @@ import * as R from "ramda";
 
 import { Observable, Subject, BehaviorSubject } from "rxjs";
 import { OrderedMap, OrderedSet } from "immutable";
-import { success, failure, Result } from "../result";
 
+import { success, failure, Result } from "../result";
 import { Event, PublishedEvent } from "../types";
 import { EventStore } from "../event-store";
+import { config } from "../config";
 
 import {
   Command,
@@ -38,7 +39,7 @@ export class Aggregate {
       try {
         this.versions.next(await action(version || (await this.load(id))));
       } catch (error) {
-        console.error(error);
+        config.logger.error(`failed to process command`, { error });
         this.versions.next(version);
       }
     });
@@ -53,11 +54,17 @@ export class Aggregate {
           reject(Error("Internal inconsistency. Aggregate and command don't match"));
         }
 
-        const update = process(version, command, allHandlers.get(command.command, noHandlers), this.publish)
+        const update = (await process(
+          version,
+          command,
+          allHandlers.get(command.command, noHandlers),
+          this.publish
+        ))
+          .mapError(errors => errors.map<CommandError>(e => ({ ...e, version })))
           .withError(errors => resolve(failure(errors)))
-          .withResult(async result => resolve(success(await result)));
+          .withValue(result => resolve(success(result)));
 
-        return update.result !== undefined ? update.result.then(r => r.version) : version;
+        return update.value !== undefined ? update.value.version : version;
       };
 
       this.actions.next(action);
@@ -105,22 +112,27 @@ function handlersForType(handlers: CommandHandlers, type: CommandType): OrderedS
   return handlers.get(type, noHandlers);
 }
 
-function process(
+async function process(
   version: AggregateVersion,
   command: Command,
   handlers: OrderedSet<CommandHandler>,
   publish: (events: Event[]) => Promise<PublishedEvent[]>
-) {
-  return validate(version, command, handlers)
-    .flatMap(handlers => run(version, command, handlers))
-    .mapError(errors => errors.map<CommandError>(e => ({ ...e, version })))
-    .map(events => publish(events))
-    .map(async events => {
-      const published = await events;
-      const newVersion = versionFromEvents(version, published);
+): Promise<ExecuteResult> {
+  const { value: valid, error } = validate(version, command, handlers);
 
-      return { events: published, version: newVersion };
-    });
+  if (valid !== undefined) {
+    const { value: events, error } = await run(version, command, valid);
+
+    if (events !== undefined) {
+      const published = await publish(events);
+      const newVersion = versionFromEvents(version, published);
+      return success({ events: published, version: newVersion });
+    } else {
+      return failure(error || []);
+    }
+  } else {
+    return failure(error || []);
+  }
 }
 
 function validate(
@@ -137,23 +149,21 @@ function validate(
   return success(handlers);
 }
 
-function run(
+async function run(
   version: AggregateVersion,
   command: Command,
   handlers: OrderedSet<CommandHandler>,
   events: Event[] = []
-): CommandResult {
-  return handlers.reduce(
-    (result: CommandResult, handler) =>
-      result.flatMap(a => {
-        try {
-          return handler.action(version, command).map(b => a.concat(b));
-        } catch (error) {
-          return failure([{ version, error }]);
-        }
-      }),
-    success(events)
-  );
+): Promise<CommandResult> {
+  return handlers.reduce(async (current: Promise<CommandResult>, handler) => {
+    const { value } = await current;
+
+    if (value !== undefined) {
+      return (await handler.action(version, command)).map(events => value.concat(events));
+    } else {
+      return current;
+    }
+  }, Promise.resolve(success<Event<any>[], CommandError[]>(events)));
 }
 
 function versionFromEvents(current: AggregateVersion, published: PublishedEvent[]): AggregateVersion {

@@ -1,18 +1,18 @@
-export interface Result<R, E> {
-  readonly result?: R;
+export interface Result<V, E> {
+  readonly value?: V;
   readonly error?: E;
 
-  map<U>(f: (result: R) => U): Result<U, E>;
-  flatMap<U>(f: (result: R) => Result<U, E>): Result<U, E>;
+  map<U>(f: (result: V) => U): Result<U, E>;
+  flatMap<U>(f: (result: V) => Result<U, E>): Result<U, E>;
 
-  mapError<U>(f: (error: E) => U): Result<R, U>;
-  flatMapError<U>(f: (error: E) => Result<R, U>): Result<R, U>;
+  mapError<U>(f: (error: E) => U): Result<V, U>;
+  flatMapError<U>(f: (error: E) => Result<V, U>): Result<V, U>;
 
-  recover(f: (error: E) => R): Result<R, E>;
+  recover(f: (error: E) => V): Result<V, E>;
 
-  withResult(f: (result: R) => void): Result<R, E>;
-  withError(f: (error: E) => void): Result<R, E>;
-  with(success: (result: R) => void, failure: (error: E) => void): Result<R, E>;
+  withValue(f: (result: V) => void): Result<V, E>;
+  withError(f: (error: E) => void): Result<V, E>;
+  with(success: (result: V) => void, failure: (error: E) => void): Result<V, E>;
 }
 
 // // monoid, a collection of things, plus a rule for combining them according to rules
@@ -29,7 +29,7 @@ export interface Result<R, E> {
 class Success<R, E> implements Result<R, E> {
   constructor(private r: R) {}
 
-  get result(): R | undefined {
+  get value(): R | undefined {
     return this.r;
   }
 
@@ -59,10 +59,10 @@ class Success<R, E> implements Result<R, E> {
   }
 
   with(succeeded: (value: R) => void, fail: (value: E) => void): Result<R, E> {
-    return this.withResult(succeeded);
+    return this.withValue(succeeded);
   }
 
-  withResult(f: (result: R) => void): Result<R, E> {
+  withValue(f: (result: R) => void): Result<R, E> {
     f(this.r);
     return this;
   }
@@ -75,7 +75,7 @@ class Success<R, E> implements Result<R, E> {
 class Failure<R, E> implements Result<R, E> {
   constructor(private e: E) {}
 
-  get result(): R | undefined {
+  get value(): R | undefined {
     return undefined;
   }
 
@@ -111,7 +111,7 @@ class Failure<R, E> implements Result<R, E> {
     return this.withError(failed);
   }
 
-  withResult(f: (result: R) => void): Result<R, E> {
+  withValue(f: (result: R) => void): Result<R, E> {
     return this;
   }
 

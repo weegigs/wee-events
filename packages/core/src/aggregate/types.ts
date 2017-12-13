@@ -18,7 +18,7 @@ export interface Command<T = any> {
 
 export interface CommandHandler {
   command: CommandType;
-  action: <T extends Command>(aggregate: AggregateVersion, command: T) => CommandResult;
+  action: <T extends Command>(aggregate: AggregateVersion, command: T) => CommandResult | Promise<CommandResult>;
 }
 
 export interface CommandError {
