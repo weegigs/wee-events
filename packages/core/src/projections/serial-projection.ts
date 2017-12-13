@@ -5,9 +5,9 @@ import { ProjectionFunction } from "./types";
 import { PublishedEvent, AggregateId } from "../index";
 import { config } from "../config";
 
-export function serialize<T>(projection: ProjectionFunction<T>): ProjectionFunction<T> {
-  let queues: Map<string, AsyncQueue<PublishedEvent<T>>> = Map();
+let queues: Map<string, AsyncQueue<PublishedEvent<any>>> = Map();
 
+export function serialize<T>(projection: ProjectionFunction<T>): ProjectionFunction<T> {
   const worker: AsyncWorker<PublishedEvent<T>, Error> = async event => {
     await projection(event);
   };
