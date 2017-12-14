@@ -31,18 +31,20 @@ async function updatePosition(name: string, collection: Collection, position: st
 function project<T>(
   collection: MongoProjectionCollection<T>,
   projection: DocumentProjectionFunction<T>,
-  options: DocumentProjectionOptions = {}
+  options: DocumentProjectionOptions<T>
 ) {
-  const { merge, type, preload, remove } = {
+  const { events, preload, merge, remove } = {
     merge: true,
     preload: false,
     remove: false,
     ...options,
-  } as DocumentProjectionOptions;
+  } as DocumentProjectionOptions<T>;
+  const types = events !== undefined ? (_.isArray(events) ? events : [events]) : undefined;
 
   return async (event: PublishedEvent): Promise<void> => {
-    const { aggregateId: id } = event;
-    if (type === undefined || type === id.type) {
+    const { aggregateId: id, type } = event;
+
+    if (types === undefined || _.includes(types, type)) {
       const current = preload || merge ? await collection.fetch(id) : undefined;
       const data = await projection(event, current);
       if (data) {
@@ -59,11 +61,10 @@ function create<T>(
   name: string,
   collection: Collection<ProjectionDocument<T>>,
   projection: DocumentProjectionFunction<T>,
-  options?: DocumentProjectionOptions
+  options: DocumentProjectionOptions<T>
 ): ProjectionFunction<T> {
-  const projectCollection = new MongoProjectionCollection<T>(collection);
-
-  const process = project<T>(projectCollection, projection, options);
+  const mongoCollection = new MongoProjectionCollection<T>(collection);
+  const process = project<T>(mongoCollection, projection, options);
 
   return (event: PublishedEvent<T>) => {
     return serialize(async (event: PublishedEvent<T>) => {
@@ -75,22 +76,26 @@ function create<T>(
 
 export async function attach<T>(
   store: MongoEventStore,
-  name: string,
   collection: Collection<ProjectionDocument<T>>,
-  projection: DocumentProjectionFunction<T>,
-  options: DocumentProjectionOptions = {}
+  options: DocumentProjectionOptions<T>
 ): Promise<Subscription> {
-  const after = await position(name, collection);
-  const subscriptionOptions = { after, ...options };
-  const mongoProjection = create(name, collection, projection, subscriptionOptions);
+  const { projection, name, events } = options;
+  const mongoProjection = create(name, collection, projection, options);
 
-  return store.stream(subscriptionOptions).subscribe(
-    event => mongoProjection(event),
-    error => {
-      config.logger.error("event stream error", error);
-    },
-    () => {
-      config.logger.info("event stream completed");
-    }
-  ) as any;
+  const types = events !== undefined ? (_.isArray(events) ? events : [events]) : undefined;
+  const after = await position(name, collection);
+  const streamOptions = { after };
+
+  return store
+    .stream(streamOptions)
+    .filter(({ type }) => types === undefined || _.includes(types, type))
+    .subscribe(
+      event => mongoProjection(event),
+      error => {
+        config.logger.error("event stream error", error);
+      },
+      () => {
+        config.logger.info("event stream completed");
+      }
+    ) as any;
 }
