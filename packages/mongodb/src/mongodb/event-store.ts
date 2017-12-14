@@ -53,7 +53,7 @@ export class MongoEventStore implements EventStore {
   }
 
   async publish(events: Event | Event[]): Promise<PublishedEvent[]> {
-    const published = toPublished(events);
+    const published = toPublished(events).map(e => ({ _id: e.id, ...e }));
 
     await this.collection.insertMany(published);
     published.forEach(e => this.events.next(e));
