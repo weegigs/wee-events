@@ -5,14 +5,19 @@ import { ProjectionFunction } from "./types";
 import { PublishedEvent, AggregateId } from "../index";
 import { config } from "../config";
 
-let queues: Map<string, AsyncQueue<PublishedEvent<any>>> = Map();
+type Task<T> = {
+  projection: ProjectionFunction<T>;
+  event: PublishedEvent<T>;
+};
+
+let queues: Map<string, AsyncQueue<Task<any>>> = Map();
 
 export function serialize<T>(projection: ProjectionFunction<T>): ProjectionFunction<T> {
-  const worker: AsyncWorker<PublishedEvent<T>, Error> = async event => {
-    await projection(event);
+  const worker: AsyncWorker<Task<T>, Error> = async task => {
+    await task.projection(task.event);
   };
 
-  const queueForAggregate = (aggregateId: AggregateId): AsyncQueue<PublishedEvent<T>> => {
+  const queueForAggregate = (aggregateId: AggregateId): AsyncQueue<Task<T>> => {
     const { type, id } = aggregateId;
     const key = `${type}|${id}`;
     let q = queues.get(key);
@@ -31,7 +36,7 @@ export function serialize<T>(projection: ProjectionFunction<T>): ProjectionFunct
 
   return (event: PublishedEvent<T>) => {
     const jobs = queueForAggregate(event.aggregateId);
-    jobs.push(event, (error: any) => {
+    jobs.push({ projection, event }, (error: any) => {
       if (error) {
         config.logger.warn("projection failed to process event", {
           event: event.id,
