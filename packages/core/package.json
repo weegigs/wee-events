@@ -7,7 +7,7 @@
   "types": "lib/index.d.ts",
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
   "scripts": {
-    "build": "yarn run lint && yarn run compile && yarn run test",
+    "build": "yarn run lint && yarn run compile",
     "prebuild": "yarn run clean",
     "clean": "rimraf lib",
     "compile:tsc": "tsc -p .",

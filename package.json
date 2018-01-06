@@ -7,7 +7,7 @@
     "test": "lerna run test",
     "clean": "lerna run clean",
     "build": "lerna run build",
-    "release": "lerna publish --exact --cd-version=prerelease --preid=alpha --npm-tag=alpha"
+    "release": "lerna publish --exact"
   },
   "devDependencies": {
     "lerna": "2.5.1"
