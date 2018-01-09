@@ -1,3 +1,5 @@
+import { InternalInconsistencyError } from "./errors";
+
 export interface Result<V, E> {
   readonly value?: V;
   readonly error?: E;
@@ -133,7 +135,7 @@ export function valueOrThrow<T, E = Error>(result: Result<T, E>): T {
   const { value, error } = result;
 
   if (undefined === value) {
-    throw error || new Error("result produced no value or error");
+    throw error || new InternalInconsistencyError("Result had no value or error");
   }
 
   return value;
@@ -144,6 +146,6 @@ export async function promiseToResult<T>(promise: Promise<T>): Promise<Result<T,
     const value = await promise;
     return success(value);
   } catch (error) {
-    return failure(error);
+    return failure(error || new Error("Promise rejected for unspecified reason"));
   }
 }

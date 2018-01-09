@@ -7,13 +7,14 @@ import { success, failure, Result } from "../result";
 import { Event, PublishedEvent } from "../types";
 import { EventStore } from "../event-store";
 import { config } from "../config";
+import { InternalInconsistencyError } from "../errors";
 
 import {
   Command,
   CommandType,
   AggregateId,
   AggregateVersion,
-  CommandError,
+  ExecutionError,
   CommandResult,
   CommandHandler,
   ExecuteResult,
@@ -51,7 +52,7 @@ export class Aggregate {
     return new Promise<ExecuteResult>(async (resolve, reject) => {
       const action: Action = async (version: AggregateVersion) => {
         if (!R.equals(version.id, command.aggregateId)) {
-          reject(Error("Internal inconsistency. Aggregate and command don't match"));
+          reject(new InternalInconsistencyError("Aggregate and Command id's don't match"));
         }
 
         const update = (await process(
@@ -60,7 +61,6 @@ export class Aggregate {
           allHandlers.get(command.command, noHandlers),
           this.publish
         ))
-          .mapError(errors => errors.map<CommandError>(e => ({ ...e, version })))
           .withError(errors => resolve(failure(errors)))
           .withValue(result => resolve(success(result)));
 
@@ -128,10 +128,18 @@ async function process(
       const newVersion = versionFromEvents(version, published);
       return success({ events: published, version: newVersion });
     } else {
-      return failure(error || []);
+      return failure({
+        version,
+        error: error || new InternalInconsistencyError("No events or error generated"),
+      });
     }
   } else {
-    return failure(error || []);
+    return failure(
+      error || {
+        version,
+        error: new InternalInconsistencyError("No handler or error generated"),
+      }
+    );
   }
 }
 
@@ -140,10 +148,10 @@ function validate(
   command: Command,
   handlers: OrderedSet<CommandHandler>,
   events: Event[] = []
-): Result<OrderedSet<CommandHandler>, CommandError[]> {
+): Result<OrderedSet<CommandHandler>, ExecutionError> {
   if (handlers.isEmpty()) {
     const error = Error(`Aggregate ${aggregateKey(version.id)} has no handler for ${command.command}`);
-    return failure([{ version, error }]);
+    return failure({ version, error });
   }
 
   return success(handlers);
@@ -163,7 +171,7 @@ async function run(
     } else {
       return current;
     }
-  }, Promise.resolve(success<Event<any>[], CommandError[]>(events)));
+  }, Promise.resolve(success<Event<any>[], Error>(events)));
 }
 
 function versionFromEvents(current: AggregateVersion, published: PublishedEvent[]): AggregateVersion {

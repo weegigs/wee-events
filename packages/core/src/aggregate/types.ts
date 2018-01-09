@@ -21,10 +21,10 @@ export interface CommandHandler {
   action: <T extends Command>(aggregate: AggregateVersion, command: T) => CommandResult | Promise<CommandResult>;
 }
 
-export interface CommandError {
-  version: AggregateVersion;
-  error: Error;
+export interface ExecutionError {
+  readonly version: AggregateVersion;
+  readonly error: Error;
 }
 
-export type CommandResult = Result<Event[], CommandError[]>;
-export type ExecuteResult = Result<{ events: PublishedEvent[]; version: AggregateVersion }, CommandError[]>;
+export type CommandResult = Result<Event[], Error>;
+export type ExecuteResult = Result<{ events: PublishedEvent[]; version: AggregateVersion }, ExecutionError>;
