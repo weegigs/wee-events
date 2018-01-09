@@ -128,3 +128,22 @@ export function success<T, E = Error>(value: T): Result<T, E> {
 export function failure<T, E = Error>(value: E): Result<T, E> {
   return new Failure(value);
 }
+
+export function valueOrThrow<T, E = Error>(result: Result<T, E>): T {
+  const { value, error } = result;
+
+  if (undefined === value) {
+    throw error || new Error("result produced no value or error");
+  }
+
+  return value;
+}
+
+export async function promiseToResult<T>(promise: Promise<T>): Promise<Result<T, Error>> {
+  try {
+    const value = await promise;
+    return success(value);
+  } catch (error) {
+    return failure(error);
+  }
+}
