@@ -15,7 +15,7 @@ export class MongoProjectionCollection<T> {
   async updateProjection(event: PublishedEvent, content: T): Promise<UpdateWriteOpResult> {
     return this.collection.updateOne(
       aggregateFilter(event.aggregateId),
-      { id: event.aggregateId, version: event.id, content },
+      { $set: { id: event.aggregateId, version: event.id, content } },
       { upsert: true }
     );
   }

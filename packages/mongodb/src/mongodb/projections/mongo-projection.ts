@@ -25,7 +25,7 @@ async function position(name: string, collection: Collection) {
 }
 
 async function updatePosition(name: string, collection: Collection, position: string) {
-  return collection.updateOne({ name }, { name, position }, { upsert: true });
+  return collection.updateOne({ name }, { $set: { name, position } }, { upsert: true });
 }
 
 function project<T>(
