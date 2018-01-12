@@ -1,6 +1,6 @@
 import * as R from "ramda";
 
-import { connect, Db, Collection } from "mongodb";
+import { MongoClient, Db, Collection } from "mongodb";
 import { EventStore, Event, PublishedEvent, EventStreamOptions, subscribe } from "@weegigs/events-core";
 import { Subscription } from "rxjs";
 
@@ -12,11 +12,13 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 const testOne = testId("1");
 
 describe("mongo event store", () => {
+  let client: MongoClient;
   let db: Db;
   let collection: Collection;
 
   beforeAll(async done => {
-    db = await connect("mongodb://localhost:27017/test", { poolSize: 50 });
+    client = await MongoClient.connect("mongodb://localhost:27017/", { poolSize: 50 });
+    db = client.db("test");
 
     done();
   });
@@ -33,7 +35,7 @@ describe("mongo event store", () => {
   });
 
   afterAll(async done => {
-    await db.close();
+    await client.close();
     done();
   });
 

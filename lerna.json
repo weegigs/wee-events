@@ -4,9 +4,7 @@
   "npmClient": "yarn",
   "useWorkspaces": false,
   "gitVersionPrefix": "v",
-  "packages": [
-    "packages/*"
-  ],
+  "packages": ["packages/*"],
   "command": {
     "init": {
       "exact": true

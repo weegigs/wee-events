@@ -73,7 +73,7 @@ Observable.timer(0, 701).subscribe(async count => {
     console.log(`[${tick} ${JSON.stringify(errors)}`);
   });
 
-  result.withResult(result => {
+  result.withValue(result => {
     const version = result.version;
     const oddCount = counters["odd"];
     const evenCount = counters["even"];

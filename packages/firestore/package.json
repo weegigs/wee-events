@@ -7,7 +7,7 @@
   "types": "lib/index.d.ts",
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
   "scripts": {
-    "build": "yarn run lint && yarn run compile && yarn run test",
+    "build": "yarn run lint && yarn run compile",
     "prebuild": "yarn run clean",
     "clean": "rimraf lib",
     "compile:tsc": "tsc -p .",
@@ -21,26 +21,26 @@
     "prepublishOnly": "yarn run clean && yarn run lint && yarn run compile"
   },
   "devDependencies": {
-    "@google-cloud/firestore": "0.10.0",
+    "@google-cloud/firestore": "0.11.0",
     "@types/dotenv": "4.0.2",
     "@types/faker": "4.1.2",
-    "@types/jest": "21.1.8",
+    "@types/jest": "22.0.1",
     "@types/mz": "0.0.32",
-    "@types/node": "8.0.56",
-    "@types/ramda": "0.25.7",
+    "@types/node": "9.3.0",
+    "@types/ramda": "0.25.15",
     "@types/winston": "2.3.7",
     "@weegigs/events-core": "0.5.0",
     "dotenv": "4.0.0",
     "faker": "4.1.0",
-    "jest": "21.2.1",
-    "jest-cli": "21.2.1",
+    "jest": "22.0.6",
+    "jest-cli": "22.0.6",
     "jest-environment-node-debug": "2.0.0",
-    "prettier": "1.9.1",
+    "prettier": "1.10.2",
     "ramda": "0.25.0",
     "rimraf": "2.6.2",
-    "rxjs": "5.5.5",
-    "ts-jest": "21.2.4",
-    "tslint": "5.8.0",
+    "rxjs": "5.5.6",
+    "ts-jest": "22.0.1",
+    "tslint": "5.9.1",
     "tslint-config-prettier": "1.6.0",
     "tslint-config-standard": "7.0.0",
     "typescript": "2.6.2",
@@ -57,23 +57,12 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ]
+    "moduleFileExtensions": ["ts", "js", "json"]
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": [
-    "lib",
-    "package.json",
-    "yarn.lock",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENCE"
-  ],
+  "files": ["lib", "package.json", "README.md", "CHANGELOG.md", "LICENCE"],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
