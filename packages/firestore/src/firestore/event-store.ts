@@ -16,13 +16,7 @@ export interface FirestoreStreamOptions extends EventStreamOptions {
 }
 
 export class FirestoreEventStore implements EventStore {
-  constructor(
-    private all: CollectionReference,
-    private eventKey: (
-      collection: CollectionReference,
-      event: PublishedEvent
-    ) => Promise<DocumentReference> = defaultKey
-  ) {}
+  constructor(private all: CollectionReference) {}
 
   private get events() {
     return this.all.orderBy("id");
@@ -30,18 +24,9 @@ export class FirestoreEventStore implements EventStore {
 
   async publish(events: Event | Event[]): Promise<PublishedEvent[]> {
     const published = toPublished(events);
-    const collection = this.all;
-
     const batch = this.all.firestore.batch();
     const normalized = await Promise.all(
       published.map(async event => {
-        if (event.key) {
-          const doc = await collection.doc(event.key).get();
-          if (doc.exists) {
-            return asEvent(doc);
-          }
-        }
-
         batch.create(await this.documentKey(event), event);
         return event;
       })
@@ -105,13 +90,9 @@ export class FirestoreEventStore implements EventStore {
     return events(snapshot.docs);
   }
 
-  private documentKey(event: PublishedEvent) {
-    return this.eventKey(this.all, event);
+  private documentKey(event: PublishedEvent): DocumentReference {
+    return this.all.doc(event.id);
   }
-}
-
-async function defaultKey(collection: CollectionReference, event: PublishedEvent): Promise<DocumentReference> {
-  return collection.doc(event.key || event.id);
 }
 
 function events(docs: DocumentSnapshot[]): PublishedEvent[] {
