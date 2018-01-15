@@ -7,7 +7,7 @@ export type EventType = string;
 export interface Event<T = any> {
   type: EventType;
   aggregateId: AggregateId;
-  data?: T;
+  data: T;
 }
 
 export interface PublishedEvent<T = any> {
@@ -15,6 +15,5 @@ export interface PublishedEvent<T = any> {
   type: EventType;
   aggregateId: AggregateId;
   publishedAt: Date;
-  key?: string;
-  data?: T;
+  data: T;
 }
