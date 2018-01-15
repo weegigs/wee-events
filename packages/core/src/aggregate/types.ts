@@ -13,7 +13,7 @@ export type CommandType = string;
 export interface Command<T = any> {
   command: CommandType;
   aggregateId: AggregateId;
-  data?: T;
+  data: T;
 }
 
 export interface CommandHandler {
