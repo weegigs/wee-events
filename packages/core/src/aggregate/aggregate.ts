@@ -71,7 +71,7 @@ export class Aggregate {
     });
   };
 
-  publish = async (events: Event[]): Promise<PublishedEvent[]> => {
+  publish = async (events: Event | Event[]): Promise<PublishedEvent[]> => {
     return this.stream.publish(events);
   };
 
@@ -116,7 +116,7 @@ async function process(
   version: AggregateVersion,
   command: Command,
   handlers: OrderedSet<CommandHandler>,
-  publish: (events: Event[]) => Promise<PublishedEvent[]>
+  publish: (events: Event[] | Event) => Promise<PublishedEvent[]>
 ): Promise<ExecuteResult> {
   const { value: valid, error } = validate(version, command, handlers);
 
@@ -167,7 +167,8 @@ async function run(
     const { value } = await current;
 
     if (value !== undefined) {
-      return (await handler.action(version, command)).map(events => value.concat(events));
+      const values = Array.isArray(value) ? value : [value];
+      return (await handler.action(version, command)).map(events => values.concat(events));
     } else {
       return current;
     }

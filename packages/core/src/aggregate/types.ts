@@ -27,5 +27,5 @@ export interface ExecutionError {
   readonly error: Error;
 }
 
-export type CommandResult = Result<Event[], Error>;
+export type CommandResult = Result<Event[] | Event, Error>;
 export type ExecuteResult = Result<{ events: PublishedEvent[]; version: AggregateVersion }, ExecutionError>;
