@@ -27,7 +27,7 @@ export class FirestoreEventStore implements EventStore {
     const batch = this.all.firestore.batch();
     const normalized = await Promise.all(
       published.map(async event => {
-        batch.create(await this.documentKey(event), event);
+        batch.create(this.documentKey(event), event);
         return event;
       })
     );
