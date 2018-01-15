@@ -91,7 +91,7 @@ export class Aggregate {
 
   private async load(id: AggregateId): Promise<AggregateVersion> {
     const published = await this.stream.snapshot(id);
-    const version = versionFromEvents({ id, version: undefined }, published);
+    const version = versionFromEvents({ id, version: undefined, events: [] }, published);
 
     return version;
   }
@@ -174,8 +174,13 @@ async function run(
   }, Promise.resolve(success<Event<any>[], Error>(events)));
 }
 
+const eventId = (event: PublishedEvent) => event.id;
+
+const sortEvents = (events: PublishedEvent[]) => R.sortBy<PublishedEvent>(eventId, R.uniqBy(eventId, events));
+
 function versionFromEvents(current: AggregateVersion, published: PublishedEvent[]): AggregateVersion {
   const latest = R.last(published);
   const version = (latest && latest.id) || current.version;
-  return { id: current.id, version };
+  const events = sortEvents(R.concat(current.events, published));
+  return { id: current.id, version, events };
 }

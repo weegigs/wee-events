@@ -7,6 +7,7 @@ export type AggregateId = { id: string; type: AggregateType };
 export interface AggregateVersion {
   readonly id: AggregateId;
   readonly version: EventId | undefined;
+  readonly events: PublishedEvent[];
 }
 
 export type CommandType = string;
