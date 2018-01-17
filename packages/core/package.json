@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-core",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Core components for the wee gigs event sourcing system",
   "license": "MIT",
   "main": "lib/index.js",
@@ -30,8 +30,8 @@
     "@types/winston": "2.3.7",
     "concurrently": "^3.5.1",
     "faker": "4.1.0",
-    "jest": "22.0.6",
-    "jest-cli": "22.0.6",
+    "jest": "22.1.1",
+    "jest-cli": "22.1.1",
     "jest-environment-node-debug": "2.0.0",
     "prettier": "1.10.2",
     "rimraf": "2.6.2",
