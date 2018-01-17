@@ -8,10 +8,10 @@ export interface SourceEvent<T = any> {
   aggregateId: AggregateId;
 }
 
-export interface PublicationMetadata {
+export type PublicationMetadata = {
   id: EventId;
   publishedAt: Date;
-}
+};
 
 export type PublishedEvent<T extends SourceEvent = any> = T & {
   __publicationMetadata: PublicationMetadata;
