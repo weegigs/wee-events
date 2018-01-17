@@ -1,12 +1,12 @@
 import * as path from "path";
 import * as R from "ramda";
 
-import { Event, PublishedEvent, subscribe } from "@weegigs/events-core";
+import { SourceEvent, PublishedEvent, subscribe, eventId } from "@weegigs/events-core";
 import { Firestore, CollectionReference } from "@google-cloud/firestore";
 import { Subscription } from "rxjs";
 import { config } from "dotenv";
 
-import { FirestoreEventStore } from "../src/";
+import { FirestoreEventStore, FirestoreStreamOptions } from "../src/";
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
@@ -44,9 +44,9 @@ describe("adding events", () => {
   it("can add an event", async () => {
     const id = { type: "test", id: "1" };
 
-    const event: Event = { type: "test/1", aggregateId: id };
+    const event: SourceEvent = { type: "test/1", aggregateId: id };
     const published = await store.publish(event);
-    expect(published[0].id).toBeDefined();
+    expect(eventId(published[0])).toBeDefined();
 
     const snapshot = await store.snapshot(id);
     expect(snapshot).toHaveLength(1);
@@ -56,7 +56,7 @@ describe("adding events", () => {
   it("can add a batch of events", async () => {
     const id = { type: "test", id: "1" };
 
-    const events: Event[] = R.range(0, 10).map(n => ({ type: `test/${n}`, aggregateId: id }));
+    const events: SourceEvent[] = R.range(0, 10).map(n => ({ type: `test/${n}`, aggregateId: id }));
     const published = await store.publish(events);
     expect(published).toHaveLength(10);
 
@@ -64,7 +64,7 @@ describe("adding events", () => {
     expect(snapshot).toHaveLength(10);
     expect(snapshot[0].aggregateId).toEqual(id);
 
-    const sorted = snapshot.sort((a, b) => a.id.localeCompare(b.id));
+    const sorted = snapshot.sort((a, b) => eventId(a).localeCompare(eventId(b)));
 
     expect(snapshot).toEqual(sorted);
   });
@@ -85,9 +85,9 @@ describe("listening for events", () => {
   it("can add an event", async () => {
     const id = { type: "test", id: "1" };
 
-    const event: Event = { type: "test/1", aggregateId: id };
+    const event: SourceEvent = { type: "test/1", aggregateId: id };
     const published = await store.publish(event);
-    expect(published[0].id).toBeDefined();
+    expect(eventId(published[0])).toBeDefined();
 
     const snapshot = await store.snapshot(id);
     expect(snapshot).toHaveLength(1);
@@ -97,7 +97,7 @@ describe("listening for events", () => {
   it("can add a batch of events", async () => {
     const id = { type: "test", id: "1" };
 
-    const events: Event[] = R.range(0, 10).map(n => ({ type: `test/${n}`, aggregateId: id }));
+    const events: SourceEvent[] = R.range(0, 10).map(n => ({ type: `test/${n}`, aggregateId: id }));
     const published = await store.publish(events);
     expect(published).toHaveLength(10);
 
@@ -105,7 +105,7 @@ describe("listening for events", () => {
     expect(snapshot).toHaveLength(10);
     expect(snapshot[0].aggregateId).toEqual(id);
 
-    const sorted = snapshot.sort((a, b) => a.id.localeCompare(b.id));
+    const sorted = snapshot.sort((a, b) => eventId(a).localeCompare(eventId(b)));
 
     expect(snapshot).toEqual(sorted);
   });
@@ -188,7 +188,7 @@ describe("streaming events", () => {
     const [after] = await store.publish({ type: "test", aggregateId: testId("2") });
 
     const second: Promise<PublishedEvent> = new Promise((resolve, reject) => {
-      subscription = subscribe(store, async e => resolve(e), { after: before.id });
+      subscription = subscribe(store, async e => resolve(e), { after: eventId(before) });
     });
 
     const event = await second;

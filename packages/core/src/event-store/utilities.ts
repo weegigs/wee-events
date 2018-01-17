@@ -3,23 +3,26 @@ import * as moment from "moment";
 import { Observable, Subscription } from "rxjs";
 import { monotonicFactory, decodeTime } from "ulid";
 
-import { Event, PublishedEvent } from "../types";
+import { eventId } from "../utilities";
+import { SourceEvent, PublishedEvent } from "../types";
 import { EventStore, EventStreamOptions, EventListener } from "../event-store";
 
 const ulid = monotonicFactory();
 
-export function stampEvent(source: Event | Event[]): PublishedEvent[] {
+export function stampEvent(source: SourceEvent<any> | SourceEvent<any>[]): PublishedEvent<any>[] {
   const now = moment.utc();
   const timestamp = now.valueOf();
   const publishedAt = now.toDate();
 
   const events = Array.isArray(source) ? source : [source];
 
-  return events.map((event: Event, index) => {
+  return events.map((event: SourceEvent, index) => {
     const published: PublishedEvent = {
+      __publicationMetadata: {
+        id: ulid(timestamp),
+        publishedAt,
+      },
       ...event,
-      id: ulid(timestamp),
-      publishedAt,
     };
 
     return published;
@@ -27,7 +30,7 @@ export function stampEvent(source: Event | Event[]): PublishedEvent[] {
 }
 
 export function eventTimestamp(event: PublishedEvent): number {
-  return decodeTime(event.id);
+  return decodeTime(eventId(event));
 }
 
 const FLUSH_INTERVAL = 15 * 60 * 1000; // 15 minutes

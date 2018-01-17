@@ -1,9 +1,9 @@
 import { Observable } from "rxjs";
 
-import { EventId, Event, PublishedEvent } from "../types";
+import { EventId, SourceEvent, PublishedEvent } from "../types";
 import { AggregateId } from "../aggregate";
 
-export type EventListener = (event: PublishedEvent) => Promise<void>;
+export type EventListener = <E extends SourceEvent = any>(event: PublishedEvent<E>) => Promise<void>;
 
 export interface EventStreamOptions {
   after?: EventId;
@@ -14,7 +14,7 @@ export interface EventSnapshotOptions {
 }
 
 export interface EventStore {
-  publish(events: Event | Event[]): Promise<PublishedEvent[]>;
-  stream(options?: EventStreamOptions): Observable<PublishedEvent>;
-  snapshot(aggregateId: AggregateId, options?: EventSnapshotOptions): Promise<PublishedEvent[]>;
+  publish(events: SourceEvent<any> | SourceEvent<any>[]): Promise<PublishedEvent<any>[]>;
+  stream(options?: EventStreamOptions): Observable<PublishedEvent<any>>;
+  snapshot(aggregateId: AggregateId, options?: EventSnapshotOptions): Promise<PublishedEvent<any>[]>;
 }

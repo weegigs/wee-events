@@ -3,8 +3,9 @@ import * as R from "ramda";
 import { Observable, Subject, BehaviorSubject } from "rxjs";
 import { OrderedMap, OrderedSet } from "immutable";
 
+import { eventId } from "../utilities";
 import { success, failure, Result } from "../result";
-import { Event, PublishedEvent } from "../types";
+import { SourceEvent, PublishedEvent } from "../types";
 import { EventStore } from "../event-store";
 import { config } from "../config";
 import { InternalInconsistencyError } from "../errors";
@@ -71,7 +72,7 @@ export class Aggregate {
     });
   };
 
-  publish = async (events: Event | Event[]): Promise<PublishedEvent[]> => {
+  publish = async (events: SourceEvent | SourceEvent[]): Promise<PublishedEvent[]> => {
     return this.stream.publish(events);
   };
 
@@ -116,7 +117,7 @@ async function process(
   version: AggregateVersion,
   command: Command,
   handlers: OrderedSet<CommandHandler>,
-  publish: (events: Event[] | Event) => Promise<PublishedEvent[]>
+  publish: (events: SourceEvent[] | SourceEvent) => Promise<PublishedEvent[]>
 ): Promise<ExecuteResult> {
   const { value: valid, error } = validate(version, command, handlers);
 
@@ -147,7 +148,7 @@ function validate(
   version: AggregateVersion,
   command: Command,
   handlers: OrderedSet<CommandHandler>,
-  events: Event[] = []
+  events: SourceEvent[] = []
 ): Result<OrderedSet<CommandHandler>, ExecutionError> {
   if (handlers.isEmpty()) {
     const error = Error(`Aggregate ${aggregateKey(version.id)} has no handler for ${command.command}`);
@@ -161,7 +162,7 @@ async function run(
   version: AggregateVersion,
   command: Command,
   handlers: OrderedSet<CommandHandler>,
-  events: Event[] = []
+  events: SourceEvent[] = []
 ): Promise<CommandResult> {
   return handlers.reduce(async (current: Promise<CommandResult>, handler) => {
     const { value } = await current;
@@ -172,16 +173,14 @@ async function run(
     } else {
       return current;
     }
-  }, Promise.resolve(success<Event<any>[], Error>(events)));
+  }, Promise.resolve(success<SourceEvent<any>[], Error>(events)));
 }
-
-const eventId = (event: PublishedEvent) => event.id;
 
 const sortEvents = (events: PublishedEvent[]) => R.sortBy<PublishedEvent>(eventId, R.uniqBy(eventId, events));
 
 function versionFromEvents(current: AggregateVersion, published: PublishedEvent[]): AggregateVersion {
   const latest = R.last(published);
-  const version = (latest && latest.id) || current.version;
+  const version = (latest && eventId(latest)) || current.version;
   const events = sortEvents(R.concat(current.events, published));
   return { id: current.id, version, events };
 }

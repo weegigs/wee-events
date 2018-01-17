@@ -1,7 +1,15 @@
 import * as R from "ramda";
 
 import { MongoClient, Db, Collection } from "mongodb";
-import { EventStore, Event, PublishedEvent, EventStreamOptions, subscribe } from "@weegigs/events-core";
+import {
+  SourceEvent,
+  EventStore,
+  EventId,
+  PublishedEvent,
+  EventStreamOptions,
+  subscribe,
+  eventId,
+} from "@weegigs/events-core";
 import { Subscription } from "rxjs";
 
 import { MongoEventStore } from "../src";
@@ -63,9 +71,9 @@ describe("mongo event store", () => {
 
       const id = { type: "test", id: "1" };
 
-      const event: Event = { type: "test/1", aggregateId: id };
+      const event: SourceEvent = { type: "test/1", aggregateId: id };
       const published = await store.publish(event);
-      expect(published[0].id).toBeDefined();
+      expect(eventId(published[0])).toBeDefined();
 
       const snapshot = await store.snapshot(id);
       expect(snapshot).toHaveLength(1);
@@ -77,7 +85,7 @@ describe("mongo event store", () => {
 
       const id = { type: "test", id: "1" };
 
-      const events: Event[] = R.range(0, 10).map(n => ({ type: `test/${n}`, aggregateId: id }));
+      const events: SourceEvent[] = R.range(0, 10).map(n => ({ type: `test/${n}`, aggregateId: id }));
       const published = await store.publish(events);
       expect(published).toHaveLength(10);
 
@@ -85,7 +93,7 @@ describe("mongo event store", () => {
       expect(snapshot).toHaveLength(10);
       expect(snapshot[0].aggregateId).toEqual(id);
 
-      const sorted = snapshot.sort((a, b) => a.id.localeCompare(b.id));
+      const sorted = snapshot.sort((a, b) => eventId(a).localeCompare(eventId(b)));
 
       expect(snapshot).toEqual(sorted);
     });
@@ -95,15 +103,15 @@ describe("mongo event store", () => {
 
       const id = { type: "test", id: "1" };
 
-      const events: Event[] = R.range(0, 10).map(n => ({ type: `test/${n}`, aggregateId: id }));
+      const events: SourceEvent[] = R.range(0, 10).map(n => ({ type: `test/${n}`, aggregateId: id }));
       const published = await store.publish(events);
       expect(published).toHaveLength(10);
 
-      const snapshot = await store.snapshot(id, { after: published[4].id });
+      const snapshot = await store.snapshot(id, { after: eventId(published[4]) });
       expect(snapshot).toHaveLength(5);
-      expect(snapshot[0].id).toEqual(published[5].id);
+      expect(eventId(snapshot[0])).toEqual(eventId(published[5]));
 
-      const sorted = snapshot.sort((a, b) => a.id.localeCompare(b.id));
+      const sorted = snapshot.sort((a, b) => eventId(a).localeCompare(eventId(b)));
 
       expect(snapshot).toEqual(sorted);
     });
@@ -186,7 +194,7 @@ describe("mongo event store", () => {
       const [after] = await store.publish({ type: "test", aggregateId: testId("2") });
 
       const second: Promise<PublishedEvent> = new Promise((resolve, reject) => {
-        subscription = subscribe(store, async e => resolve(e), { after: before.id });
+        subscription = subscribe(store, async e => resolve(e), { after: eventId(before) });
       });
 
       const event = await second;

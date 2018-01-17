@@ -2,7 +2,8 @@ import * as R from "ramda";
 
 import { ReplaySubject, Observable } from "rxjs";
 
-import { Event, PublishedEvent } from "../types";
+import { eventId } from "../utilities";
+import { SourceEvent, PublishedEvent } from "../types";
 import { AggregateId } from "../aggregate";
 
 import { EventStore, EventStreamOptions, EventSnapshotOptions } from "./types";
@@ -16,7 +17,7 @@ export class MemoryEventStore implements EventStore {
     this.updates = new ReplaySubject<PublishedEvent>();
   }
 
-  async publish(events: Event[] | Event): Promise<PublishedEvent[]> {
+  async publish(events: SourceEvent[] | SourceEvent): Promise<PublishedEvent[]> {
     const published = stampEvent(events);
 
     this.events = this.events.concat(published);
@@ -29,7 +30,7 @@ export class MemoryEventStore implements EventStore {
     const { after } = options;
 
     const events = this.events.filter(e => R.equals(e.aggregateId, aggregateId));
-    return after ? events.filter(e => e.id > after) : events;
+    return after ? events.filter(e => eventId(e) > after) : events;
   }
 
   stream(options: EventStreamOptions = {}): Observable<PublishedEvent> {
@@ -37,7 +38,7 @@ export class MemoryEventStore implements EventStore {
     const { after } = options;
 
     if (after) {
-      observable = observable.filter(e => e.id > after);
+      observable = observable.filter(e => eventId(e) > after);
     }
 
     return observable as any;

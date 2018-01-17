@@ -1,4 +1,4 @@
-import { AggregateId, PublishedEvent } from "@weegigs/events-core";
+import { AggregateId, PublishedEvent, eventId } from "@weegigs/events-core";
 import { Collection, DeleteWriteOpResultObject, UpdateWriteOpResult } from "mongodb";
 
 import { ProjectionDocument } from "./types";
@@ -12,10 +12,10 @@ export class MongoProjectionCollection<T> {
     return projection === null ? undefined : projection.content;
   }
 
-  async updateProjection(event: PublishedEvent, content: T): Promise<UpdateWriteOpResult> {
+  async updateProjection(event: PublishedEvent<any>, content: T): Promise<UpdateWriteOpResult> {
     return this.collection.updateOne(
       aggregateFilter(event.aggregateId),
-      { $set: { id: event.aggregateId, version: event.id, content } },
+      { $set: { id: event.aggregateId, version: eventId(event), content } },
       { upsert: true }
     );
   }

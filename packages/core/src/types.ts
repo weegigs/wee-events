@@ -2,18 +2,17 @@ import { AggregateId } from "./aggregate";
 
 /** Universally Unique Lexicographically Sortable Identifier */
 export type EventId = string;
-export type EventType = string;
 
-export interface Event<T = any> {
-  type: EventType;
+export interface SourceEvent<T = any> {
+  type: T;
   aggregateId: AggregateId;
-  data: T;
 }
 
-export interface PublishedEvent<T = any> {
+export interface PublicationMetadata {
   id: EventId;
-  type: EventType;
-  aggregateId: AggregateId;
   publishedAt: Date;
-  data: T;
 }
+
+export type PublishedEvent<T extends SourceEvent = any> = T & {
+  __publicationMetadata: PublicationMetadata;
+};

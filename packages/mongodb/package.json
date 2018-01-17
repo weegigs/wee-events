@@ -30,6 +30,7 @@
     "@types/ramda": "0.25.15",
     "@types/winston": "2.3.7",
     "@weegigs/events-core": "0.6.1",
+    "concurrently": "^3.5.1",
     "dotenv": "4.0.0",
     "faker": "4.1.0",
     "jest": "22.0.6",

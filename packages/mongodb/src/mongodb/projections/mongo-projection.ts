@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 
-import { PublishedEvent, ProjectionFunction, serialize } from "@weegigs/events-core";
+import { SourceEvent, PublishedEvent, ProjectionFunction, serialize, eventId } from "@weegigs/events-core";
 import { Collection } from "mongodb";
 import { Subscription } from "rxjs";
 
@@ -9,7 +9,7 @@ import { DocumentProjectionFunction, DocumentProjectionOptions } from "../types"
 import { config } from "../config";
 
 import { MongoProjectionCollection } from "./mongo-projection-collection";
-import { ProjectionDocument, ProjectionMetadata } from "./types";
+import { ProjectionMetadata } from "./types";
 
 async function projectionMetadata(
   name: string,
@@ -28,10 +28,10 @@ async function updatePosition(name: string, collection: Collection, position: st
   return collection.updateOne({ name }, { $set: { name, position } }, { upsert: true });
 }
 
-function project<T>(
+function project<T, E extends SourceEvent = SourceEvent>(
   collection: MongoProjectionCollection<T>,
-  projection: DocumentProjectionFunction<T>,
-  options: DocumentProjectionOptions<T>
+  projection: DocumentProjectionFunction<T, E>,
+  options: DocumentProjectionOptions<T, E>
 ) {
   const { events, preload, merge, remove } = {
     merge: true,
@@ -41,7 +41,7 @@ function project<T>(
   } as DocumentProjectionOptions<T>;
   const types = events !== undefined ? (_.isArray(events) ? events : [events]) : undefined;
 
-  return async (event: PublishedEvent): Promise<void> => {
+  return async (event: PublishedEvent<E>): Promise<void> => {
     const { aggregateId: id, type } = event;
 
     if (types === undefined || _.includes(types, type)) {
@@ -57,27 +57,27 @@ function project<T>(
   };
 }
 
-function create<T>(
+function create<E extends SourceEvent = any>(
   name: string,
-  collection: Collection<ProjectionDocument<T>>,
-  projection: DocumentProjectionFunction<T>,
-  options: DocumentProjectionOptions<T>
-): ProjectionFunction<T> {
-  const mongoCollection = new MongoProjectionCollection<T>(collection);
-  const process = project<T>(mongoCollection, projection, options);
+  collection: Collection,
+  projection: DocumentProjectionFunction<any, any>,
+  options: DocumentProjectionOptions<any>
+): ProjectionFunction<E> {
+  const mongoCollection = new MongoProjectionCollection<any>(collection);
+  const process = project(mongoCollection, projection, options);
 
-  return (event: PublishedEvent<T>) => {
-    return serialize(async (event: PublishedEvent<T>) => {
+  return (event: PublishedEvent<E>) => {
+    return serialize(async (event: PublishedEvent<E>) => {
       await process(event);
-      await updatePosition(name, collection, event.id);
+      await updatePosition(name, collection, eventId(event));
     })(event);
   };
 }
 
-export async function attach<T>(
+export async function attach(
   store: MongoEventStore,
-  collection: Collection<ProjectionDocument<T>>,
-  options: DocumentProjectionOptions<T>
+  collection: Collection,
+  options: DocumentProjectionOptions<any>
 ): Promise<Subscription> {
   const { projection, name, events } = options;
   const mongoProjection = create(name, collection, projection, options);

@@ -1,4 +1,4 @@
-import { Event, EventId, PublishedEvent } from "../types";
+import { SourceEvent, EventId, PublishedEvent } from "../types";
 import { Result } from "../result";
 
 export type AggregateType = string;
@@ -27,5 +27,8 @@ export interface ExecutionError {
   readonly error: Error;
 }
 
-export type CommandResult = Result<Event[] | Event, Error>;
-export type ExecuteResult = Result<{ events: PublishedEvent[]; version: AggregateVersion }, ExecutionError>;
+export type CommandResult<T = any> = Result<SourceEvent<T>[] | SourceEvent<T>, Error>;
+export type ExecuteResult<E extends SourceEvent = any> = Result<
+  { events: PublishedEvent<E>[]; version: AggregateVersion },
+  ExecutionError
+>;

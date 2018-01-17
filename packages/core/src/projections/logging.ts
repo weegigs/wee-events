@@ -1,5 +1,7 @@
 import { config } from "../config";
-import { PublishedEvent } from "../types";
+import { SourceEvent, PublishedEvent } from "../types";
+import { eventMetadata } from "../utilities";
+
 import { ProjectionFunction, serialize } from "./";
 
 export interface EventLogger {
@@ -7,19 +9,20 @@ export interface EventLogger {
 }
 
 const defaultLogger: EventLogger = (event, message, namespace) => {
-  const { id, publishedAt, type } = event;
+  const { type } = event;
+  const { id, publishedAt } = eventMetadata(event);
   const prefix = namespace === undefined ? "" : `${namespace}: `;
   const suffix = message === undefined ? "" : ` - ${message}`;
   config.logger.debug(`${prefix}[${type}] ${id} ${publishedAt}${suffix}`);
 };
 
 export const LoggingProjection = {
-  create: (logger: EventLogger = defaultLogger): ProjectionFunction => {
+  create: (logger: EventLogger = defaultLogger): ProjectionFunction<SourceEvent> => {
     return serialize((event: PublishedEvent) => logger(event));
   },
-  wrap: <T>(
+  wrap: (
     name: string,
-    projection: ProjectionFunction<T>,
+    projection: ProjectionFunction,
     logger: EventLogger = defaultLogger
   ): ProjectionFunction => {
     return serialize(async (event: PublishedEvent) => {

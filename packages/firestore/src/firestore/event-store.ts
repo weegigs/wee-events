@@ -2,13 +2,14 @@ import { CollectionReference, DocumentSnapshot, DocumentReference } from "@googl
 import { Observable, Subscriber } from "rxjs";
 
 import {
-  Event,
+  SourceEvent,
   PublishedEvent,
   AggregateId,
   EventStore,
   EventStreamOptions,
   EventSnapshotOptions,
   stampEvent as toPublished,
+  eventId,
 } from "@weegigs/events-core";
 
 export interface FirestoreStreamOptions extends EventStreamOptions {
@@ -19,10 +20,10 @@ export class FirestoreEventStore implements EventStore {
   constructor(private all: CollectionReference) {}
 
   private get events() {
-    return this.all.orderBy("id");
+    return this.all.orderBy("__publicationMetadata.id");
   }
 
-  async publish(events: Event | Event[]): Promise<PublishedEvent[]> {
+  async publish(events: SourceEvent | SourceEvent[]): Promise<PublishedEvent[]> {
     const published = toPublished(events);
     const batch = this.all.firestore.batch();
     const normalized = await Promise.all(
@@ -37,12 +38,12 @@ export class FirestoreEventStore implements EventStore {
     return normalized;
   }
 
-  stream(options: FirestoreStreamOptions = {}): Observable<PublishedEvent> {
+  stream<E extends SourceEvent = any>(options: FirestoreStreamOptions = {}): Observable<PublishedEvent<E>> {
     const { after, reconnect } = { reconnect: true, ...options } as FirestoreStreamOptions;
 
     let position = after;
-    const streamStartingAfter: (startAfter?: string) => Observable<PublishedEvent> = (startAfter?: string) =>
-      Observable.create((subscriber: Subscriber<PublishedEvent>) => {
+    const streamStartingAfter: (startAfter?: string) => Observable<PublishedEvent<E>> = (startAfter?: string) =>
+      Observable.create((subscriber: Subscriber<PublishedEvent<E>>) => {
         let query = this.events;
         if (startAfter) {
           query = query.startAfter(startAfter);
@@ -55,7 +56,7 @@ export class FirestoreEventStore implements EventStore {
               .map(change => asEvent(change.doc))
               .forEach(event => {
                 subscriber.next(event);
-                position = event.id;
+                position = eventId(event);
               });
           },
           error => subscriber.error(error)
@@ -81,7 +82,7 @@ export class FirestoreEventStore implements EventStore {
     options?: EventSnapshotOptions | undefined
   ): Promise<PublishedEvent[]> {
     const query = this.all
-      .orderBy("id")
+      .orderBy("__publicationMetadata.id")
       .where("aggregateId.id", "==", aggregateId.id)
       .where("aggregateId.type", "==", aggregateId.type);
 
@@ -91,14 +92,14 @@ export class FirestoreEventStore implements EventStore {
   }
 
   private documentKey(event: PublishedEvent): DocumentReference {
-    return this.all.doc(event.id);
+    return this.all.doc(eventId(event));
   }
 }
 
-function events(docs: DocumentSnapshot[]): PublishedEvent[] {
+function events(docs: DocumentSnapshot[]): PublishedEvent<any>[] {
   return docs.map(asEvent);
 }
 
-function asEvent(doc: DocumentSnapshot): PublishedEvent {
-  return doc.data() as PublishedEvent;
+function asEvent<E extends SourceEvent = any>(doc: DocumentSnapshot): PublishedEvent<E> {
+  return doc.data() as PublishedEvent<E>;
 }

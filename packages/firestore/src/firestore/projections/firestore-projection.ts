@@ -1,5 +1,12 @@
 import { DocumentReference, CollectionReference, DocumentData } from "@google-cloud/firestore";
-import { ProjectionFunction, PublishedEvent, serialize, AggregateId } from "@weegigs/events-core";
+import {
+  SourceEvent,
+  ProjectionFunction,
+  PublishedEvent,
+  serialize,
+  AggregateId,
+  eventId,
+} from "@weegigs/events-core";
 import { Subscription } from "rxjs";
 
 import { DocumentProjectionOptions, DocumentProjectionFunction } from "../types";
@@ -28,9 +35,9 @@ async function load<T extends Record<string, any>>(
   }
 }
 
-const project = <T>(
+const project = <E extends SourceEvent = any>(
   document: DocumentReference,
-  projection: DocumentProjectionFunction<T>,
+  projection: DocumentProjectionFunction<E>,
   options: DocumentProjectionOptions = {}
 ) => {
   const { merge, type, preload, remove } = {
@@ -42,7 +49,7 @@ const project = <T>(
 
   const collection = document.collection("documents");
 
-  return async (event: PublishedEvent): Promise<void> => {
+  return async (event: PublishedEvent<E>): Promise<void> => {
     const { aggregateId: id } = event;
     if (type === undefined || type === id.type) {
       const current = preload ? await load<DocumentData>(collection, id) : undefined;
@@ -57,30 +64,30 @@ const project = <T>(
   };
 };
 
-function create<T>(
+function create<E extends SourceEvent = any>(
   document: DocumentReference,
-  projection: DocumentProjectionFunction<T>,
+  projection: DocumentProjectionFunction<E>,
   options: DocumentProjectionOptions = {}
-): ProjectionFunction<T> {
-  const process = project(document, projection, options);
+): ProjectionFunction<E> {
+  const process = project<E>(document, projection, options);
 
-  return (event: PublishedEvent<T>) => {
-    return serialize(async (event: PublishedEvent<T>) => {
+  return (event: PublishedEvent<E>) => {
+    return serialize<E>(async event => {
       await process(event);
-      await document.set({ position: event.id }, { merge: true });
+      await document.set({ position: eventId(event) }, { merge: true });
     })(event);
   };
 }
 
-export async function attach<T>(
+export async function attach<E extends SourceEvent = any>(
   store: FirestoreEventStore,
   document: DocumentReference,
-  projection: DocumentProjectionFunction<T>,
+  projection: DocumentProjectionFunction<E>,
   options: DocumentProjectionOptions = {}
 ): Promise<Subscription> {
   const after = await position(document);
   const subscriptionOptions = { after, ...options };
-  const firestoreProjection = create(document, projection, subscriptionOptions);
+  const firestoreProjection = create<E>(document, projection, subscriptionOptions);
 
   return store.stream(subscriptionOptions).subscribe(
     event => firestoreProjection(event),

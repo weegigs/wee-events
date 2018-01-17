@@ -1,8 +1,8 @@
-import { PublishedEvent, EventStreamOptions } from "@weegigs/events-core";
+import { SourceEvent, PublishedEvent, EventStreamOptions } from "@weegigs/events-core";
 import { DocumentData } from "@google-cloud/firestore";
 
-export type DocumentProjectionFunction<T> = (
-  event: PublishedEvent<T>,
+export type DocumentProjectionFunction<E extends SourceEvent = SourceEvent> = (
+  event: PublishedEvent<E>,
   current?: DocumentData
 ) => Promise<DocumentData | undefined>;
 
