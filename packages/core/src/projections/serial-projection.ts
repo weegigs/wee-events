@@ -3,6 +3,7 @@ import { Map } from "immutable";
 
 import { config } from "../config";
 import { SourceEvent } from "../types";
+import { eventId } from "../utilities";
 import { ProjectionFunction } from "./types";
 import { PublishedEvent, AggregateId } from "../index";
 
@@ -15,7 +16,18 @@ let queues: Map<string, AsyncQueue<Task>> = Map();
 
 export function serialize<E extends SourceEvent>(projection: ProjectionFunction<E>): ProjectionFunction<E> {
   const worker: AsyncWorker<Task, Error> = async task => {
-    await task.projection(task.event);
+    const { event, projection } = task;
+    try {
+      await projection(event);
+    } catch (error) {
+      config.logger.error("projection failed to process event", {
+        event: {
+          id: eventId(event),
+          type: event.type,
+        },
+        error,
+      });
+    }
   };
 
   const queueForAggregate = (aggregateId: AggregateId): AsyncQueue<Task> => {
@@ -36,14 +48,6 @@ export function serialize<E extends SourceEvent>(projection: ProjectionFunction<
   };
 
   return event => {
-    const jobs = queueForAggregate(event.aggregateId);
-    jobs.push({ projection, event }, (error: any) => {
-      if (error) {
-        config.logger.warn("projection failed to process event", {
-          event,
-          error,
-        });
-      }
-    });
+    queueForAggregate(event.aggregateId).push({ projection, event });
   };
 }
