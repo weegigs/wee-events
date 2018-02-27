@@ -1,5 +1,5 @@
 import { Observable, Subject, Observer } from "rxjs";
-import { Collection, IndexOptions, MongoError } from "mongodb";
+import { Collection, MongoError } from "mongodb";
 
 import {
   SourceEvent,
@@ -11,6 +11,8 @@ import {
   stampEvent as toPublished,
   eventId,
 } from "@weegigs/events-core";
+
+import { createIndex } from "./utilities";
 
 async function createIndexes(collection: Collection) {
   const ids = createIndex(
@@ -30,17 +32,6 @@ async function createIndexes(collection: Collection) {
   );
 
   return Promise.all([ids, aggregates]);
-}
-
-async function createIndex(
-  name: string,
-  fields: Record<string, 1 | -1>,
-  options: IndexOptions,
-  collection: Collection
-) {
-  if (!await collection.indexExists(name)) {
-    await collection.createIndex(fields, { ...options, name });
-  }
 }
 
 export class MongoEventStore implements EventStore {
