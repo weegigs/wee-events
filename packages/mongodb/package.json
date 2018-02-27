@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-mongo",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Mongo event store and projections for @weegigs/events",
   "license": "MIT",
   "main": "lib/index.js",
@@ -61,13 +61,23 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": ["ts", "js", "json"],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ],
     "mapCoverage": true
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": ["lib", "package.json", "README.md", "CHANGELOG.md", "LICENCE"],
+  "files": [
+    "lib",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
