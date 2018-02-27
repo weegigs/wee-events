@@ -10,7 +10,7 @@
     "release": "lerna publish --exact"
   },
   "devDependencies": {
-    "lerna": "2.5.1"
+    "lerna": "2.9.0"
   },
   "version": "1.0.0",
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
