@@ -17,17 +17,17 @@ export function combineReducers<S, E extends SourceEvent = SourceEvent>(
 ): Reducer<S, E> {
   const ordered = OrderedMap(reducers);
 
-  return (state: S, event: PublishedEvent<E>) => {
-    return ordered.reduce((state, reducer, key) => {
+  return async (state: S, event: PublishedEvent<E>) => {
+    return ordered.reduce(async (state, reducer, key) => {
       if (reducer === undefined || key === undefined) {
         throw new InternalInconsistencyError("Inconsistency found in combined reducer");
       }
 
       try {
-        return reducer(state, event);
+        return reducer(await state, event);
       } catch (error) {
         throw new ReducerError(key, error);
       }
-    }, state);
+    }, Promise.resolve(state));
   };
 }
