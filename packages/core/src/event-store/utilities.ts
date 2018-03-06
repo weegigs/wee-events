@@ -41,6 +41,6 @@ export function subscribe(
 ): Subscription {
   return store
     .stream(options)
-    .distinct((e: any) => e.jey || e.id, Observable.timer(FLUSH_INTERVAL, FLUSH_INTERVAL))
+    .distinct((e: PublishedEvent) => eventId(e), Observable.timer(FLUSH_INTERVAL, FLUSH_INTERVAL))
     .subscribe(subscriber);
 }
