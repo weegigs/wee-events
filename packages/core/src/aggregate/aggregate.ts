@@ -15,7 +15,6 @@ import {
   CommandType,
   AggregateId,
   AggregateVersion,
-  ExecutionError,
   CommandResult,
   CommandHandler,
   ExecuteResult,
@@ -129,18 +128,10 @@ async function process(
       const newVersion = versionFromEvents(version, published);
       return success({ events: published, version: newVersion });
     } else {
-      return failure({
-        version,
-        error: error || new InternalInconsistencyError("No events or error generated"),
-      });
+      return failure(error || new InternalInconsistencyError("No events or error generated"));
     }
   } else {
-    return failure(
-      error || {
-        version,
-        error: new InternalInconsistencyError("No handler or error generated"),
-      }
-    );
+    return failure(error || new InternalInconsistencyError("No handler or error generated"));
   }
 }
 
@@ -149,10 +140,10 @@ function validate(
   command: Command,
   handlers: OrderedSet<CommandHandler>,
   events: SourceEvent[] = []
-): Result<OrderedSet<CommandHandler>, ExecutionError> {
+): Result<OrderedSet<CommandHandler>, Error> {
   if (handlers.isEmpty()) {
-    const error = Error(`Aggregate ${aggregateKey(version.id)} has no handler for ${command.command}`);
-    return failure({ version, error });
+    const error = new Error(`Aggregate ${aggregateKey(version.id)} has no handler for ${command.command}`);
+    return failure(error);
   }
 
   return success(handlers);
