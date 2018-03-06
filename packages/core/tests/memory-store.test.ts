@@ -1,7 +1,7 @@
 import { Subscription } from "rxjs";
 
 import { subscribe, MemoryEventStore } from "../src/event-store";
-import { PublishedEvent } from "../src";
+import { PublishedEvent, eventPublishedAt, EventStreamOptions, eventId } from "../src";
 
 describe("creating a memory store", () => {
   it("can be created", () => {
@@ -28,9 +28,10 @@ describe("publishing events", () => {
     expect(events).toHaveLength(1);
 
     const event = events[0];
+    console.dir(event);
     expect(event).toEqual(published);
     expect(event.key).toBeUndefined();
-    expect(event.publishedAt).toBeDefined();
+    expect(eventPublishedAt(event)).toBeDefined();
     expect(event.aggregateId).toEqual(testOne);
   });
 });
@@ -117,7 +118,7 @@ describe("streaming events", () => {
     const [after] = await store.publish({ type: "test", aggregateId: testId("2") });
 
     const second: Promise<PublishedEvent> = new Promise((resolve, reject) => {
-      subscription = subscribe(store, async e => resolve(e), { after: before.id });
+      subscription = subscribe(store, async e => resolve(e), { after: eventId(before) });
     });
 
     const event = await second;
@@ -128,7 +129,7 @@ describe("streaming events", () => {
 });
 
 function take(store: MemoryEventStore, count: number) {
-  return (subscription: (value: any) => void, options: EventListenerOptions = {}) => {
+  return (subscription: (value: any) => void, options: EventStreamOptions = {}) => {
     return store
       .stream(options)
       .take(count)
