@@ -1,7 +1,8 @@
+import * as async from "async";
+
 import { OrderedMap } from "immutable";
 
 import { SourceEvent, PublishedEvent } from "../types";
-import { InternalInconsistencyError } from "../errors";
 
 import { Reducer } from "./types";
 
@@ -18,16 +19,28 @@ export function combineReducers<S, E extends SourceEvent = SourceEvent>(
   const ordered = OrderedMap(reducers);
 
   return async (state: S, event: PublishedEvent<E>) => {
-    return ordered.reduce(async (state, reducer, key) => {
-      if (reducer === undefined || key === undefined) {
-        throw new InternalInconsistencyError("Inconsistency found in combined reducer");
-      }
+    const reducers = ordered.toArray();
 
-      try {
-        return reducer(await state, event);
-      } catch (error) {
-        throw new ReducerError(key, error);
-      }
-    }, Promise.resolve(state));
+    return new Promise<S>((resolve, reject) => {
+      async.reduce(
+        reducers,
+        state,
+        async (current, [key, reducer], complete) => {
+          try {
+            // the state as any is used as S may be defined as `X | undefined` making `undefined a valid value
+            return await reducer(current as any, event);
+          } catch (error) {
+            throw new ReducerError(key, error);
+          }
+        },
+        (error, updated) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(updated);
+          }
+        }
+      );
+    });
   };
 }

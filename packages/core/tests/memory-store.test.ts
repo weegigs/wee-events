@@ -28,7 +28,6 @@ describe("publishing events", () => {
     expect(events).toHaveLength(1);
 
     const event = events[0];
-    console.dir(event);
     expect(event).toEqual(published);
     expect(event.key).toBeUndefined();
     expect(eventPublishedAt(event)).toBeDefined();

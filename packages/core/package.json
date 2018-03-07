@@ -13,10 +13,10 @@
     "compile:tsc": "tsc -p .",
     "compile": "yarn run compile:tsc",
     "lint": "tslint -c tslint.json --project . \"src/**/*.ts\"",
-    "test:unit": "jest \"tests/*\" --env=node --coverage",
+    "test:unit": "jest \"tests/*\" --env=node --coverage --forceExit",
     "test": "yarn run test:unit",
     "watch:tsc": "tsc -p . --watch",
-    "watch:test": "jest \"tests/*\" --env=node --coverage --watch",
+    "watch:test": "jest \"tests/*\" --env=node --watch",
     "watch": "concurrently -k --names 'tsc' 'yarn run watch:tsc'",
     "prepublishOnly": "yarn run clean && yarn run lint && yarn run compile"
   },
@@ -61,22 +61,12 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ]
+    "moduleFileExtensions": ["ts", "js"]
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": [
-    "lib",
-    "package.json",
-    "yarn.lock",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENCE"
-  ],
+  "files": ["lib", "package.json", "yarn.lock", "README.md", "CHANGELOG.md", "LICENCE"],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
