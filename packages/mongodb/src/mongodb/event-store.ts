@@ -53,7 +53,9 @@ export class MongoEventStore implements EventStore {
     return published;
   }
 
-  stream<E extends SourceEvent = any>(options: EventStreamOptions = {}): Observable<PublishedEvent<E>> {
+  stream<E extends SourceEvent = any>(
+    options: EventStreamOptions = {}
+  ): Observable<PublishedEvent<E>> {
     const collection = this.collection;
     let latest = "";
 
@@ -61,8 +63,9 @@ export class MongoEventStore implements EventStore {
       (observer: Observer<PublishedEvent<E>>) => {
         const { after } = options;
 
-        const query = after === undefined ? undefined : { "__publicationMetadata.id": { $gt: after } };
-        const cursor = collection.find(query).sort({ "__publicationMetadata.id": 1 });
+        const query =
+          after === undefined ? undefined : { "__publicationMetadata.id": { $gt: after } };
+        const cursor = collection.find<any>(query).sort({ "__publicationMetadata.id": 1 });
 
         cursor.forEach(
           event => {
@@ -88,7 +91,10 @@ export class MongoEventStore implements EventStore {
     return existing.concat(updates);
   }
 
-  async snapshot(aggregateId: AggregateId, options: EventSnapshotOptions = {}): Promise<PublishedEvent<any>[]> {
+  async snapshot(
+    aggregateId: AggregateId,
+    options: EventSnapshotOptions = {}
+  ): Promise<PublishedEvent<any>[]> {
     const { after } = options;
 
     const query = after

@@ -1,11 +1,11 @@
 import { AggregateId, PublishedEvent, eventId } from "@weegigs/events-core";
 import { Collection, DeleteWriteOpResultObject, UpdateWriteOpResult } from "mongodb";
 
-import { ProjectionDocument } from "./types";
+import { AggregateProjectionDocument } from "./types";
 import { aggregateFilter } from "./utilities";
 
-export class MongoProjectionCollection<T> {
-  constructor(private collection: Collection<ProjectionDocument<T>>) {}
+export class MongoAggregateCollection<T> {
+  constructor(private collection: Collection<AggregateProjectionDocument<T>>) {}
 
   async fetch(id: AggregateId): Promise<T | undefined> {
     const projection = await this.collection.findOne(aggregateFilter(id));
@@ -24,7 +24,7 @@ export class MongoProjectionCollection<T> {
     return this.collection.deleteOne(aggregateFilter(id));
   }
 
-  async getProjection(id: AggregateId): Promise<ProjectionDocument<T> | undefined> {
+  async getProjection(id: AggregateId): Promise<AggregateProjectionDocument<T> | undefined> {
     const document = await this.collection.findOne(aggregateFilter(id));
     return document === null ? undefined : document;
   }

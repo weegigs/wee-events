@@ -2,7 +2,7 @@ import { Logger, LoggerInstance, transports } from "winston";
 
 function create(): LoggerInstance {
   return new Logger({
-    level: "debug",
+    level: "info",
     transports: [new transports.Console({ colorize: true, handleExceptions: true })],
   });
 }
