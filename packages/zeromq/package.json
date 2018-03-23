@@ -1,0 +1,72 @@
+{
+  "name": "@weegigs/events-zeromq",
+  "version": "0.10.0",
+  "description": "Dispatcher proxy client and server that uses ZeroMQ for message passing",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "author": "Kevin O'Neill <kevin@oneill.id.au>",
+  "scripts": {
+    "build": "yarn run lint && yarn run compile",
+    "prebuild": "yarn run clean",
+    "clean": "rimraf lib",
+    "compile:tsc": "tsc -p .",
+    "compile": "yarn run compile:tsc",
+    "lint": "tslint -c tslint.json --project . \"src/**/*.ts\"",
+    "test:unit": "jest \"tests/*\" --env=node --coverage",
+    "test": "yarn run test:unit",
+    "watch:tsc": "tsc -p . --watch",
+    "watch:test": "jest \"tests/*\" --env=node --coverage --watch",
+    "watch": "concurrently -k --names 'tsc,test' 'yarn run watch:tsc' 'yarn run watch:test'",
+    "prepublishOnly": "yarn run clean && yarn run lint && yarn run compile"
+  },
+  "devDependencies": {
+    "@types/dotenv": "4.0.2",
+    "@types/jest": "22.2.2",
+    "@types/moment": "^2.13.0",
+    "@types/mz": "0.0.32",
+    "@types/node": "9.6.0",
+    "@types/ramda": "0.25.20",
+    "@types/winston": "2.3.8",
+    "@types/zeromq": "^4.6.1",
+    "@weegigs/events-core": "0.10.0",
+    "concurrently": "^3.5.1",
+    "dotenv": "5.0.1",
+    "jest": "22.4.3",
+    "jest-cli": "22.4.3",
+    "jest-environment-node-debug": "2.0.0",
+    "prettier": "1.11.1",
+    "rimraf": "2.6.2",
+    "ts-jest": "22.4.2",
+    "tslint": "5.9.1",
+    "tslint-config-prettier": "1.10.0",
+    "tslint-config-standard": "7.0.0",
+    "typescript": "2.7.2",
+    "winston": "2.4.1"
+  },
+  "jest": {
+    "verbose": true,
+    "bail": true,
+    "transform": {
+      ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
+    "moduleFileExtensions": ["ts", "js", "json"]
+  },
+  "engines": {
+    "node": ">=8.9"
+  },
+  "files": ["lib", "package.json", "README.md", "CHANGELOG.md", "LICENCE"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevinoneill/wee-events.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "moment": "2.21.0",
+    "ulid": "2.3.0",
+    "zeromq": "4.6.0"
+  }
+}
