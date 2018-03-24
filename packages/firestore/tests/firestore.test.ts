@@ -17,11 +17,8 @@ const testOne = testId("1");
 describe("creating a firestore store", () => {
   it("can be created", async () => {
     const db = new Firestore();
-    const collection = db
-      .collection("test")
-      .doc("events")
-      .collection("all");
-    const store = new FirestoreEventStore(collection);
+    const events = db.collection("test").doc("events");
+    const store = await FirestoreEventStore.create(events);
 
     expect(store).toBeDefined();
   });
@@ -29,9 +26,9 @@ describe("creating a firestore store", () => {
 
 describe("adding events", () => {
   const db = new Firestore();
-  const events = db.collection("test").doc("events");
+  const events = db.doc("test/events");
   const all = events.collection("all");
-  const store = new FirestoreEventStore(all);
+  const store = new FirestoreEventStore(events);
 
   beforeAll(async () => {
     const docs = await clear(all);
@@ -74,7 +71,7 @@ describe("listening for events", () => {
   const db = new Firestore();
   const events = db.collection("test").doc("events");
   const all = events.collection("all");
-  const store = new FirestoreEventStore(all);
+  const store = new FirestoreEventStore(events);
   store.stream();
 
   afterEach(async done => {
@@ -115,7 +112,7 @@ describe("streaming events", () => {
   const db = new Firestore();
   const events = db.collection("test").doc("events");
   const all = events.collection("all");
-  const store = new FirestoreEventStore(all);
+  const store = new FirestoreEventStore(events);
 
   const take1 = take(store, 1);
   const take2 = take(store, 2);

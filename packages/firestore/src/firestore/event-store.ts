@@ -17,7 +17,15 @@ export interface FirestoreStreamOptions extends EventStreamOptions {
 }
 
 export class FirestoreEventStore implements EventStore {
-  constructor(private all: CollectionReference) {}
+  private readonly all: CollectionReference;
+
+  constructor(events: DocumentReference) {
+    this.all = events.collection("all");
+  }
+
+  static async create(events: DocumentReference): Promise<FirestoreEventStore> {
+    return new FirestoreEventStore(events);
+  }
 
   private get events() {
     return this.all.orderBy("__publicationMetadata.id");
