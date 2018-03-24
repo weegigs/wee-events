@@ -20,6 +20,10 @@
   version "22.2.2"
   resolved "https://registry.npmjs.org/@types/jest/-/jest-22.2.2.tgz#afe5dacbd00d65325f52da0ed3e76e259629ac9d"
 
+"@types/lodash@4.14.106":
+  version "4.14.106"
+  resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.106.tgz#6093e9a02aa567ddecfe9afadca89e53e5dce4dd"
+
 "@types/moment@^2.13.0":
   version "2.13.0"
   resolved "https://registry.npmjs.org/@types/moment/-/moment-2.13.0.tgz#604ebd189bc3bc34a1548689404e61a2a4aac896"
@@ -2080,6 +2084,10 @@ locate-path@^2.0.0:
 lodash.sortby@^4.7.0:
   version "4.7.0"
   resolved "https://registry.npmjs.org/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
+
+lodash@4.17.5:
+  version "4.17.5"
+  resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
 
 lodash@^4.13.1, lodash@^4.14.0, lodash@^4.17.4, lodash@^4.5.1:
   version "4.17.4"

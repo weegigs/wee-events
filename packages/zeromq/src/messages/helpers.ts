@@ -1,8 +1,10 @@
+import * as moment from "moment";
+import * as _ from "lodash";
+
 import { Command, success, failure } from "@weegigs/events-core";
 import { monotonicFactory, decodeTime } from "ulid";
 
 import * as t from "./types";
-import * as moment from "moment";
 
 const ulid = monotonicFactory();
 
@@ -65,15 +67,32 @@ export function timestamp(message: t.Message<any>): Date {
   return moment.utc(decodeTime(requestId)).toDate();
 }
 
+export function verifyCommand(source: Command): Command {
+  const { aggregateId, command, data } = source;
+
+  if (undefined === aggregateId) {
+    throw new Error("Expected command aggregate id");
+  }
+
+  if (_.isEmpty(command)) {
+    throw new Error("Expected command identifer");
+  }
+
+  if (undefined === data) {
+    throw new Error("Expected command data");
+  }
+
+  return {
+    aggregateId,
+    command,
+    data,
+  };
+}
+
 export function executePayload(command: Command): t.Execute {
   return {
     requestId: ulid(),
     action: t.RequestType.execute,
-    payload: {
-      ...command,
-      aggregateId: command.aggregateId,
-      command: command.command,
-      data: command.data,
-    },
+    payload: verifyCommand(command),
   };
 }

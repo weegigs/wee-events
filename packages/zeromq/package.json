@@ -23,6 +23,7 @@
   "devDependencies": {
     "@types/dotenv": "4.0.2",
     "@types/jest": "22.2.2",
+    "@types/lodash": "4.14.106",
     "@types/moment": "^2.13.0",
     "@types/mz": "0.0.32",
     "@types/node": "9.6.0",
@@ -51,22 +52,12 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ]
+    "moduleFileExtensions": ["ts", "js", "json"]
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": [
-    "lib",
-    "package.json",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENCE"
-  ],
+  "files": ["lib", "package.json", "README.md", "CHANGELOG.md", "LICENCE"],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
@@ -75,6 +66,7 @@
     "access": "public"
   },
   "dependencies": {
+    "lodash": "4.17.5",
     "moment": "2.21.0",
     "ulid": "2.3.0",
     "zeromq": "4.6.0"
