@@ -3,7 +3,7 @@ import { socket, Socket } from "zeromq";
 
 import { Deferred } from "../utilities/deferred";
 import { DELIMITER } from "../constants";
-import { execute, messageToFrames, framesToResponse } from "../messages";
+import { executePayload, messageToFrames, framesToResponse } from "../messages";
 
 export class ZeroMQDispatcher implements Dispatcher {
   private readonly dealer: Socket;
@@ -36,7 +36,7 @@ export class ZeroMQDispatcher implements Dispatcher {
 
   async execute(command: Command<any>): Promise<ExecuteResult> {
     const deferred = new Deferred<ExecuteResult>();
-    const request = execute(command);
+    const request = executePayload(command);
 
     this.requests.set(request.requestId, deferred);
     this.dealer.send([DELIMITER, ...messageToFrames(request)]);

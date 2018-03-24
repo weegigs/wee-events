@@ -65,10 +65,15 @@ export function timestamp(message: t.Message<any>): Date {
   return moment.utc(decodeTime(requestId)).toDate();
 }
 
-export function execute(command: Command): t.Execute {
+export function executePayload(command: Command): t.Execute {
   return {
     requestId: ulid(),
     action: t.RequestType.execute,
-    payload: command,
+    payload: {
+      ...command,
+      aggregateId: command.aggregateId,
+      command: command.command,
+      data: command.data,
+    },
   };
 }
