@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-zeromq",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Dispatcher proxy client and server that uses ZeroMQ for message passing",
   "license": "MIT",
   "main": "lib/index.js",
@@ -29,7 +29,7 @@
     "@types/ramda": "0.25.20",
     "@types/winston": "2.3.8",
     "@types/zeromq": "^4.6.1",
-    "@weegigs/events-core": "0.10.0",
+    "@weegigs/events-core": "0.11.0",
     "concurrently": "^3.5.1",
     "dotenv": "5.0.1",
     "jest": "22.4.3",
@@ -51,12 +51,22 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": ["ts", "js", "json"]
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ]
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": ["lib", "package.json", "README.md", "CHANGELOG.md", "LICENCE"],
+  "files": [
+    "lib",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
