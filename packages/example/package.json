@@ -15,17 +15,17 @@
   },
   "devDependencies": {
     "concurrently": "^3.5.1",
-    "prettier": "1.10.2",
+    "prettier": "1.11.1",
     "rimraf": "2.6.2",
     "tslint": "5.9.1",
-    "tslint-config-prettier": "1.6.0",
+    "tslint-config-prettier": "1.10.0",
     "tslint-config-standard": "7.0.0",
-    "typescript": "2.6.2"
+    "typescript": "2.7.2"
   },
   "dependencies": {
-    "@google-cloud/firestore": "0.11.1",
+    "@google-cloud/firestore": "0.13.0",
     "@weegigs/events-core": "0.10.0",
-    "rxjs": "5.5.6"
+    "rxjs": "5.5.7"
   },
   "repository": {
     "type": "git",

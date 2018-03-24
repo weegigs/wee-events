@@ -38,11 +38,15 @@ export class FirestoreEventStore implements EventStore {
     return normalized;
   }
 
-  stream<E extends SourceEvent = any>(options: FirestoreStreamOptions = {}): Observable<PublishedEvent<E>> {
+  stream<E extends SourceEvent = any>(
+    options: FirestoreStreamOptions = {}
+  ): Observable<PublishedEvent<E>> {
     const { after, reconnect } = { reconnect: true, ...options } as FirestoreStreamOptions;
 
     let position = after;
-    const streamStartingAfter: (startAfter?: string) => Observable<PublishedEvent<E>> = (startAfter?: string) =>
+    const streamStartingAfter: (startAfter?: string) => Observable<PublishedEvent<E>> = (
+      startAfter?: string
+    ) =>
       Observable.create((subscriber: Subscriber<PublishedEvent<E>>) => {
         let query = this.events;
         if (startAfter) {
@@ -67,7 +71,9 @@ export class FirestoreEventStore implements EventStore {
 
     return streamStartingAfter(position).catch(error => {
       if (reconnect) {
-        console.log(`[WARN] FirestoreStream: Reconnecting after connection failure: ${error.message}`);
+        console.log(
+          `[WARN] FirestoreStream: Reconnecting after connection failure: ${error.message}`
+        );
         return Observable.of(position)
           .delay(100)
           .flatMap(streamStartingAfter);
