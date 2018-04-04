@@ -24,12 +24,7 @@ async function createIndexes(collection: Collection) {
     collection
   );
 
-  const aggregates = createIndex(
-    "event-aggregates",
-    { "aggregateId.type": 1, "aggregateId.id": 1 },
-    {},
-    collection
-  );
+  const aggregates = createIndex("event-aggregates", { "aggregateId.type": 1, "aggregateId.id": 1 }, {}, collection);
 
   return Promise.all([ids, aggregates]);
 }
@@ -53,37 +48,32 @@ export class MongoEventStore implements EventStore {
     return published;
   }
 
-  stream<E extends SourceEvent = any>(
-    options: EventStreamOptions = {}
-  ): Observable<PublishedEvent<E>> {
+  stream<E extends SourceEvent = any>(options: EventStreamOptions = {}): Observable<PublishedEvent<E>> {
     const collection = this.collection;
     let latest = "";
 
-    const existing: Observable<PublishedEvent<E>> = Observable.create(
-      (observer: Observer<PublishedEvent<E>>) => {
-        const { after } = options;
+    const existing: Observable<PublishedEvent<E>> = Observable.create((observer: Observer<PublishedEvent<E>>) => {
+      const { after } = options;
 
-        const query =
-          after === undefined ? undefined : { "__publicationMetadata.id": { $gt: after } };
-        const cursor = collection.find<any>(query).sort({ "__publicationMetadata.id": 1 });
+      const query = after === undefined ? undefined : { "__publicationMetadata.id": { $gt: after } };
+      const cursor = collection.find<any>(query).sort({ "__publicationMetadata.id": 1 });
 
-        cursor.forEach(
-          event => {
-            latest = eventId(event);
-            observer.next(event);
-          },
-          (error: MongoError | null) => {
-            if (error === null) {
-              observer.complete();
-            } else {
-              observer.error(error);
-            }
+      cursor.forEach(
+        event => {
+          latest = eventId(event);
+          observer.next(event);
+        },
+        (error: MongoError | null) => {
+          if (error === null) {
+            observer.complete();
+          } else {
+            observer.error(error);
           }
-        );
+        }
+      );
 
-        return () => cursor.close();
-      }
-    );
+      return () => cursor.close();
+    });
 
     // subscribe into buffer
 
@@ -91,18 +81,20 @@ export class MongoEventStore implements EventStore {
     return existing.concat(updates);
   }
 
-  async snapshot(
-    aggregateId: AggregateId,
-    options: EventSnapshotOptions = {}
-  ): Promise<PublishedEvent<any>[]> {
+  async snapshot(aggregateId: AggregateId, options: EventSnapshotOptions = {}): Promise<PublishedEvent<any>[]> {
     const { after } = options;
+
+    const aggregate = {
+      "aggregateId.type": aggregateId.type,
+      "aggregateId.id": aggregateId.id,
+    };
 
     const query = after
       ? {
-          aggregateId,
+          ...aggregate,
           "__publicationMetadata.id": { $gt: after },
         }
-      : { aggregateId };
+      : aggregate;
 
     return this.collection
       .find(query)
