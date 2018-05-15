@@ -1,4 +1,5 @@
-import { Observable, Subject, Observer } from "rxjs";
+import { Observable, Subject, Observer, defer, concat } from "rxjs";
+import { filter } from "rxjs/operators";
 import { Collection, MongoError } from "mongodb";
 
 import {
@@ -77,8 +78,8 @@ export class MongoEventStore implements EventStore {
 
     // subscribe into buffer
 
-    const updates = Observable.defer(() => this.events.filter(e => eventId(e) > latest));
-    return existing.concat(updates);
+    const updates = defer(() => this.events.pipe(filter(e => eventId(e) > latest)));
+    return concat(existing, updates);
   }
 
   async snapshot(aggregateId: AggregateId, options: EventSnapshotOptions = {}): Promise<PublishedEvent<any>[]> {

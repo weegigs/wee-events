@@ -1,6 +1,6 @@
 import * as R from "ramda";
 
-import { Observable, Subject, BehaviorSubject } from "rxjs";
+import { Subject, BehaviorSubject, zip } from "rxjs";
 import { OrderedMap, OrderedSet } from "immutable";
 
 import { eventId } from "../utilities";
@@ -36,7 +36,7 @@ export class Aggregate {
     this.versions = new BehaviorSubject<AggregateVersion | undefined>(undefined);
     this.handlers = groupHandlers(handlers);
 
-    Observable.zip(this.actions, this.versions).subscribe(async ([action, version]) => {
+    zip(this.actions, this.versions).subscribe(async ([action, version]) => {
       try {
         this.versions.next(await action(version || (await this.load(id))));
       } catch (error) {
@@ -55,12 +55,7 @@ export class Aggregate {
           reject(new InternalInconsistencyError("Aggregate and Command id's don't match"));
         }
 
-        const update = (await process(
-          version,
-          command,
-          allHandlers.get(command.command, noHandlers),
-          this.publish
-        ))
+        const update = (await process(version, command, allHandlers.get(command.command, noHandlers), this.publish))
           .withError(errors => resolve(failure(errors)))
           .withValue(result => resolve(success(result)));
 

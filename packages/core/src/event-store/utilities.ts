@@ -1,6 +1,8 @@
 import * as moment from "moment";
 
-import { Observable, Subscription } from "rxjs";
+import { Subscription, timer } from "rxjs";
+import { distinct } from "rxjs/operators";
+
 import { monotonicFactory, decodeTime } from "ulid";
 
 import { eventId } from "../utilities";
@@ -41,6 +43,6 @@ export function subscribe(
 ): Subscription {
   return store
     .stream(options)
-    .distinct((e: PublishedEvent) => eventId(e), Observable.timer(FLUSH_INTERVAL, FLUSH_INTERVAL))
+    .pipe(distinct((e: PublishedEvent) => eventId(e), timer(FLUSH_INTERVAL, FLUSH_INTERVAL)))
     .subscribe(subscriber);
 }

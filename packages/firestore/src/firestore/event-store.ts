@@ -1,5 +1,6 @@
 import { CollectionReference, DocumentSnapshot, DocumentReference } from "@google-cloud/firestore";
-import { Observable, Subscriber } from "rxjs";
+import { Observable, Subscriber, of } from "rxjs";
+import { catchError, delay, flatMap } from "rxjs/operators";
 
 import {
   SourceEvent,
@@ -46,15 +47,11 @@ export class FirestoreEventStore implements EventStore {
     return normalized;
   }
 
-  stream<E extends SourceEvent = any>(
-    options: FirestoreStreamOptions = {}
-  ): Observable<PublishedEvent<E>> {
+  stream<E extends SourceEvent = any>(options: FirestoreStreamOptions = {}): Observable<PublishedEvent<E>> {
     const { after, reconnect } = { reconnect: true, ...options } as FirestoreStreamOptions;
 
     let position = after;
-    const streamStartingAfter: (startAfter?: string) => Observable<PublishedEvent<E>> = (
-      startAfter?: string
-    ) =>
+    const streamStartingAfter: (startAfter?: string) => Observable<PublishedEvent<E>> = (startAfter?: string) =>
       Observable.create((subscriber: Subscriber<PublishedEvent<E>>) => {
         let query = this.events;
         if (startAfter) {
@@ -77,24 +74,19 @@ export class FirestoreEventStore implements EventStore {
         return subscription;
       });
 
-    return streamStartingAfter(position).catch(error => {
-      if (reconnect) {
-        console.log(
-          `[WARN] FirestoreStream: Reconnecting after connection failure: ${error.message}`
-        );
-        return Observable.of(position)
-          .delay(100)
-          .flatMap(streamStartingAfter);
-      } else {
-        throw error;
-      }
-    });
+    return streamStartingAfter(position).pipe(
+      catchError(error => {
+        if (reconnect) {
+          console.log(`[WARN] FirestoreStream: Reconnecting after connection failure: ${error.message}`);
+          return of(position).pipe(delay(100), flatMap(streamStartingAfter));
+        } else {
+          throw error;
+        }
+      })
+    );
   }
 
-  async snapshot(
-    aggregateId: AggregateId,
-    options?: EventSnapshotOptions | undefined
-  ): Promise<PublishedEvent[]> {
+  async snapshot(aggregateId: AggregateId, options?: EventSnapshotOptions | undefined): Promise<PublishedEvent[]> {
     const query = this.all
       .orderBy("__publicationMetadata.id")
       .where("aggregateId.id", "==", aggregateId.id)

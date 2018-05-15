@@ -1,6 +1,7 @@
 import * as R from "ramda";
 
 import { ReplaySubject, Observable } from "rxjs";
+import { filter } from "rxjs/operators";
 
 import { eventId } from "../utilities";
 import { SourceEvent, PublishedEvent } from "../types";
@@ -38,7 +39,7 @@ export class MemoryEventStore implements EventStore {
     const { after } = options;
 
     if (after) {
-      observable = observable.filter(e => eventId(e) > after);
+      observable = observable.pipe(filter(e => eventId(e) > after));
     }
 
     return observable as any;

@@ -2,6 +2,9 @@
   "name": "@weegigs/events",
   "private": true,
   "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "test": "lerna run test",
@@ -10,9 +13,8 @@
     "release": "lerna publish --exact"
   },
   "devDependencies": {
-    "lerna": "2.9.0"
+    "lerna": "2.11.0"
   },
   "version": "1.0.0",
-  "author": "Kevin O'Neill <kevin@oneill.id.au>",
-  "license": "MIT"
+  "author": "Kevin O'Neill <kevin@oneill.id.au>"
 }

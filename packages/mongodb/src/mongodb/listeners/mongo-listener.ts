@@ -1,12 +1,7 @@
-import {
-  SourceEvent,
-  PublishedEvent,
-  ProjectionFunction,
-  serialize,
-  eventId,
-} from "@weegigs/events-core";
+import { SourceEvent, PublishedEvent, ProjectionFunction, serialize, eventId } from "@weegigs/events-core";
 import { Collection } from "mongodb";
 import { Subscription } from "rxjs";
+import { filter } from "rxjs/operators";
 
 import { MongoEventStore } from "../event-store";
 import { config } from "../config";
@@ -53,12 +48,12 @@ export async function attachListener(
   const after = await position(name, collection);
   const streamOptions = { after };
 
-  const filter = createEventFilter(events);
+  const eventFilter = createEventFilter(events);
   const projection = createProjection(name, collection, options);
 
   return store
     .stream(streamOptions)
-    .filter(filter)
+    .pipe(filter(eventFilter))
     .subscribe(
       event => projection(event),
       error => {

@@ -1,13 +1,9 @@
-import { Subscription } from "rxjs/Subscription";
+import { Subscription } from "rxjs";
 
 import { EventStore, ProjectionFunction, EventStreamOptions } from "../";
 import { config } from "../config";
 
-export function attach(
-  store: EventStore,
-  projection: ProjectionFunction,
-  options?: EventStreamOptions
-): Subscription {
+export function attach(store: EventStore, projection: ProjectionFunction, options?: EventStreamOptions): Subscription {
   return store.stream(options).subscribe(
     event => projection(event),
     error => {
