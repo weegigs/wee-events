@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-firestore",
-  "version": "0.12.0",
+  "version": "0.12.4",
   "description": "Core components for the wee gigs event sourcing system",
   "license": "MIT",
   "main": "lib/index.js",
@@ -29,7 +29,7 @@
     "@types/node": "10.3.3",
     "@types/ramda": "0.25.33",
     "@types/winston": "2.3.9",
-    "@weegigs/events-core": "0.11.0",
+    "@weegigs/events-core": "0.12.4",
     "concurrently": "^3.5.1",
     "dotenv": "6.0.0",
     "faker": "4.1.0",
@@ -61,18 +61,27 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": ["ts", "js", "json"]
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ]
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": ["lib", "package.json", "README.md", "CHANGELOG.md", "LICENCE"],
+  "files": [
+    "lib",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {}
+  }
 }

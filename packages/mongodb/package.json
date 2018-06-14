@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-mongo",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "Mongo event store and projections for @weegigs/events",
   "license": "MIT",
   "main": "lib/index.js",
@@ -12,10 +12,10 @@
     "compile:tsc": "tsc -p .",
     "compile": "yarn run compile:tsc",
     "lint": "tslint -c tslint.json --project . \"src/**/*.ts\"",
-    "test:unit": "jest \"tests/*\" --env=node --coverage",
+    "test:unit": "npx jest \"tests/*\" --env=node --coverage --detectOpenHandles",
     "test": "yarn run test:unit",
     "watch:tsc": "tsc -p . --watch",
-    "watch:test": "jest \"tests/*\" --env=node --coverage --watch",
+    "watch:test": "npx jest \"tests/*\" --env=node --coverage --watch",
     "watch": "yarn run watch:tsc & yarn run watch:test",
     "prepublishOnly": "yarn run clean && yarn run lint && yarn run compile"
   },
@@ -29,7 +29,7 @@
     "@types/node": "10.3.3",
     "@types/ramda": "0.25.33",
     "@types/winston": "2.3.9",
-    "@weegigs/events-core": "0.11.0",
+    "@weegigs/events-core": "0.12.4",
     "concurrently": "3.5.1",
     "dotenv": "6.0.0",
     "faker": "4.1.0",
@@ -63,13 +63,23 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": ["ts", "js", "json"],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ],
     "mapCoverage": true
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": ["lib", "package.json", "README.md", "CHANGELOG.md", "LICENCE"],
+  "files": [
+    "lib",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"

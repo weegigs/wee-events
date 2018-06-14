@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-core",
-  "version": "0.11.0",
+  "version": "0.12.4",
   "description": "Core components for the wee gigs event sourcing system",
   "license": "MIT",
   "main": "lib/index.js",
@@ -13,7 +13,7 @@
     "compile:tsc": "tsc -p .",
     "compile": "yarn run compile:tsc",
     "lint": "tslint -c tslint.json --project . \"src/**/*.ts\"",
-    "test:unit": "jest \"tests/*\" --env=node --coverage --forceExit",
+    "test:unit": "jest \"tests/*\" --env=node --coverage --detectOpenHandles --forceExit",
     "test": "yarn run test:unit",
     "watch:tsc": "tsc -p . --watch",
     "watch:test": "jest \"tests/*\" --env=node --watch",
@@ -50,7 +50,6 @@
     "moment": "2.22.2",
     "mz": "2.7.0",
     "ramda": "0.25.0",
-
     "tsmonad": "0.8.0",
     "ulid": "2.3.0"
   },
@@ -63,12 +62,21 @@
       ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts)$",
-    "moduleFileExtensions": ["ts", "js"]
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
   },
   "engines": {
     "node": ">=8.9"
   },
-  "files": ["lib", "package.json", "README.md", "CHANGELOG.md", "LICENCE"],
+  "files": [
+    "lib",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kevinoneill/wee-events.git"
