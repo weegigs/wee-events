@@ -1,4 +1,5 @@
-import { Subscription } from "rxjs";
+import { Subscription, pipe } from "rxjs";
+import { take as rtake, toArray } from "rxjs/operators";
 
 import { subscribe, MemoryEventStore } from "../src/event-store";
 import { PublishedEvent, eventPublishedAt, EventStreamOptions, eventId } from "../src";
@@ -98,8 +99,10 @@ describe("streaming events", () => {
     const publications: Promise<PublishedEvent[]> = new Promise((resolve, reject) => {
       subscription = store
         .stream()
-        .take(2)
-        .toArray()
+        .pipe(
+          rtake(2),
+          toArray()
+        )
         .subscribe(e => resolve(e));
     });
     const [second] = await store.publish({ type: "test", aggregateId: testId("2") });
@@ -131,8 +134,10 @@ function take(store: MemoryEventStore, count: number) {
   return (subscription: (value: any) => void, options: EventStreamOptions = {}) => {
     return store
       .stream(options)
-      .take(count)
-      .toArray()
+      .pipe(
+        rtake(count),
+        toArray()
+      )
       .subscribe(subscription);
   };
 }
