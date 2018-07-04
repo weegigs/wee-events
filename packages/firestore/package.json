@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-firestore",
-  "version": "0.12.4",
+  "version": "0.12.5",
   "description": "Core components for the wee gigs event sourcing system",
   "license": "MIT",
   "main": "lib/index.js",
@@ -29,7 +29,7 @@
     "@types/node": "10.3.3",
     "@types/ramda": "0.25.33",
     "@types/winston": "2.3.9",
-    "@weegigs/events-core": "0.12.4",
+    "@weegigs/events-core": "0.12.5",
     "concurrently": "3.6.0",
     "dotenv": "6.0.0",
     "faker": "4.1.0",
