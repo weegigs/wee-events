@@ -20,12 +20,13 @@ export function serialize<E extends SourceEvent>(projection: ProjectionFunction<
     try {
       await projection(event);
     } catch (error) {
-      config.logger.error("projection failed to process event", {
+      config.logger.error("failed to process event", {
         event: {
           id: eventId(event),
           type: event.type,
         },
         error,
+        description: error.description || error.message,
       });
     }
   };

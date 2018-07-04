@@ -8,7 +8,7 @@ import { Reducer } from "./types";
 
 export class ReducerError extends Error {
   constructor(public reducer: string, public error: Error) {
-    super(`[ReducerError] ${reducer} ${error.message}`);
+    super(error.message);
     Object.setPrototypeOf(this, ReducerError.prototype);
   }
 }
