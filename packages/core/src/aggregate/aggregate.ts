@@ -113,21 +113,29 @@ async function process(
   handlers: OrderedSet<CommandHandler>,
   publish: (events: SourceEvent[] | SourceEvent) => Promise<PublishedEvent[]>
 ): Promise<ExecuteResult> {
-  const { value: valid, error } = validate(version, command, handlers);
+  const { value: valid, error: validationError } = validate(version, command, handlers);
 
-  if (valid !== undefined) {
-    const { value: events, error } = await run(version, command, valid);
-
-    if (events !== undefined) {
-      const published = await publish(events);
-      const newVersion = versionFromEvents(version, published);
-      return success({ events: published, version: newVersion });
-    } else {
-      return failure(error || new InternalInconsistencyError("No events or error generated"));
-    }
-  } else {
-    return failure(error || new InternalInconsistencyError("No handler or error generated"));
+  if (valid === undefined) {
+    return failure(validationError || new InternalInconsistencyError("No handler or error generated"));
   }
+
+  const { value: events, error } = await run(version, command, valid);
+
+  if (error !== undefined) {
+    return failure(error);
+  }
+
+  if (events === undefined) {
+    return failure(new InternalInconsistencyError("No events or error generated"));
+  }
+
+  if (Array.isArray(events) && events.length === 0) {
+    return success({ events: [], version: version });
+  }
+
+  const published = await publish(events);
+  const newVersion = versionFromEvents(version, published);
+  return success({ events: published, version: newVersion });
 }
 
 function validate(
