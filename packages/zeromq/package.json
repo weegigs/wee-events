@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-zeromq",
-  "version": "0.12.6",
+  "version": "0.12.7",
   "description": "Dispatcher proxy client and server that uses ZeroMQ for message passing",
   "license": "MIT",
   "main": "lib/index.js",
@@ -28,7 +28,7 @@
     "@types/node": "11.9.5",
     "@types/ramda": "0.25.50",
     "@types/zeromq": "4.6.1",
-    "@weegigs/events-core": "0.12.6",
+    "@weegigs/events-core": "0.12.7",
     "concurrently": "^4.1.0",
     "dotenv": "6.2.0",
     "jest": "24.1.0",
