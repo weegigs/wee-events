@@ -21,29 +21,29 @@
     "prepublishOnly": "yarn run clean && yarn run lint && yarn run compile"
   },
   "devDependencies": {
-    "@types/dotenv": "4.0.3",
-    "@types/jest": "23.1.0",
-    "@types/lodash": "4.14.109",
-    "@types/moment": "^2.13.0",
+    "@types/dotenv": "6.1.0",
+    "@types/jest": "24.0.8",
+    "@types/lodash": "4.14.121",
     "@types/mz": "0.0.32",
-    "@types/node": "10.3.3",
-    "@types/ramda": "0.25.33",
-    "@types/winston": "2.3.9",
+    "@types/node": "11.9.5",
+    "@types/ramda": "0.25.50",
     "@types/zeromq": "4.6.1",
     "@weegigs/events-core": "0.12.6",
-    "concurrently": "^3.5.1",
-    "dotenv": "6.0.0",
-    "jest": "23.1.0",
-    "jest-cli": "23.1.0",
+    "concurrently": "^4.1.0",
+    "dotenv": "6.2.0",
+    "jest": "24.1.0",
+    "jest-cli": "24.1.0",
     "jest-environment-node-debug": "2.0.0",
-    "prettier": "1.13.5",
-    "rimraf": "2.6.2",
-    "rxjs-tslint": "0.1.4",
-    "ts-jest": "22.4.6",
-    "tslint": "5.10.0",
-    "tslint-config-prettier": "1.13.0",
-    "tslint-config-standard": "7.0.0",
-    "typescript": "2.9.2"
+    "prettier": "1.16.4",
+    "rimraf": "2.6.3",
+    "rxjs": "6.4.0",
+    "rxjs-tslint": "0.1.7",
+    "ts-jest": "24.0.0",
+    "tslint": "5.13.0",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-config-standard": "8.0.1",
+    "typescript": "3.3.3333",
+    "winston": "3.2.1"
   },
   "jest": {
     "verbose": true,
@@ -76,9 +76,9 @@
     "access": "public"
   },
   "dependencies": {
-    "lodash": "4.17.10",
-    "moment": "2.22.2",
+    "lodash": "4.17.11",
+    "moment": "2.24.0",
     "ulid": "2.3.0",
-    "zeromq": "4.6.0"
+    "zeromq": "5.1.0"
   }
 }

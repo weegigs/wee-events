@@ -52,7 +52,7 @@ export class FirestoreEventStore implements EventStore {
 
     let position = after;
     const streamStartingAfter: (startAfter?: string) => Observable<PublishedEvent<E>> = (startAfter?: string) =>
-      Observable.create((subscriber: Subscriber<PublishedEvent<E>>) => {
+      new Observable((subscriber: Subscriber<PublishedEvent<E>>) => {
         let query = this.events;
         if (startAfter) {
           query = query.startAfter(startAfter);
@@ -60,7 +60,8 @@ export class FirestoreEventStore implements EventStore {
 
         const subscription = query.onSnapshot(
           snapshot => {
-            snapshot.docChanges
+            snapshot
+              .docChanges()
               .filter(change => change.type === "added")
               .map(change => asEvent(change.doc))
               .forEach(event => {
@@ -78,7 +79,10 @@ export class FirestoreEventStore implements EventStore {
       catchError(error => {
         if (reconnect) {
           console.log(`[WARN] FirestoreStream: Reconnecting after connection failure: ${error.message}`);
-          return of(position).pipe(delay(100), flatMap(streamStartingAfter));
+          return of(position).pipe(
+            delay(100),
+            flatMap(streamStartingAfter)
+          );
         } else {
           throw error;
         }

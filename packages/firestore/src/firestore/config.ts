@@ -1,9 +1,9 @@
-import { Logger, LoggerInstance, transports } from "winston";
+import { createLogger, Logger, transports } from "winston";
 
-function create(): LoggerInstance {
-  return new Logger({
+function create(): Logger {
+  return createLogger({
     level: "debug",
-    transports: [new transports.Console({ colorize: true, handleExceptions: true })],
+    transports: [new transports.Console({ handleExceptions: true })],
   });
 }
 

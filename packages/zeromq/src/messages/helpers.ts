@@ -70,7 +70,7 @@ export function timestamp(message: t.Message<any>): Date {
 export function verifyCommand(source: Command): Command {
   const { aggregateId, command, data } = source;
 
-  if (undefined === aggregateId) {
+  if (undefined === (aggregateId as any)) {
     throw new Error("Expected command aggregate id");
   }
 

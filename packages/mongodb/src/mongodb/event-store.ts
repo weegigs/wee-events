@@ -53,7 +53,7 @@ export class MongoEventStore implements EventStore {
     const collection = this.collection;
     let latest = "";
 
-    const existing: Observable<PublishedEvent<E>> = Observable.create((observer: Observer<PublishedEvent<E>>) => {
+    const existing: Observable<PublishedEvent<E>> = new Observable((observer: Observer<PublishedEvent<E>>) => {
       const { after } = options;
 
       const query = after === undefined ? undefined : { "__publicationMetadata.id": { $gt: after } };

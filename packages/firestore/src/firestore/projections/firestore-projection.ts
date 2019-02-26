@@ -15,7 +15,7 @@ import { config } from "../config";
 import { position } from "./utilities";
 
 function documentId(id: AggregateId) {
-  const buffer = new Buffer(`${id.id}:${id.type}`);
+  const buffer = Buffer.from(`${id.id}:${id.type}`);
   return buffer.toString("base64");
 }
 
