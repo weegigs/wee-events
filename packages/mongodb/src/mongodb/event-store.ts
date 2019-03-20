@@ -1,6 +1,6 @@
 import { Observable, Subject, Observer, defer, concat } from "rxjs";
 import { filter } from "rxjs/operators";
-import { Collection, MongoError } from "mongodb";
+import { Collection, MongoError, ReadPreference } from "mongodb";
 
 import {
   SourceEvent,
@@ -43,7 +43,7 @@ export class MongoEventStore implements EventStore {
   async publish(events: SourceEvent<any> | SourceEvent<any>[]): Promise<PublishedEvent<any>[]> {
     const published = toPublished(events).map(e => ({ _id: eventId(e), ...e }));
 
-    await this.collection.insertMany(published);
+    await this.collection.insertMany(published, { w: "majority" });
     published.forEach(e => this.events.next(e));
 
     return published;
@@ -99,6 +99,7 @@ export class MongoEventStore implements EventStore {
 
     return this.collection
       .find(query)
+      .setReadPreference(ReadPreference.PRIMARY)
       .sort({ "__publicationMetadata.id": 1 })
       .toArray();
   }
