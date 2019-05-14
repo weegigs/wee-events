@@ -5,7 +5,7 @@ import { aggregateFilter } from "./aggregate-projections/utilities";
 
 export type CollectionResolver = (id: AggregateId) => Collection;
 
-export const TypeNameCollectionResolver = (db: Db): ((id: AggregateId) => Collection) => {
+export const createTypeNameCollectionResolver = (db: Db): ((id: AggregateId) => Collection) => {
   return (id: AggregateId) => {
     return db.collection(`version.${id.type}`);
   };
