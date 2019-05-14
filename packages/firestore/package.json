@@ -49,7 +49,7 @@
   },
   "peerDependencies": {
     "@google-cloud/firestore": "^1.0",
-    "@weegigs/events-core": "^0.12",
+    "@weegigs/events-core": "^0.13",
     "rxjs": "^6.4",
     "winston": "^3.2"
   },

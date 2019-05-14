@@ -53,7 +53,7 @@
     "mongodb": "3.1.13"
   },
   "peerDependencies": {
-    "@weegigs/events-core": "^0.12",
+    "@weegigs/events-core": "^0.13",
     "rxjs": "^6.4",
     "winston": "^3.2"
   },
