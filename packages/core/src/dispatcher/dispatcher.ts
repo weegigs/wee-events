@@ -1,7 +1,7 @@
 import { OrderedSet, Map } from "immutable";
 import { queue, AsyncWorker, AsyncQueue } from "async";
 
-import { Aggregate, Command, CommandHandler, ExecuteResult, AggregateId } from "../aggregate";
+import { Aggregate, Command, CommandHandler, ExecuteResult, AggregateId, aggregateKey } from "../aggregate";
 import { EventStore } from "../event-store";
 import { success, failure } from "../result";
 import { InternalInconsistencyError } from "../errors";
@@ -82,7 +82,7 @@ function dispatcher(loader: Loader, action: Action): (command: Command) => Promi
 let queues: Map<string, AsyncQueue<Command>> = Map();
 function queueFor(loader: Loader, aggregateId: AggregateId, action: Action): AsyncQueue<Command> {
   const { type, id } = aggregateId;
-  const key = `${type}|${id}`;
+  const key = aggregateKey(aggregateId)
   let q = queues.get(key);
   if (q === undefined) {
     const worker: AsyncWorker<Command, Error> = async (command: Command): Promise<ExecuteResult> => {

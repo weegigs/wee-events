@@ -2,10 +2,11 @@ import { queue, AsyncWorker, AsyncQueue } from "async";
 import { Map } from "immutable";
 
 import { config } from "../config";
-import { SourceEvent } from "../types";
+import { SourceEvent, PublishedEvent } from "../types";
 import { eventId } from "../utilities";
+import { AggregateId, aggregateKey } from "../aggregate";
+
 import { ProjectionFunction } from "./types";
-import { PublishedEvent, AggregateId } from "../index";
 
 type Task = {
   projection: ProjectionFunction<any>;
@@ -33,7 +34,7 @@ export function serialize<E extends SourceEvent>(projection: ProjectionFunction<
 
   const queueForAggregate = (aggregateId: AggregateId): AsyncQueue<Task> => {
     const { type, id } = aggregateId;
-    const key = `${type}|${id}`;
+    const key = aggregateKey(aggregateId);
     let q = queues.get(key);
     if (q === undefined) {
       q = queue(worker, 1);

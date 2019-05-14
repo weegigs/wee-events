@@ -121,12 +121,8 @@ async function process(
 
   const { value: events, error } = await run(version, command, valid);
 
-  if (error !== undefined) {
-    return failure(error);
-  }
-
   if (events === undefined) {
-    return failure(new InternalInconsistencyError("No events or error generated"));
+    return failure(error || new InternalInconsistencyError("No events or error generated"));
   }
 
   if (Array.isArray(events) && events.length === 0) {
