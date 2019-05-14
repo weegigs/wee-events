@@ -66,11 +66,11 @@ function dispatcher(loader: Loader, action: Action): (command: Command) => Promi
     return new Promise((resolve, reject) => {
       queueFor(loader, command.aggregateId, action).push<ExecuteResult, Error>(command, (error, result) => {
         if (error) {
-          resolve(failure(error));
+          return resolve(failure(error));
         }
 
         if (result) {
-          resolve(result);
+          return resolve(result);
         }
 
         throw new InternalInconsistencyError("queue returned neither a value or an error");
