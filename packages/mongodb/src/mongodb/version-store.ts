@@ -19,7 +19,7 @@ export class MongoVersionStore implements VersionStore {
   };
 
   write = async (version: VersionRecord): Promise<VersionRecord> => {
-    await this.collection(version.id).updateOne(
+    await this.collection(version.id).replaceOne(
       aggregateFilter(version.id),
       { _id: version.id, ...version },
       { upsert: true }
