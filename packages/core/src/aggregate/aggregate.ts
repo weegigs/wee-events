@@ -3,12 +3,13 @@ import * as R from "ramda";
 import { Subject, BehaviorSubject, zip } from "rxjs";
 import { OrderedMap, OrderedSet } from "immutable";
 
-import { eventId } from "../utilities";
 import { success, failure, Result } from "../result";
 import { SourceEvent, PublishedEvent } from "../types";
 import { EventStore } from "../event-store";
 import { config } from "../config";
 import { InternalInconsistencyError } from "../errors";
+
+import { aggregateVersionFromEvents, aggregateKey } from "./utilities";
 
 import {
   Command,
@@ -19,7 +20,6 @@ import {
   CommandHandler,
   ExecuteResult,
 } from "./types";
-import { aggregateKey } from "./utilities";
 
 type Action = (aggregate: AggregateVersion) => Promise<AggregateVersion>;
 type CommandHandlers = OrderedMap<CommandType, OrderedSet<CommandHandler>>;
@@ -86,7 +86,7 @@ export class Aggregate {
 
   private async load(id: AggregateId): Promise<AggregateVersion> {
     const published = await this.stream.snapshot(id);
-    const version = versionFromEvents({ id, version: undefined, events: [] }, published);
+    const version = aggregateVersionFromEvents(id, published);
 
     return version;
   }
@@ -130,7 +130,7 @@ async function process(
   }
 
   const published = await publish(events);
-  const newVersion = versionFromEvents(version, published);
+  const newVersion = aggregateVersionFromEvents(version.id, published, version);
   return success({ events: published, version: newVersion });
 }
 
@@ -164,13 +164,4 @@ async function run(
       return current;
     }
   }, Promise.resolve(success<SourceEvent<any>[], Error>(events)));
-}
-
-const sortEvents = (events: PublishedEvent[]) => R.sortBy<PublishedEvent>(eventId, R.uniqBy(eventId, events));
-
-function versionFromEvents(current: AggregateVersion, published: PublishedEvent[]): AggregateVersion {
-  const latest = R.last(published);
-  const version = (latest && eventId(latest)) || current.version;
-  const events = sortEvents(R.concat(current.events, published));
-  return { id: current.id, version, events };
 }
