@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-core",
-  "version": "0.13.2",
+  "version": "0.13.5",
   "description": "Core components for the wee gigs event sourcing system",
   "license": "MIT",
   "main": "lib/index.js",
