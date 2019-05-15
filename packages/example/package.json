@@ -4,7 +4,7 @@
   "license": "MIT",
   "private": true,
   "main": "lib/index.js",
-  "version": "0.13.5",
+  "version": "0.13.6",
   "scripts": {
     "clean": "rimraf lib",
     "compile:tsc": "tsc -p .",
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@google-cloud/firestore": "0.14.1",
-    "@weegigs/events-core": "0.13.5",
+    "@weegigs/events-core": "0.13.6",
     "rxjs": "6.2.1"
   },
   "repository": {
