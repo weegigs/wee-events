@@ -1,13 +1,21 @@
 import * as async from "async";
 
-import { AggregateVersion } from "../aggregate";
+import { AggregateVersion, loadAggregateVersion } from "../aggregate";
 import { SourceEvent } from "../types";
 import { InternalInconsistencyError } from "../errors";
 
-import { InitialReducer } from "./types";
+import { InitialReducer, ProjectionFunction } from "./types";
 import { VersionStore, VersionRecord } from "./version-store";
+import { EventStore } from "../event-store";
 
 export type Reducers = Record<string, InitialReducer<any, any>>;
+
+export function createVersionProjection(store: EventStore, writer: VersionWriter): ProjectionFunction {
+  return async event => {
+    let version = await loadAggregateVersion(store, event.aggregateId);
+    await writer.write(version);
+  };
+}
 
 export interface VersionWriter {
   write: (version: AggregateVersion) => Promise<VersionRecord | undefined>;
