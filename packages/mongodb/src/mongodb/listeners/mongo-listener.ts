@@ -1,4 +1,12 @@
-import { SourceEvent, PublishedEvent, ProjectionFunction, serialize, eventId } from "@weegigs/events-core";
+import {
+  eventId,
+  ListenerPositionStore,
+  ProjectionFunction,
+  PublishedEvent,
+  serialize,
+  SourceEvent,
+  EventId,
+} from "@weegigs/events-core";
 import { Collection } from "mongodb";
 import { Subscription } from "rxjs";
 import { filter } from "rxjs/operators";
@@ -9,23 +17,32 @@ import { createEventFilter } from "../utilities";
 
 import { ListenerMetadata, ListenerOptions } from "./types";
 
-async function metadataFor(name: string, collection: Collection): Promise<ListenerMetadata> {
-  const document = await collection.findOne({ _id: name });
-  return document === null ? { name } : document;
-}
+export class MongoListenerPositionStore implements ListenerPositionStore {
+  constructor(private readonly collection: Collection) {}
 
-async function position(name: string, collection: Collection) {
-  const { position } = await metadataFor(name, collection);
-  return position;
-}
+  async positionFor(listener: string): Promise<EventId | undefined> {
+    const { position } = await this.metadataFor(listener);
+    return position;
+  }
 
-async function updatePosition(name: string, collection: Collection, position: string) {
-  return collection.updateOne({ _id: name }, { $set: { name, position } }, { upsert: true });
+  async updatePosition(listener: string, position: EventId): Promise<EventId> {
+    try {
+      await this.collection.replaceOne({ _id: listener }, { listener, position }, { upsert: true });
+      return position;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async metadataFor(name: string): Promise<ListenerMetadata> {
+    const document = await this.collection.findOne({ _id: name });
+    return document === null ? { name } : document;
+  }
 }
 
 function createProjection<E extends SourceEvent = any>(
   name: string,
-  collection: Collection,
+  position: ListenerPositionStore,
   options: ListenerOptions
 ): ProjectionFunction<E> {
   const projection = options.projection;
@@ -33,23 +50,23 @@ function createProjection<E extends SourceEvent = any>(
   return (event: PublishedEvent<E>) => {
     return serialize(async (event: PublishedEvent<E>) => {
       await projection(event);
-      await updatePosition(name, collection, eventId(event));
+      await position.updatePosition(name, eventId(event));
     })(event);
   };
 }
 
 export async function attachListener(
   store: MongoEventStore,
-  collection: Collection,
+  position: ListenerPositionStore,
   options: ListenerOptions
 ): Promise<Subscription> {
   const { name, events } = options;
 
-  const after = await position(name, collection);
+  const after = await position.positionFor(name);
   const streamOptions = { after };
 
   const eventFilter = createEventFilter(events);
-  const projection = createProjection(name, collection, options);
+  const projection = createProjection(name, position, options);
 
   return store
     .stream(streamOptions)

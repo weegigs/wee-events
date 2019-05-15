@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 
-import { SourceEvent, PublishedEvent } from "@weegigs/events-core";
+import { SourceEvent, PublishedEvent, ListenerPositionStore } from "@weegigs/events-core";
 import { Collection } from "mongodb";
 import { Subscription } from "rxjs";
 
@@ -42,11 +42,12 @@ function createAggregateProjection<T, E extends SourceEvent = SourceEvent>(
 
 export async function attachAggregateProjection(
   store: MongoEventStore,
+  position: ListenerPositionStore,
   collection: Collection,
   options: AggregateProjectionOptions<any>
 ): Promise<Subscription> {
   const projection = createAggregateProjection(collection, options);
   const listenerOptions = { ...options, projection };
 
-  return attachListener(store, collection, listenerOptions);
+  return attachListener(store, position, listenerOptions);
 }

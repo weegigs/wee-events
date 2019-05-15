@@ -1,4 +1,4 @@
-import { SourceEvent, PublishedEvent } from "@weegigs/events-core";
+import { SourceEvent, PublishedEvent, ListenerPositionStore } from "@weegigs/events-core";
 import { Collection } from "mongodb";
 import { Subscription } from "rxjs";
 
@@ -24,11 +24,12 @@ function createCollectionProjection<E extends SourceEvent = SourceEvent>(
 
 export async function attachCollectionProjection(
   store: MongoEventStore,
+  position: ListenerPositionStore,
   collection: Collection,
   options: CollectionProjectionOptions<any>
 ): Promise<Subscription> {
   const projection = createCollectionProjection(collection, options);
   const listenerOptions = { ...options, projection };
 
-  return attachListener(store, collection, listenerOptions);
+  return attachListener(store, position, listenerOptions);
 }
