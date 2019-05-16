@@ -1,21 +1,7 @@
-import {
-  eventId,
-  ListenerPositionStore,
-  ProjectionFunction,
-  PublishedEvent,
-  serialize,
-  SourceEvent,
-  EventId,
-} from "@weegigs/events-core";
+import { ListenerPositionStore, EventId } from "@weegigs/events-core";
 import { Collection } from "mongodb";
-import { Subscription } from "rxjs";
-import { filter } from "rxjs/operators";
 
-import { MongoEventStore } from "../event-store";
-import { config } from "../config";
-import { createEventFilter } from "../utilities";
-
-import { ListenerMetadata, ListenerOptions } from "./types";
+import { ListenerMetadata } from "./types";
 
 export class MongoListenerPositionStore implements ListenerPositionStore {
   constructor(private readonly collection: Collection) {}
@@ -38,46 +24,4 @@ export class MongoListenerPositionStore implements ListenerPositionStore {
     const document = await this.collection.findOne({ _id: name });
     return document === null ? { name } : document;
   }
-}
-
-function createProjection<E extends SourceEvent = any>(
-  name: string,
-  position: ListenerPositionStore,
-  options: ListenerOptions
-): ProjectionFunction<E> {
-  const projection = options.projection;
-
-  return (event: PublishedEvent<E>) => {
-    return serialize(async (event: PublishedEvent<E>) => {
-      await projection(event);
-      await position.updatePosition(name, eventId(event));
-    })(event);
-  };
-}
-
-export async function attachListener(
-  store: MongoEventStore,
-  position: ListenerPositionStore,
-  options: ListenerOptions
-): Promise<Subscription> {
-  const { name, events } = options;
-
-  const after = await position.positionFor(name);
-  const streamOptions = { after };
-
-  const eventFilter = createEventFilter(events);
-  const projection = createProjection(name, position, options);
-
-  return store
-    .stream(streamOptions)
-    .pipe(filter(eventFilter))
-    .subscribe(
-      event => projection(event),
-      error => {
-        config.logger.error(`${name}: Event stream error`, error);
-      },
-      () => {
-        config.logger.info(`${name}: Event stream completed`);
-      }
-    ) as any;
 }

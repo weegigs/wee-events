@@ -1,5 +1,7 @@
 import { EventStreamOptions } from "../event-store";
-import { EventId } from "../types";
+import { EventId, PublishedEvent } from "../types";
+
+export type Listener = (event: PublishedEvent) => Promise<void> | void;
 
 export interface ListenerOptions extends EventStreamOptions {
   /** Name of the listener */
