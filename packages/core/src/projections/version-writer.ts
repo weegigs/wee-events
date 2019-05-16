@@ -37,6 +37,10 @@ export class ReducerWriter implements VersionWriter {
     }
 
     const entity = await rehydrate(reducer, events);
+    if (entity === undefined) {
+      return undefined;
+    }
+
     const record = {
       id,
       version: revision,
