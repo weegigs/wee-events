@@ -21,7 +21,7 @@ export function serializer(name: string, listener: Listener): Listener {
     try {
       await listener(event);
     } catch (error) {
-      config.logger.error(`serializer-${name}: failed to process event`, {
+      config.logger.error(`${name}: failed to process event`, {
         name,
         aggregate: event.aggregateId,
         event: {

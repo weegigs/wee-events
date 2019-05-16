@@ -6,22 +6,32 @@ import { filter } from "rxjs/operators";
 import { EventStore } from "../event-store";
 import { serialize } from "../projections";
 
-import { ListenerPositionStore, ListenerOptions, Listener } from "./types";
+import { ListenerPositionStore, ListenerOptions, Listener, EventFilter } from "./types";
 import { PublishedEvent } from "../types";
 import { eventId } from "../utilities";
 import { config } from "../config";
 
-function createEventFilter<E extends PublishedEvent>(events?: string | string[]): (event: E) => boolean {
-  const types = events !== undefined ? (_.isArray(events) ? events : [events]) : undefined;
-  return (event: E) => types === undefined || _.includes(types, event.type);
+function includes(types: string[]) {
+  return (event: PublishedEvent): boolean => {
+    return _.includes(types, event.type);
+  };
 }
 
-function createSerializedListener(
-  name: string,
-  listener: Listener,
-  position: ListenerPositionStore,
-  options: ListenerOptions
-): Listener {
+const all = (event: PublishedEvent) => true;
+
+function createEventFilter<E extends PublishedEvent>(events?: string | string[] | EventFilter): (event: E) => boolean {
+  if (events === undefined) {
+    return all;
+  }
+
+  if (_.isFunction(events)) {
+    return events;
+  }
+
+  return _.isArray(events) ? includes(events) : includes([events]);
+}
+
+function createSerializedListener(name: string, listener: Listener, position: ListenerPositionStore): Listener {
   return async (event: PublishedEvent) => {
     return serialize(async (event: PublishedEvent) => {
       await listener(event);
@@ -42,7 +52,7 @@ export async function attachListener(
   const streamOptions = { after };
 
   const eventFilter = createEventFilter(events);
-  const serialized = createSerializedListener(name, listener, position, options);
+  const serialized = createSerializedListener(name, listener, position);
 
   return store
     .stream(streamOptions)
