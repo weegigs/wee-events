@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-mongo",
-  "version": "0.13.9",
+  "version": "0.13.10",
   "description": "Mongo event store and projections for @weegigs/events",
   "license": "MIT",
   "main": "lib/index.js",
@@ -28,7 +28,7 @@
     "@types/mz": "0.0.32",
     "@types/node": "11.11.4",
     "@types/ramda": "0.26.3",
-    "@weegigs/events-core": "0.13.9",
+    "@weegigs/events-core": "0.13.10",
     "concurrently": "4.1.0",
     "dotenv": "7.0.0",
     "faker": "4.1.0",
