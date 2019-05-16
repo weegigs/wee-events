@@ -23,12 +23,13 @@ export function serializer(name: string, listener: Listener): Listener {
     } catch (error) {
       config.logger.error(`serializer-${name}: failed to process event`, {
         name,
+        aggregate: event.aggregateId,
         event: {
           id: eventId(event),
           type: event.type,
         },
-        error,
         description: error.description || error.message,
+        error,
       });
     }
   };
