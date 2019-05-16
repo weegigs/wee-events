@@ -42,16 +42,36 @@ export function serializer(name: string, listener: Listener): Listener {
       q = queue(worker, 1);
       q.drain = () => {
         queues = queues.delete(key);
-        config.logger.debug(`serializer-${name} queue removed for ${type}:${id} `, { name, type, id });
+        config.logger.debug(`${name} queue removed for ${type}:${id} `, {
+          name,
+          type,
+          id,
+          "q-count": queues.count(),
+        });
       };
       queues = queues.set(key, q);
-      config.logger.debug(`serializer-${name} queue added for ${type}:${id} `, { name, type, id });
+      config.logger.debug(`${name} queue added for ${type}:${id} `, {
+        name,
+        type,
+        id,
+        "q-count": queues.count(),
+      });
     }
 
     return q;
   };
 
   return event => {
-    queueForAggregate(event.aggregateId).push({ listener, event });
+    const { aggregateId } = event;
+    const { type, id } = aggregateId;
+
+    const q = queueForAggregate(aggregateId);
+    q.push({ listener, event });
+    config.logger.debug(`${name} event added for ${type}:${id} `, {
+      type,
+      id,
+      name,
+      length: q.length(),
+    });
   };
 }
