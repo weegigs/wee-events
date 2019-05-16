@@ -44,7 +44,6 @@ export class ReducerWriter implements VersionWriter {
     const record = {
       id,
       version: revision,
-      events,
       entity,
     };
 
