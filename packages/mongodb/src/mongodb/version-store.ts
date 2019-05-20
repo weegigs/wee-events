@@ -19,20 +19,14 @@ export class MongoVersionStore implements VersionStore {
   };
 
   write = async (version: VersionRecord): Promise<VersionRecord> => {
-    // KAO: Multiple versions may exist in the version store
-    // during a write.
-    // Selection would need to be aware of the possibility of multiple versions and
-    // return the most recent
-    await this.collection(version.id).replaceOne(
-      aggregateFilter(version.id),
-      { _id: version.id, ...version },
-      { upsert: true }
-    );
-
-    const collection = this.collection(version.id);
+    // KAO: Multiple versions may exist in the version store during a write.
+    // Read needs to be aware of the possibility of multiple versions and
+    // return the most recent.
+    const { id, version: revision } = version;
+    const collection = this.collection(id);
     try {
-      await collection.insertOne({ _id: { ...version.id, version: version.version }, ...version });
-      await collection.deleteMany({ _id: { ...version.id, version: { $lt: version.version } } });
+      await collection.insertOne({ _id: { ...id, version: revision }, ...version });
+      await collection.deleteMany({ ...aggregateFilter(id), version: { $lt: revision } });
     } catch (err) {
       if (err.code !== 11000) {
         throw err;
@@ -45,7 +39,7 @@ export class MongoVersionStore implements VersionStore {
   read = async (id: AggregateId): Promise<VersionRecord | undefined> => {
     const query = this.collection(id)
       .find(aggregateFilter(id))
-      .sort({ _id: { version: -1 } })
+      .sort({ version: -1 })
       .limit(1);
 
     try {
