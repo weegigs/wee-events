@@ -1,18 +1,29 @@
 import * as async from "async";
 
 import { AggregateVersion, loadAggregateVersion } from "../aggregate";
-import { SourceEvent } from "../types";
 import { InternalInconsistencyError } from "../errors";
+import { Listener } from "../listener";
+import { SourceEvent, PublishedEvent } from "../types";
+import { eventId } from "../utilities";
 
-import { InitialReducer, ProjectionFunction } from "./types";
-import { VersionStore, VersionRecord } from "./version-store";
 import { EventStore } from "../event-store";
+import { InitialReducer } from "./types";
+import { VersionStore, VersionRecord } from "./version-store";
 
 export type Reducers = Record<string, InitialReducer<any, any>>;
 
-export function createVersionProjection(store: EventStore, writer: VersionWriter): ProjectionFunction {
-  return async event => {
-    let version = await loadAggregateVersion(store, event.aggregateId);
+export function createReducerProjection(events: EventStore, versions: VersionStore, reducers: Reducers): Listener {
+  const writer = new ReducerWriter(versions, reducers);
+  return async (event: PublishedEvent) => {
+    const { aggregateId } = event;
+    const eid = eventId(event);
+
+    const current = await versions.read(aggregateId);
+    if (current && current.version >= eid) {
+      return;
+    }
+
+    let version = await loadAggregateVersion(events, event.aggregateId);
     await writer.write(version);
   };
 }
