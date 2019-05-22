@@ -21,15 +21,18 @@ export function serializer(name: string, listener: Listener): Listener {
     try {
       await listener(event);
     } catch (error) {
-      config.logger.error(`${name}: failed to process event`, {
+      const { fileName, lineNumber, description, message } = error;
+
+      config.logger.error(`${name}: failed to process ${event.type}`, {
         name,
         aggregate: event.aggregateId,
         event: {
           id: eventId(event),
           type: event.type,
         },
-        description: error.description || error.message,
-        error,
+        description: description || message,
+        fileName,
+        lineNumber,
       });
     }
   };
@@ -67,7 +70,7 @@ export function serializer(name: string, listener: Listener): Listener {
 
     const q = queueForAggregate(aggregateId);
     q.push({ listener, event });
-    config.logger.debug(`${name} event added for ${type}:${id} `, {
+    config.logger.debug(`${name} event (${event.type}) added for ${type}:${id} `, {
       type,
       id,
       name,
