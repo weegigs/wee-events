@@ -372,13 +372,14 @@
   dependencies:
     "@types/node" "*"
 
-"@weegigs/events-core@0.12.7":
-  version "0.12.7"
-  resolved "https://registry.npmjs.org/@weegigs/events-core/-/events-core-0.12.7.tgz#dfab705a98321766ae461a8c0a15308e3b3f4aa5"
-  integrity sha512-8mwUilUcwLlhCiL0Liyc8sVqNPD1DD+N5Mo4DRuCdL+tJhlzBN7iNRLqRYcIIhNpG1y9lDzbI2zHOd+qbIvVFA==
+"@weegigs/events-core@0.13.14":
+  version "0.13.14"
+  resolved "https://registry.yarnpkg.com/@weegigs/events-core/-/events-core-0.13.14.tgz#9a39735bf0fb5b593c3b0f8cc1fe4980c93ba1c7"
+  integrity sha512-TbXsAkHC9sHOh6XQee83F4ks6iIYV4jWVgFfq4Mn1GPiZl2KFpDNFG9EvReqvKUAkJz83Ic4Zp/z1HIZ4mTtYg==
   dependencies:
     async "2.6.2"
     immutable "4.0.0-rc.12"
+    lodash "4.17.11"
     moment "2.24.0"
     mz "2.7.0"
     ramda "0.26.1"
@@ -404,9 +405,9 @@ acorn-walk@^6.0.1:
   integrity sha512-OtUw6JUTgxA2QoqqmrmQ7F2NYqiBPi/L2jqHyFtllhOUvXYQXf0Z1CYUinIfyT4bTCGmrA7gX9FvHA81uzCoVw==
 
 acorn@^5.5.3:
-  version "5.7.3"
-  resolved "https://registry.npmjs.org/acorn/-/acorn-5.7.3.tgz#67aa231bf8812974b85235a96771eb6bd07ea279"
-  integrity sha512-T/zvzYRfbVojPWahDsE5evJdHb3oJoQfFbsrKM7w5Zcs++Tr257tia3BmMP8XYVjp1S9RZXQMh7gao96BlqZOw==
+  version "5.7.4"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.7.4.tgz#3e8d8a9947d0599a1796d10225d7432f4a4acf5e"
+  integrity sha512-1D++VG7BhrtvQpNbBzovKNc1FLGGEE/oGe7b9xJm/RFHMBeUaUGpluV9RLjZa47YFdPcDAenEYuq9pQPcMdLJg==
 
 acorn@^6.0.1:
   version "6.1.1"
