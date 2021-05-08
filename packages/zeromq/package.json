@@ -76,7 +76,7 @@
     "access": "public"
   },
   "dependencies": {
-    "lodash": "4.17.11",
+    "lodash": "4.17.21",
     "moment": "2.24.0",
     "ulid": "2.3.0",
     "zeromq": "5.1.0"
