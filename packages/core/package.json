@@ -47,7 +47,7 @@
   "dependencies": {
     "async": "2.6.2",
     "immutable": "4.0.0-rc.12",
-    "lodash": "4.17.11",
+    "lodash": "4.17.21",
     "moment": "2.24.0",
     "mz": "2.7.0",
     "ramda": "0.26.1",
