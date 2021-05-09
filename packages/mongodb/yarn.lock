@@ -390,13 +390,14 @@
   resolved "https://registry.npmjs.org/@weegigs/concurrent/-/concurrent-1.0.1.tgz#f7b6a7bee2ab545d78ab5b4e6c549017686dfced"
   integrity sha512-2zWOVYa3GhtWLfns1WMU2nTDmJFAqqiNnk0G7Ub4wf2fouI2UmfcAuPfw5VjvVejUYt+tPX3bueCiUxvoeMxQQ==
 
-"@weegigs/events-core@0.12.7":
-  version "0.12.7"
-  resolved "https://registry.npmjs.org/@weegigs/events-core/-/events-core-0.12.7.tgz#dfab705a98321766ae461a8c0a15308e3b3f4aa5"
-  integrity sha512-8mwUilUcwLlhCiL0Liyc8sVqNPD1DD+N5Mo4DRuCdL+tJhlzBN7iNRLqRYcIIhNpG1y9lDzbI2zHOd+qbIvVFA==
+"@weegigs/events-core@0.13.14":
+  version "0.13.14"
+  resolved "https://registry.yarnpkg.com/@weegigs/events-core/-/events-core-0.13.14.tgz#9a39735bf0fb5b593c3b0f8cc1fe4980c93ba1c7"
+  integrity sha512-TbXsAkHC9sHOh6XQee83F4ks6iIYV4jWVgFfq4Mn1GPiZl2KFpDNFG9EvReqvKUAkJz83Ic4Zp/z1HIZ4mTtYg==
   dependencies:
     async "2.6.2"
     immutable "4.0.0-rc.12"
+    lodash "4.17.11"
     moment "2.24.0"
     mz "2.7.0"
     ramda "0.26.1"
@@ -1515,9 +1516,9 @@ has@^1.0.1, has@^1.0.3:
     function-bind "^1.1.1"
 
 hosted-git-info@^2.1.4:
-  version "2.7.1"
-  resolved "https://registry.npmjs.org/hosted-git-info/-/hosted-git-info-2.7.1.tgz#97f236977bd6e125408930ff6de3eec6281ec047"
-  integrity sha512-7T/BxH19zbcCTa8XkMlbK5lTo1WtgkFi3GvdWEyNuc4Vex7/9Dqbnpsf4JMydcfj9HCg4zUWFTL3Za6lapg5/w==
+  version "2.8.9"
+  resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.9.tgz#dffc0bf9a21c02209090f2aa69429e1414daf3f9"
+  integrity sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==
 
 html-encoding-sniffer@^1.0.2:
   version "1.0.2"
