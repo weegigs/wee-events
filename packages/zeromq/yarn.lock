@@ -372,13 +372,14 @@
   dependencies:
     "@types/node" "*"
 
-"@weegigs/events-core@0.12.7":
-  version "0.12.7"
-  resolved "https://registry.npmjs.org/@weegigs/events-core/-/events-core-0.12.7.tgz#dfab705a98321766ae461a8c0a15308e3b3f4aa5"
-  integrity sha512-8mwUilUcwLlhCiL0Liyc8sVqNPD1DD+N5Mo4DRuCdL+tJhlzBN7iNRLqRYcIIhNpG1y9lDzbI2zHOd+qbIvVFA==
+"@weegigs/events-core@0.13.14":
+  version "0.13.14"
+  resolved "https://registry.yarnpkg.com/@weegigs/events-core/-/events-core-0.13.14.tgz#9a39735bf0fb5b593c3b0f8cc1fe4980c93ba1c7"
+  integrity sha512-TbXsAkHC9sHOh6XQee83F4ks6iIYV4jWVgFfq4Mn1GPiZl2KFpDNFG9EvReqvKUAkJz83Ic4Zp/z1HIZ4mTtYg==
   dependencies:
     async "2.6.2"
     immutable "4.0.0-rc.12"
+    lodash "4.17.11"
     moment "2.24.0"
     mz "2.7.0"
     ramda "0.26.1"
@@ -3718,9 +3719,9 @@ throat@^4.0.0:
   integrity sha1-iQN8vJLFarGJJua6TLsgDhVnKmo=
 
 tmpl@1.0.x:
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/tmpl/-/tmpl-1.0.4.tgz#23640dd7b42d00433911140820e5cf440e521dd1"
-  integrity sha1-I2QN17QtAEM5ERQIIOXPRA5SHdE=
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/tmpl/-/tmpl-1.0.5.tgz#8683e0b902bb9c20c4f726e3c0b69f36518c07cc"
+  integrity sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==
 
 to-buffer@^1.1.1:
   version "1.1.1"
