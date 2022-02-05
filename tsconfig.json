@@ -1,0 +1,53 @@
+{
+  "extends": "@tsconfig/node14/tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "include": [
+    "scripts/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    ".build/**/*",
+    ".vscode/**/*"
+  ],
+  "references": [
+    {
+      "path": "packages/common"
+    },
+    {
+      "path": "packages/cypher"
+    },
+    {
+      "path": "packages/dynamo-event-store"
+    },
+    {
+      "path": "packages/effects"
+    },
+    {
+      "path": "packages/events"
+    },
+    {
+      "path": "packages/logging"
+    },
+    {
+      "path": "packages/render"
+    }
+  ]
+}

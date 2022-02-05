@@ -1,0 +1,74 @@
+{
+  "name": "@weegigs/effects",
+  "version": "0.15.0",
+  "description": "Effects utilities for Wee Events",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "packageManager": "yarn@3.1.1",
+  "scripts": {
+    "build": "yarn ws:build",
+    "clean": "yarn ws:clean",
+    "compile": "yarn ws:compile",
+    "test": "yarn ws:test",
+    "lint": "yarn ws:lint",
+    "doctor": "yarn ws:doctor",
+    "fix": "yarn run ws:fix"
+  },
+  "author": "Kevin O'Neill <kevin@weegigs.com.au>",
+  "license": "ISC",
+  "dependencies": {
+    "@effect-ts/node": "^0.36.0",
+    "@middy/core": "^2.5.7",
+    "@middy/do-not-wait-for-empty-event-loop": "^2.5.7",
+    "aws-lambda": "^1.0.7"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-cloudwatch": "*",
+    "@aws-sdk/client-dynamodb": "*",
+    "@aws-sdk/client-eventbridge": "*",
+    "@aws-sdk/client-sfn": "*",
+    "@effect-ts/core": "*",
+    "@effect-ts/system": "*"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.49.0",
+    "@aws-sdk/client-dynamodb": "^3.49.0",
+    "@aws-sdk/client-eventbridge": "^3.49.0",
+    "@aws-sdk/client-sfn": "^3.49.0",
+    "@effect-ts/core": "^0.55.1",
+    "@effect-ts/node": "^0.36.0",
+    "@effect-ts/system": "^0.52.1",
+    "@tsconfig/node14": "^1.0.1",
+    "@types/aws-lambda": "^8.10.92",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^14.18.10",
+    "jest": "^27.4.7",
+    "ts-jest": "^27.1.3",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.5"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "lib"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "**/*.{ts,tsx}",
+      "!**/node_modules/**"
+    ],
+    "testMatch": [
+      "**/*.spec.ts",
+      "**/*.test.ts"
+    ],
+    "collectCoverage": false,
+    "coverageReporters": [
+      "html"
+    ]
+  },
+  "prettier": {
+    "printWidth": 120,
+    "trailingComma": "es5"
+  }
+}

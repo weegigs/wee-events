@@ -1,0 +1,181 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`dynamo store encryption should tokenize the content of encrypted events 1`] = `
+Object {
+  "array": Array [
+    "array.0:one",
+  ],
+  "boolean": true,
+  "nested": Object {
+    "number": -105807839,
+    "string": "nested.string:a nested string",
+  },
+  "number": -393008511,
+  "string": "string:a string",
+}
+`;
+
+exports[`dynamo store event publishing rejects events with invalid data 1`] = `
+[ZodError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "code": "invalid_union",
+            "unionErrors": [
+              {
+                "issues": [
+                  {
+                    "code": "invalid_type",
+                    "expected": "string",
+                    "received": "null",
+                    "path": [
+                      "data",
+                      "value"
+                    ],
+                    "message": "Expected string, received null"
+                  }
+                ],
+                "name": "ZodError"
+              },
+              {
+                "issues": [
+                  {
+                    "code": "invalid_type",
+                    "expected": "number",
+                    "received": "null",
+                    "path": [
+                      "data",
+                      "value"
+                    ],
+                    "message": "Expected number, received null"
+                  }
+                ],
+                "name": "ZodError"
+              },
+              {
+                "issues": [
+                  {
+                    "code": "invalid_type",
+                    "expected": "boolean",
+                    "received": "null",
+                    "path": [
+                      "data",
+                      "value"
+                    ],
+                    "message": "Expected boolean, received null"
+                  }
+                ],
+                "name": "ZodError"
+              }
+            ],
+            "path": [
+              "data",
+              "value"
+            ],
+            "message": "Invalid input"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_union",
+            "unionErrors": [
+              {
+                "issues": [
+                  {
+                    "code": "invalid_type",
+                    "expected": "array",
+                    "received": "null",
+                    "path": [
+                      "data",
+                      "value"
+                    ],
+                    "message": "Expected array, received null"
+                  }
+                ],
+                "name": "ZodError"
+              },
+              {
+                "issues": [
+                  {
+                    "code": "invalid_type",
+                    "expected": "array",
+                    "received": "null",
+                    "path": [
+                      "data",
+                      "value"
+                    ],
+                    "message": "Expected array, received null"
+                  }
+                ],
+                "name": "ZodError"
+              },
+              {
+                "issues": [
+                  {
+                    "code": "invalid_type",
+                    "expected": "array",
+                    "received": "null",
+                    "path": [
+                      "data",
+                      "value"
+                    ],
+                    "message": "Expected array, received null"
+                  }
+                ],
+                "name": "ZodError"
+              }
+            ],
+            "path": [
+              "data",
+              "value"
+            ],
+            "message": "Invalid input"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "object",
+            "received": "null",
+            "path": [
+              "data",
+              "value"
+            ],
+            "message": "Expected object, received null"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [
+      "data",
+      "value"
+    ],
+    "message": "Invalid input"
+  }
+]]
+`;
+
+exports[`dynamo store event publishing rejects events with invalid type 1`] = `
+[ZodError: [
+  {
+    "code": "too_small",
+    "minimum": 1,
+    "type": "string",
+    "inclusive": true,
+    "message": "Should be at least 1 characters",
+    "path": [
+      "type"
+    ]
+  }
+]]
+`;

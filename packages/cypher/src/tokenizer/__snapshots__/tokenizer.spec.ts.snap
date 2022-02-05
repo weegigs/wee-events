@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`tokenizer should tokenize a payload with nested lists 1`] = `
+Object {
+  "nested": Array [
+    Object {
+      "boolean": true,
+      "number": 833454428,
+      "string": "nested.0.string|string",
+    },
+    Object {
+      "boolean": true,
+      "number": -963496772,
+      "string": "nested.1.string|another",
+    },
+  ],
+}
+`;
+
+exports[`tokenizer should tokenize a payload with nested payloads 1`] = `
+Object {
+  "nested": Object {
+    "boolean": true,
+    "number": 1681225690,
+    "string": "nested.string|string",
+  },
+}
+`;
+
+exports[`tokenizer should tokenize a payload with simple values 1`] = `
+Object {
+  "boolean": false,
+  "number": 1649953809,
+  "string": "string|string",
+}
+`;

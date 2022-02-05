@@ -1,0 +1,60 @@
+{
+  "name": "@weegigs/events-render",
+  "version": "0.15.0",
+  "description": "Document Rendering for Wee Events",
+  "author": "Kevin O'Neill <kevin@weegigs.com.au>",
+  "license": "ISC",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "packageManager": "yarn@3.1.1",
+  "scripts": {
+    "build": "yarn ws:build",
+    "clean": "yarn ws:clean",
+    "compile": "yarn ws:compile",
+    "test": "yarn ws:test",
+    "lint": "yarn ws:lint",
+    "doctor": "yarn ws:doctor",
+    "fix": "yarn run ws:fix"
+  },
+  "peerDependencies": {
+    "@effect-ts/core": "*",
+    "@weegigs/wee-events": "workspace:^"
+  },
+  "devDependencies": {
+    "@effect-ts/core": "^0.55.1",
+    "@tsconfig/node14": "^1.0.1",
+    "@types/jest": "^27.4.0",
+    "@types/lodash": "^4.14.178",
+    "@types/node": "^14.18.10",
+    "@weegigs/wee-events": "workspace:*",
+    "jest": "^27.4.7",
+    "testcontainers": "^8.2.0",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.5.5"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "**/*.{ts,tsx}",
+      "!**/node_modules/**"
+    ],
+    "testMatch": [
+      "**/*.spec.ts",
+      "**/*.test.ts"
+    ],
+    "collectCoverage": false,
+    "coverageReporters": [
+      "html"
+    ]
+  },
+  "prettier": {
+    "printWidth": 120,
+    "trailingComma": "es5"
+  },
+  "dependencies": {
+    "@weegigs/effects": "workspace:^",
+    "firebase-admin": "^10.0.2",
+    "lodash": "^4.17.21"
+  }
+}
