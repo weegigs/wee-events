@@ -5,6 +5,10 @@
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
   "private": true,
   "packageManager": "yarn@3.1.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/weegigs/wee-events.git"
+  },
   "scripts": {
     "bootstrap": "yarn install --immutable",
     "clean": "ultra -r clean",
