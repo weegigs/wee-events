@@ -39,7 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/effects"
       },
       {
-        "name": "@weegigs/wee-events",
+        "name": "@weegigs/events-core",
         "reference": "workspace:packages/events"
       },
       {
@@ -61,12 +61,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@weegigs/dynamo-event-store", ["virtual:ce4d1808b2c102ec4ed8ffd27a404aa5d62fb9c51383ae4b0f0ae428209c47ae1d844c2c18a9d8b017f876a99c7d0fb7d7ff72011c2abd4b679de4e14cf8e1f4#workspace:packages/dynamo-event-store", "workspace:packages/dynamo-event-store"]],
       ["@weegigs/effects", ["virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/effects", "workspace:packages/effects"]],
       ["@weegigs/events-common", ["workspace:packages/common"]],
+      ["@weegigs/events-core", ["virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events", "workspace:packages/events"]],
       ["@weegigs/events-cypher", ["virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/cypher", "workspace:packages/cypher"]],
       ["@weegigs/events-logging", ["workspace:packages/logging"]],
       ["@weegigs/events-monorepo", ["workspace:."]],
       ["@weegigs/events-render", ["workspace:packages/render"]],
-      ["@weegigs/events-tools", ["workspace:tools/events"]],
-      ["@weegigs/wee-events", ["virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events", "workspace:packages/events"]]
+      ["@weegigs/events-tools", ["workspace:tools/events"]]
     ],
     "fallbackPool": [
     ],
@@ -2869,12 +2869,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/lodash", "npm:4.14.178"],
             ["@types/luxon", "npm:2.0.9"],
             ["@types/node", "npm:14.18.10"],
+            ["@types/weegigs__events-core", null],
             ["@types/weegigs__events-cypher", null],
-            ["@types/weegigs__wee-events", null],
             ["@weegigs/effects", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/effects"],
             ["@weegigs/events-common", "workspace:packages/common"],
+            ["@weegigs/events-core", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["@weegigs/events-cypher", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/cypher"],
-            ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
             ["lodash", "npm:4.17.21"],
             ["luxon", "npm:2.3.0"],
@@ -2888,9 +2888,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             "@effect-ts/core",
             "@types/aws-sdk__client-dynamodb",
             "@types/effect-ts__core",
+            "@types/weegigs__events-core",
             "@types/weegigs__events-cypher",
-            "@types/weegigs__wee-events",
-            "@weegigs/wee-events"
+            "@weegigs/events-core"
           ],
           "linkType": "SOFT",
         }],
@@ -2912,8 +2912,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:14.18.10"],
             ["@weegigs/effects", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/effects"],
             ["@weegigs/events-common", "workspace:packages/common"],
+            ["@weegigs/events-core", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["@weegigs/events-cypher", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/cypher"],
-            ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
             ["lodash", "npm:4.17.21"],
             ["luxon", "npm:2.3.0"],
@@ -3006,6 +3006,54 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "SOFT",
         }]
       ]],
+      ["@weegigs/events-core", [
+        ["virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events", {
+          "packageLocation": "./.yarn/__virtual__/@weegigs-events-core-virtual-a3da19cbee/1/packages/events/",
+          "packageDependencies": [
+            ["@weegigs/events-core", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
+            ["@effect-ts/core", "npm:0.55.1"],
+            ["@tsconfig/node14", "npm:1.0.1"],
+            ["@types/effect-ts__core", null],
+            ["@types/jest", "npm:27.4.0"],
+            ["@types/lodash", "npm:4.14.178"],
+            ["@types/luxon", "npm:2.0.9"],
+            ["@types/node", "npm:14.18.10"],
+            ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
+            ["lodash", "npm:4.17.21"],
+            ["luxon", "npm:2.3.0"],
+            ["nanoid", "npm:3.2.0"],
+            ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
+            ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"],
+            ["ulid", "npm:2.3.0"],
+            ["zod", "npm:3.11.6"]
+          ],
+          "packagePeers": [
+            "@types/effect-ts__core"
+          ],
+          "linkType": "SOFT",
+        }],
+        ["workspace:packages/events", {
+          "packageLocation": "./packages/events/",
+          "packageDependencies": [
+            ["@weegigs/events-core", "workspace:packages/events"],
+            ["@effect-ts/core", "npm:0.55.1"],
+            ["@tsconfig/node14", "npm:1.0.1"],
+            ["@types/jest", "npm:27.4.0"],
+            ["@types/lodash", "npm:4.14.178"],
+            ["@types/luxon", "npm:2.0.9"],
+            ["@types/node", "npm:14.18.10"],
+            ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
+            ["lodash", "npm:4.17.21"],
+            ["luxon", "npm:2.3.0"],
+            ["nanoid", "npm:3.2.0"],
+            ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
+            ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"],
+            ["ulid", "npm:2.3.0"],
+            ["zod", "npm:3.11.6"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
       ["@weegigs/events-cypher", [
         ["virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/cypher", {
           "packageLocation": "./.yarn/__virtual__/@weegigs-events-cypher-virtual-8d3275c520/1/packages/cypher/",
@@ -3018,8 +3066,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/aws-sdk__client-dynamodb", null],
             ["@types/jest", "npm:27.4.0"],
             ["@types/node", "npm:14.18.10"],
-            ["@types/weegigs__wee-events", null],
-            ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
+            ["@types/weegigs__events-core", null],
+            ["@weegigs/events-core", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
             ["testcontainers", "npm:8.2.0"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
@@ -3028,8 +3076,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packagePeers": [
             "@aws-sdk/client-dynamodb",
             "@types/aws-sdk__client-dynamodb",
-            "@types/weegigs__wee-events",
-            "@weegigs/wee-events"
+            "@types/weegigs__events-core",
+            "@weegigs/events-core"
           ],
           "linkType": "SOFT",
         }],
@@ -3043,7 +3091,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/types", "npm:3.49.0"],
             ["@types/jest", "npm:27.4.0"],
             ["@types/node", "npm:14.18.10"],
-            ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
+            ["@weegigs/events-core", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
             ["testcontainers", "npm:8.2.0"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
@@ -3061,7 +3109,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/jest", "npm:27.4.0"],
             ["@types/node", "npm:14.18.10"],
             ["@weegigs/effects", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/effects"],
-            ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
+            ["@weegigs/events-core", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
             ["senselogs", "npm:1.0.2"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
@@ -3104,7 +3152,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@tsconfig/node14", "npm:1.0.1"],
             ["@types/jest", "npm:27.4.0"],
             ["@types/node", "npm:14.18.10"],
-            ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
+            ["@weegigs/events-core", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
             ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"]
@@ -3122,60 +3170,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/lodash", "npm:4.14.178"],
             ["@types/node", "npm:14.18.10"],
             ["@weegigs/dynamo-event-store", "virtual:ce4d1808b2c102ec4ed8ffd27a404aa5d62fb9c51383ae4b0f0ae428209c47ae1d844c2c18a9d8b017f876a99c7d0fb7d7ff72011c2abd4b679de4e14cf8e1f4#workspace:packages/dynamo-event-store"],
-            ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
+            ["@weegigs/events-core", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["commander", "npm:9.0.0"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
             ["lodash", "npm:4.17.21"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
             ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"]
-          ],
-          "linkType": "SOFT",
-        }]
-      ]],
-      ["@weegigs/wee-events", [
-        ["virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events", {
-          "packageLocation": "./.yarn/__virtual__/@weegigs-wee-events-virtual-4bda4e8907/1/packages/events/",
-          "packageDependencies": [
-            ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
-            ["@effect-ts/core", "npm:0.55.1"],
-            ["@tsconfig/node14", "npm:1.0.1"],
-            ["@types/effect-ts__core", null],
-            ["@types/jest", "npm:27.4.0"],
-            ["@types/lodash", "npm:4.14.178"],
-            ["@types/luxon", "npm:2.0.9"],
-            ["@types/node", "npm:14.18.10"],
-            ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
-            ["lodash", "npm:4.17.21"],
-            ["luxon", "npm:2.3.0"],
-            ["nanoid", "npm:3.2.0"],
-            ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
-            ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"],
-            ["ulid", "npm:2.3.0"],
-            ["zod", "npm:3.11.6"]
-          ],
-          "packagePeers": [
-            "@types/effect-ts__core"
-          ],
-          "linkType": "SOFT",
-        }],
-        ["workspace:packages/events", {
-          "packageLocation": "./packages/events/",
-          "packageDependencies": [
-            ["@weegigs/wee-events", "workspace:packages/events"],
-            ["@effect-ts/core", "npm:0.55.1"],
-            ["@tsconfig/node14", "npm:1.0.1"],
-            ["@types/jest", "npm:27.4.0"],
-            ["@types/lodash", "npm:4.14.178"],
-            ["@types/luxon", "npm:2.0.9"],
-            ["@types/node", "npm:14.18.10"],
-            ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
-            ["lodash", "npm:4.17.21"],
-            ["luxon", "npm:2.3.0"],
-            ["nanoid", "npm:3.2.0"],
-            ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
-            ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"],
-            ["ulid", "npm:2.3.0"],
-            ["zod", "npm:3.11.6"]
           ],
           "linkType": "SOFT",
         }]

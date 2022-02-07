@@ -1,5 +1,5 @@
 {
-  "name": "@weegigs/wee-events",
+  "name": "@weegigs/events-core",
   "version": "0.15.0",
   "description": "Core Event System",
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",

@@ -19,7 +19,7 @@
   "dependencies": {
     "@effect-ts/core": "^0.55.1",
     "@weegigs/dynamo-event-store": "workspace:^",
-    "@weegigs/wee-events": "workspace:^",
+    "@weegigs/events-core": "workspace:^",
     "commander": "^9.0.0",
     "lodash": "^4.17.21"
   },
