@@ -1616,19 +1616,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jest/types@npm:^27.4.2":
-  version: 27.4.2
-  resolution: "@jest/types@npm:27.4.2"
-  dependencies:
-    "@types/istanbul-lib-coverage": ^2.0.0
-    "@types/istanbul-reports": ^3.0.0
-    "@types/node": "*"
-    "@types/yargs": ^16.0.0
-    chalk: ^4.0.0
-  checksum: 1191022023e32763063cc1c8b1143fa316fb05db2f9698280a7bdbafcabd989e5fd64f8eb875b8a2e54c53f25dba45ed2eea8ced394d9e484da0fda674cd17a5
-  languageName: node
-  linkType: hard
-
 "@jest/types@npm:^27.5.0":
   version: 27.5.0
   resolution: "@jest/types@npm:27.5.0"
@@ -2148,10 +2135,8 @@ __metadata:
     ulid: ^2.3.0
     zod: ^3.11.6
   peerDependencies:
-    "@aws-sdk/client-dynamodb": "*"
-    "@effect-ts/core": "*"
-    "@weegigs/effects": "workspace:^"
-    "@weegigs/events-common": "workspace:^"
+    "@aws-sdk/client-dynamodb": ^3.49.0
+    "@effect-ts/core": ^0.55.1
     "@weegigs/events-cypher": "workspace:^"
     "@weegigs/wee-events": "workspace:^"
   languageName: unknown
@@ -2167,7 +2152,6 @@ __metadata:
     "@aws-sdk/client-sfn": ^3.49.0
     "@effect-ts/core": ^0.55.1
     "@effect-ts/node": ^0.36.0
-    "@effect-ts/system": ^0.52.1
     "@middy/core": ^2.5.7
     "@middy/do-not-wait-for-empty-event-loop": ^2.5.7
     "@tsconfig/node14": ^1.0.1
@@ -2180,12 +2164,11 @@ __metadata:
     ts-node: ^10.4.0
     typescript: ^4.5.5
   peerDependencies:
-    "@aws-sdk/client-cloudwatch": "*"
-    "@aws-sdk/client-dynamodb": "*"
-    "@aws-sdk/client-eventbridge": "*"
-    "@aws-sdk/client-sfn": "*"
-    "@effect-ts/core": "*"
-    "@effect-ts/system": "*"
+    "@aws-sdk/client-cloudwatch": ^3.49.0
+    "@aws-sdk/client-dynamodb": ^3.49.0
+    "@aws-sdk/client-eventbridge": ^3.49.0
+    "@aws-sdk/client-sfn": ^3.49.0
+    "@effect-ts/core": ^0.55.1
   languageName: unknown
   linkType: soft
 
@@ -2219,7 +2202,7 @@ __metadata:
     ts-jest: ^27.1.3
     typescript: ^4.5.5
   peerDependencies:
-    "@aws-sdk/client-dynamodb": "*"
+    "@aws-sdk/client-dynamodb": ^3.49.0
     "@weegigs/wee-events": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -2229,19 +2212,16 @@ __metadata:
   resolution: "@weegigs/events-logging@workspace:packages/logging"
   dependencies:
     "@effect-ts/core": ^0.55.1
-    "@tsconfig/node14": ^1.0.1
     "@types/jest": ^27.4.0
-    "@types/lodash": ^4.14.178
     "@types/node": ^14.18.10
     "@weegigs/effects": "workspace:^"
     "@weegigs/wee-events": "workspace:*"
     jest: ^27.5.0
-    lodash: ^4.17.21
     senselogs: ^1.0.2
     ts-jest: ^27.1.3
     typescript: ^4.5.5
   peerDependencies:
-    "@effect-ts/core": "*"
+    "@effect-ts/core": ^0.55.1
     "@weegigs/wee-events": "workspace:^"
   languageName: unknown
   linkType: soft
@@ -2276,17 +2256,13 @@ __metadata:
     "@effect-ts/core": ^0.55.1
     "@tsconfig/node14": ^1.0.1
     "@types/jest": ^27.4.0
-    "@types/lodash": ^4.14.178
     "@types/node": ^14.18.10
-    "@weegigs/effects": "workspace:^"
     "@weegigs/wee-events": "workspace:*"
     jest: ^27.5.0
-    lodash: ^4.17.21
-    testcontainers: ^8.2.0
     ts-jest: ^27.1.3
     typescript: ^4.5.5
   peerDependencies:
-    "@effect-ts/core": "*"
+    "@effect-ts/core": ^0.55.1
     "@weegigs/wee-events": "workspace:^"
   languageName: unknown
   linkType: soft
@@ -3259,13 +3235,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"diff-sequences@npm:^27.4.0":
-  version: 27.4.0
-  resolution: "diff-sequences@npm:27.4.0"
-  checksum: 66d04033e8632eeacdd029b4ecaf87d233d475e4b0cd1cee035eda99e70e1a7f803507d72f2677990ef526f28a2f6e5709af8d94dcdc0682b8884a3a646190a1
-  languageName: node
-  linkType: hard
-
 "diff-sequences@npm:^27.5.0":
   version: 27.5.0
   resolution: "diff-sequences@npm:27.5.0"
@@ -3957,7 +3926,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6, graceful-fs@npm:^4.2.9":
+"graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.6, graceful-fs@npm:^4.2.9":
   version: 4.2.9
   resolution: "graceful-fs@npm:4.2.9"
   checksum: 68ea4e07ff2c041ada184f9278b830375f8e0b75154e3f080af6b70f66172fabb4108d19b3863a96b53fc068a310b9b6493d86d1291acc5f3861eb4b79d26ad6
@@ -4407,19 +4376,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-diff@npm:^27.0.0":
-  version: 27.4.6
-  resolution: "jest-diff@npm:27.4.6"
-  dependencies:
-    chalk: ^4.0.0
-    diff-sequences: ^27.4.0
-    jest-get-type: ^27.4.0
-    pretty-format: ^27.4.6
-  checksum: cf6b7e80e3c64a7c71ab209c0325bbda175991aed985ecee7652df9d6540e4959089038e208c04ab05391c9ddf07adc72f0c8c26cc4cee6fa17f76f500e2bf43
-  languageName: node
-  linkType: hard
-
-"jest-diff@npm:^27.5.0":
+"jest-diff@npm:^27.0.0, jest-diff@npm:^27.5.0":
   version: 27.5.0
   resolution: "jest-diff@npm:27.5.0"
   dependencies:
@@ -4479,13 +4436,6 @@ __metadata:
     jest-mock: ^27.5.0
     jest-util: ^27.5.0
   checksum: 71db2875b34b096645e49a05d32b5881bcd3751c2e875d83d654a1cb61ce7482175d335e005799f8bb4580803b59cc33ba3b378281cda775bc334cbc8ab8ba01
-  languageName: node
-  linkType: hard
-
-"jest-get-type@npm:^27.4.0":
-  version: 27.4.0
-  resolution: "jest-get-type@npm:27.4.0"
-  checksum: bb9b70e420009fdaed3026d5bccd01569f92c7500f9f544d862796d4f4efa93ced5484864b2f272c7748bfb5bfd3268d48868b169c51ab45fe5b45b9519b6e46
   languageName: node
   linkType: hard
 
@@ -4741,21 +4691,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-util@npm:^27.0.0":
-  version: 27.4.2
-  resolution: "jest-util@npm:27.4.2"
-  dependencies:
-    "@jest/types": ^27.4.2
-    "@types/node": "*"
-    chalk: ^4.0.0
-    ci-info: ^3.2.0
-    graceful-fs: ^4.2.4
-    picomatch: ^2.2.3
-  checksum: bcf16881aff1421c5f7c2df2ef9492cf8cd92fcd0a2a99bec5ab16f7185ee19aea48eda41d9dfa7b5bf4354bdc21628f5931cd2e7281741e6d2983965efb631e
-  languageName: node
-  linkType: hard
-
-"jest-util@npm:^27.5.0":
+"jest-util@npm:^27.0.0, jest-util@npm:^27.5.0":
   version: 27.5.0
   resolution: "jest-util@npm:27.5.0"
   dependencies:
@@ -5611,18 +5547,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pretty-format@npm:^27.0.0, pretty-format@npm:^27.4.6":
-  version: 27.4.6
-  resolution: "pretty-format@npm:27.4.6"
-  dependencies:
-    ansi-regex: ^5.0.1
-    ansi-styles: ^5.0.0
-    react-is: ^17.0.1
-  checksum: 5eda32e4e47ddd1a9e8fe9ebef519b217ba403eb8bcb804ba551dfb37f87e674472013fcf78480ab535844fdddcc706fac94511eba349bfb94a138a02d1a7a59
-  languageName: node
-  linkType: hard
-
-"pretty-format@npm:^27.5.0":
+"pretty-format@npm:^27.0.0, pretty-format@npm:^27.5.0":
   version: 27.5.0
   resolution: "pretty-format@npm:27.5.0"
   dependencies:

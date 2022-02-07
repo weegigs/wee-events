@@ -2209,18 +2209,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@jest/types", [
-        ["npm:27.4.2", {
-          "packageLocation": "../../../../.yarn/berry/cache/@jest-types-npm-27.4.2-3d7b3db042-8.zip/node_modules/@jest/types/",
-          "packageDependencies": [
-            ["@jest/types", "npm:27.4.2"],
-            ["@types/istanbul-lib-coverage", "npm:2.0.4"],
-            ["@types/istanbul-reports", "npm:3.0.1"],
-            ["@types/node", "npm:17.0.14"],
-            ["@types/yargs", "npm:16.0.4"],
-            ["chalk", "npm:4.1.2"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:27.5.0", {
           "packageLocation": "../../../../.yarn/berry/cache/@jest-types-npm-27.5.0-047401ea77-8.zip/node_modules/@jest/types/",
           "packageDependencies": [
@@ -2531,8 +2519,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "../../../../.yarn/berry/cache/@types-jest-npm-27.4.0-33755263ec-8.zip/node_modules/@types/jest/",
           "packageDependencies": [
             ["@types/jest", "npm:27.4.0"],
-            ["jest-diff", "npm:27.4.6"],
-            ["pretty-format", "npm:27.4.6"]
+            ["jest-diff", "npm:27.5.0"],
+            ["pretty-format", "npm:27.5.0"]
           ],
           "linkType": "HARD",
         }]
@@ -2881,8 +2869,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/lodash", "npm:4.14.178"],
             ["@types/luxon", "npm:2.0.9"],
             ["@types/node", "npm:14.18.10"],
-            ["@types/weegigs__effects", null],
-            ["@types/weegigs__events-common", null],
             ["@types/weegigs__events-cypher", null],
             ["@types/weegigs__wee-events", null],
             ["@weegigs/effects", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/effects"],
@@ -2902,8 +2888,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             "@effect-ts/core",
             "@types/aws-sdk__client-dynamodb",
             "@types/effect-ts__core",
-            "@types/weegigs__effects",
-            "@types/weegigs__events-common",
             "@types/weegigs__events-cypher",
             "@types/weegigs__wee-events",
             "@weegigs/wee-events"
@@ -2953,7 +2937,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-sfn", "npm:3.49.0"],
             ["@effect-ts/core", "npm:0.55.1"],
             ["@effect-ts/node", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#npm:0.36.0"],
-            ["@effect-ts/system", "npm:0.52.1"],
             ["@middy/core", "npm:2.5.7"],
             ["@middy/do-not-wait-for-empty-event-loop", "npm:2.5.7"],
             ["@tsconfig/node14", "npm:1.0.1"],
@@ -2963,7 +2946,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/aws-sdk__client-eventbridge", null],
             ["@types/aws-sdk__client-sfn", null],
             ["@types/effect-ts__core", null],
-            ["@types/effect-ts__system", null],
             ["@types/jest", "npm:27.4.0"],
             ["@types/node", "npm:14.18.10"],
             ["aws-lambda", "npm:1.0.7"],
@@ -2979,8 +2961,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             "@types/aws-sdk__client-dynamodb",
             "@types/aws-sdk__client-eventbridge",
             "@types/aws-sdk__client-sfn",
-            "@types/effect-ts__core",
-            "@types/effect-ts__system"
+            "@types/effect-ts__core"
           ],
           "linkType": "SOFT",
         }],
@@ -2994,7 +2975,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/client-sfn", "npm:3.49.0"],
             ["@effect-ts/core", "npm:0.55.1"],
             ["@effect-ts/node", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#npm:0.36.0"],
-            ["@effect-ts/system", "npm:0.52.1"],
             ["@middy/core", "npm:2.5.7"],
             ["@middy/do-not-wait-for-empty-event-loop", "npm:2.5.7"],
             ["@tsconfig/node14", "npm:1.0.1"],
@@ -3078,14 +3058,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@weegigs/events-logging", "workspace:packages/logging"],
             ["@effect-ts/core", "npm:0.55.1"],
-            ["@tsconfig/node14", "npm:1.0.1"],
             ["@types/jest", "npm:27.4.0"],
-            ["@types/lodash", "npm:4.14.178"],
             ["@types/node", "npm:14.18.10"],
             ["@weegigs/effects", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/effects"],
             ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
-            ["lodash", "npm:4.17.21"],
             ["senselogs", "npm:1.0.2"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
             ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"]
@@ -3126,13 +3103,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@effect-ts/core", "npm:0.55.1"],
             ["@tsconfig/node14", "npm:1.0.1"],
             ["@types/jest", "npm:27.4.0"],
-            ["@types/lodash", "npm:4.14.178"],
             ["@types/node", "npm:14.18.10"],
-            ["@weegigs/effects", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/effects"],
             ["@weegigs/wee-events", "virtual:0a9b67e58300be883022b712d1539b27a5ddfb6b182d662c6b38f85582669f57d16764ff7891d1e55fbc11c55330a69413596e4fb689362288ce9d1cbabe2aad#workspace:packages/events"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
-            ["lodash", "npm:4.17.21"],
-            ["testcontainers", "npm:8.2.0"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
             ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"]
           ],
@@ -4336,13 +4309,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["diff-sequences", [
-        ["npm:27.4.0", {
-          "packageLocation": "../../../../.yarn/berry/cache/diff-sequences-npm-27.4.0-3693b5b4cd-8.zip/node_modules/diff-sequences/",
-          "packageDependencies": [
-            ["diff-sequences", "npm:27.4.0"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:27.5.0", {
           "packageLocation": "../../../../.yarn/berry/cache/diff-sequences-npm-27.5.0-2eaabb51cc-8.zip/node_modules/diff-sequences/",
           "packageDependencies": [
@@ -5673,17 +5639,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["jest-diff", [
-        ["npm:27.4.6", {
-          "packageLocation": "../../../../.yarn/berry/cache/jest-diff-npm-27.4.6-6c776a7c1a-8.zip/node_modules/jest-diff/",
-          "packageDependencies": [
-            ["jest-diff", "npm:27.4.6"],
-            ["chalk", "npm:4.1.2"],
-            ["diff-sequences", "npm:27.4.0"],
-            ["jest-get-type", "npm:27.4.0"],
-            ["pretty-format", "npm:27.4.6"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:27.5.0", {
           "packageLocation": "../../../../.yarn/berry/cache/jest-diff-npm-27.5.0-624009103c-8.zip/node_modules/jest-diff/",
           "packageDependencies": [
@@ -5752,13 +5707,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["jest-get-type", [
-        ["npm:27.4.0", {
-          "packageLocation": "../../../../.yarn/berry/cache/jest-get-type-npm-27.4.0-72f58c1f46-8.zip/node_modules/jest-get-type/",
-          "packageDependencies": [
-            ["jest-get-type", "npm:27.4.0"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:27.5.0", {
           "packageLocation": "../../../../.yarn/berry/cache/jest-get-type-npm-27.5.0-fc79674d97-8.zip/node_modules/jest-get-type/",
           "packageDependencies": [
@@ -6034,19 +5982,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["jest-util", [
-        ["npm:27.4.2", {
-          "packageLocation": "../../../../.yarn/berry/cache/jest-util-npm-27.4.2-2662ef0bf0-8.zip/node_modules/jest-util/",
-          "packageDependencies": [
-            ["jest-util", "npm:27.4.2"],
-            ["@jest/types", "npm:27.4.2"],
-            ["@types/node", "npm:17.0.14"],
-            ["chalk", "npm:4.1.2"],
-            ["ci-info", "npm:3.3.0"],
-            ["graceful-fs", "npm:4.2.9"],
-            ["picomatch", "npm:2.3.1"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:27.5.0", {
           "packageLocation": "../../../../.yarn/berry/cache/jest-util-npm-27.5.0-889e2293b7-8.zip/node_modules/jest-util/",
           "packageDependencies": [
@@ -6998,16 +6933,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["pretty-format", [
-        ["npm:27.4.6", {
-          "packageLocation": "../../../../.yarn/berry/cache/pretty-format-npm-27.4.6-64aa09bee6-8.zip/node_modules/pretty-format/",
-          "packageDependencies": [
-            ["pretty-format", "npm:27.4.6"],
-            ["ansi-regex", "npm:5.0.1"],
-            ["ansi-styles", "npm:5.2.0"],
-            ["react-is", "npm:17.0.2"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:27.5.0", {
           "packageLocation": "../../../../.yarn/berry/cache/pretty-format-npm-27.5.0-14a206749d-8.zip/node_modules/pretty-format/",
           "packageDependencies": [
@@ -7909,7 +7834,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["esbuild", null],
             ["fast-json-stable-stringify", "npm:2.1.0"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.0"],
-            ["jest-util", "npm:27.4.2"],
+            ["jest-util", "npm:27.5.0"],
             ["json5", "npm:2.2.0"],
             ["lodash.memoize", "npm:4.1.2"],
             ["make-error", "npm:1.3.6"],

@@ -17,21 +17,22 @@
     "fix": "yarn run ws:fix"
   },
   "peerDependencies": {
-    "@effect-ts/core": "*",
+    "@effect-ts/core": "^0.55.1",
     "@weegigs/wee-events": "workspace:^"
   },
   "devDependencies": {
     "@effect-ts/core": "^0.55.1",
     "@tsconfig/node14": "^1.0.1",
     "@types/jest": "^27.4.0",
-    "@types/lodash": "^4.14.178",
     "@types/node": "^14.18.10",
     "@weegigs/wee-events": "workspace:*",
     "jest": "^27.5.0",
-    "testcontainers": "^8.2.0",
     "ts-jest": "^27.1.3",
     "typescript": "^4.5.5"
   },
+  "files": [
+    "lib"
+  ],
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
@@ -51,9 +52,5 @@
   "prettier": {
     "printWidth": 120,
     "trailingComma": "es5"
-  },
-  "dependencies": {
-    "@weegigs/effects": "workspace:^",
-    "lodash": "^4.17.21"
   }
 }
