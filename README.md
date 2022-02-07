@@ -1,3 +1,19 @@
-## Setting up
+## Building `Wee Events`
 
-https://yarnpkg.com/getting-started/editor-sdks
+### Prerequisites
+
+- Yarn - https://yarnpkg.com/
+- Docker (for testing) https://www.testcontainers.org/supported_docker_environment/
+
+### Building
+
+Make sure you
+
+```sh
+yarn install
+yarn build
+```
+
+### IDE Setup
+
+For instructions on using PnP with various editors see https://yarnpkg.com/getting-started/editor-sdks
