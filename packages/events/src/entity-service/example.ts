@@ -60,7 +60,7 @@ export class ExampleController implements Controller<State> {
   };
 
   @Reducer(Events.Started)
-  applyStarted: Controller.Reducer<State, Events.Stopped> = (state, _event) => {
+  applyStarted: Controller.Reducer<State, Events.Started> = (state, _event) => {
     return { ...state, running: true };
   };
 
