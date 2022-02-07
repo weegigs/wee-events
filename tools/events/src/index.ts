@@ -1,8 +1,8 @@
 import { Command } from "commander";
 
-import { DynamoEventStore } from "@weegigs/wee-events";
+import { DynamoEventStore } from "@weegigs/dynamo-event-store";
 
-const main = async () => {
+export const main = async () => {
   const program = new Command();
 
   program
@@ -22,5 +22,3 @@ const main = async () => {
 
   return program.parseAsync();
 };
-
-main().catch(console.log);
