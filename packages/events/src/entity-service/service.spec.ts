@@ -4,7 +4,7 @@ import { DomainEvent } from "../types";
 import { EntityService } from "../entity-service";
 import { MemoryStore } from "../store";
 
-import { Events, Controller, Commands } from "./example";
+import { Events, ExampleController, Commands } from "./example";
 
 describe("Entity Service", () => {
   let entries: string[] = [];
@@ -12,7 +12,7 @@ describe("Entity Service", () => {
   const store = new MemoryStore();
   const log = (message: string) => entries.push(message);
 
-  const service = EntityService.create(new Controller(log), { store });
+  const service = EntityService.create(new ExampleController(log), { store });
 
   const events: DomainEvent[] = [
     {
@@ -61,13 +61,5 @@ describe("Entity Service", () => {
     const { state } = (await service.execute(aggregate, { name: Commands.Increment, data: { count: 1 } }))!;
 
     expect(state.total).toEqual(1);
-  });
-
-  it("should react to events", async () => {
-    await store.publish(aggregate, events);
-    const { state } = (await service.react(aggregate, events[events.length - 1]))!;
-
-    expect(state.total).toEqual(11);
-    expect(state.running).toEqual(false);
   });
 });

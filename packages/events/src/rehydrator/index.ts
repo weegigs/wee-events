@@ -1,8 +1,8 @@
 import _ from "lodash";
 
 import { EventStore } from "../store";
-import { AggregateId, Entity, Payload, RecordedEvent, Revision } from "../types";
-import { Registry, Constructor, EntityController } from "../entity-service";
+import { AggregateId, DomainEvent, Entity, Payload, RecordedEvent, Revision } from "../types";
+import { Registry, Constructor, Controller } from "../entity-service";
 
 export type Rehydrator<T extends Payload = Payload> = (aggregate: AggregateId) => Promise<Entity<T> | undefined>;
 
@@ -11,7 +11,7 @@ export namespace Rehydrator {
     events: EventStore;
   };
 
-  export function create<S extends Payload, C extends EntityController<S>>(
+  export function create<S extends Payload, C extends Controller<S>>(
     controller: C,
     { events }: Configuration
   ): Rehydrator<S> {
@@ -50,14 +50,14 @@ const revisionFor = (events: RecordedEvent[]) => {
   return _.last(events)?.revision ?? Revision.Initial;
 };
 
-class Service<S extends Payload, T extends EntityController<S>> {
+class Service<S extends Payload, T extends Controller<S>> {
   readonly #events: EventStore;
 
   readonly #type: string;
   readonly #controller: T;
 
-  readonly #initializers: Record<string, Registry.Initializer>;
-  readonly #reducers: Record<string, Registry.Reducer>;
+  readonly #initializers: Record<string, Controller.Initializer<S, DomainEvent>>;
+  readonly #reducers: Record<string, Controller.Reducer<S, DomainEvent>>;
 
   constructor({
     events,
@@ -73,8 +73,8 @@ class Service<S extends Payload, T extends EntityController<S>> {
     this.#controller = controller;
     this.#type = controller.type;
 
-    this.#initializers = _.mapValues(registration.initializers, (r) => r.bind(controller));
-    this.#reducers = _.mapValues(registration.reducers, (r) => r.bind(controller));
+    this.#initializers = _.mapValues(registration.initializers, (key) => _.get(controller, key).bind(controller));
+    this.#reducers = _.mapValues(registration.reducers, (key) => _.get(controller, key).bind(controller));
   }
 
   #replay(events: RecordedEvent[], state?: S): S | undefined {

@@ -1,7 +1,7 @@
-import { Entity, Command, DomainEvent, EmptyPayload, RecordedEvent } from "../types";
-import { Reducer, PolicyHandler, CommandHandler } from "../decorators";
+import { Command, DomainEvent, EmptyPayload } from "../types";
+import { Reducer, CommandHandler } from "../decorators";
 
-import { EntityController, Publisher } from "./types";
+import { Controller, Publisher } from "./types";
 
 export namespace Events {
   export const Incremented = "counter:incremented";
@@ -35,9 +35,7 @@ export type State = {
   total: number;
 };
 
-type StateEntity = Entity<State>;
-
-export class Controller implements EntityController<State> {
+export class ExampleController implements Controller<State> {
   constructor(private log: (message: string) => void) {}
 
   readonly type = "example";
@@ -47,27 +45,31 @@ export class Controller implements EntityController<State> {
   }
 
   @Reducer(Events.Incremented)
-  applyIncrement(state: State, event: RecordedEvent<Events.Incremented>): State {
+  readonly applyIncrement: Controller.Reducer<State, Events.Incremented> = (state, event) => {
     if (!state.running) {
       this.log(`increment event received but the counter is not running. ignoring`);
       return state;
     }
 
     return { ...state, total: state.total + event.data.count };
-  }
+  };
 
   @Reducer(Events.Stopped)
-  applyStopped(state: State, _event: RecordedEvent<Events.Stopped>): State {
+  applyStopped: Controller.Reducer<State, Events.Stopped> = (state, _event): State => {
     return { ...state, running: false };
-  }
+  };
 
   @Reducer(Events.Started)
-  applyStarted(state: State, _event: RecordedEvent<Events.Started>): State {
+  applyStarted: Controller.Reducer<State, Events.Stopped> = (state, _event) => {
     return { ...state, running: true };
-  }
+  };
 
   @CommandHandler(Commands.Increment)
-  async increment({ data: { count } }: Commands.Increment, { state, aggregate }: StateEntity, publish: Publisher) {
+  increment: Controller.Handler<State, Commands.Increment> = async (
+    { data: { count } },
+    { state, aggregate },
+    publish: Publisher
+  ) => {
     if (state.running) {
       await publish(aggregate, {
         type: Events.Incremented,
@@ -76,40 +78,25 @@ export class Controller implements EntityController<State> {
         },
       });
     }
-  }
+  };
 
   @CommandHandler(Commands.Stop)
-  async stop(_: EmptyPayload, { state, aggregate }: StateEntity, publish: Publisher) {
+  stop: Controller.Handler<State, Commands.Stop> = async (_, { state, aggregate }, publish: Publisher) => {
     if (state.running) {
       await publish(aggregate, {
         type: Events.Stopped,
         data: {},
       });
     }
-  }
+  };
 
   @CommandHandler(Commands.Start)
-  async start(_: EmptyPayload, { state, aggregate }: StateEntity, publish: Publisher) {
+  start: Controller.Handler<State, Commands.Start> = async (_, { state, aggregate }, publish: Publisher) => {
     if (!state.running) {
       await publish(aggregate, {
         type: Events.Started,
         data: {},
       });
     }
-  }
-
-  @PolicyHandler(Events.Incremented, Events.Started)
-  async stopIfGreaterThan10(
-    _previous: StateEntity,
-    { state, aggregate }: StateEntity,
-    _event: RecordedEvent,
-    publish: Publisher
-  ) {
-    if (state.total > 10 && state.running) {
-      await publish(aggregate, {
-        type: Events.Stopped,
-        data: {},
-      });
-    }
-  }
+  };
 }

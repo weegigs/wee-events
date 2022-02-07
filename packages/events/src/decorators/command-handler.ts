@@ -1,9 +1,7 @@
 import { Constructor, Registry } from "../entity-service";
 
-export const CommandHandler = (command: string): MethodDecorator => {
-  return (target, _propertyKey, descriptor) => {
-    Registry.registerHandler(command, target.constructor as Constructor<any>, descriptor.value as any);
-
-    return descriptor;
+export const CommandHandler = (command: string): PropertyDecorator => {
+  return (target, key) => {
+    Registry.registerHandler(command, target.constructor as Constructor<any>, key);
   };
 };

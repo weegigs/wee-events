@@ -4,15 +4,12 @@ import { nanoid } from "nanoid";
 import { EventStore } from "../store";
 import { AggregateId, Command, DomainEvent, Entity, Payload, RecordedEvent, Revision } from "../types";
 
-import { Constructor, EntityController } from "./types";
+import { Constructor, Controller } from "./types";
 import { Registry } from "./registry";
 
 export interface EntityService<S extends Payload> {
   load(aggregate: AggregateId): Promise<Entity<S> | undefined>;
-
   execute(aggregate: AggregateId, command: Command): Promise<Entity<S> | undefined>;
-
-  react(aggregate: AggregateId, event: DomainEvent): Promise<Entity<S> | undefined>;
 }
 
 export namespace EntityService {
@@ -20,7 +17,7 @@ export namespace EntityService {
     store: EventStore;
   };
 
-  export function create<S extends Payload, C extends EntityController<S>>(
+  export function create<S extends Payload, C extends Controller<S>>(
     controller: C,
     { store }: Configuration
   ): EntityService<S> {
@@ -59,19 +56,18 @@ const revisionFor = (events: RecordedEvent[]) => {
   return _.last(events)?.revision ?? Revision.Initial;
 };
 
-class Service<S extends Payload, T extends EntityController<S>> implements EntityService<S> {
+class Service<S extends Payload, T extends Controller<S>> implements EntityService<S> {
   readonly #store: EventStore;
   readonly #publish: EventStore.Publisher;
 
   readonly #type: string;
   readonly #controller: T;
 
-  readonly #initializers: Record<string, Registry.Initializer>;
-  readonly #reducers: Record<string, Registry.Reducer>;
+  readonly #initializers: Record<string, Controller.Initializer<S, DomainEvent>>;
+  readonly #reducers: Record<string, Controller.Reducer<S, DomainEvent>>;
 
-  readonly #creators: Record<string, Registry.Creator>;
-  readonly #handlers: Record<string, Registry.Handler>;
-  readonly #policies: Record<string, Registry.Policy>;
+  readonly #creators: Record<string, Controller.Creator<Command>>;
+  readonly #handlers: Record<string, Controller.Handler<S, Command>>;
 
   constructor({
     store,
@@ -88,11 +84,10 @@ class Service<S extends Payload, T extends EntityController<S>> implements Entit
     this.#controller = controller;
     this.#type = controller.type;
 
-    this.#initializers = _.mapValues(registration.initializers, (r) => r.bind(controller));
-    this.#reducers = _.mapValues(registration.reducers, (r) => r.bind(controller));
-    this.#creators = _.mapValues(registration.creators, (r) => r.bind(controller));
-    this.#policies = _.mapValues(registration.policies, (r) => r.bind(controller));
-    this.#handlers = _.mapValues(registration.handlers, (r) => r.bind(controller));
+    this.#initializers = _.mapValues(registration.initializers, (key) => _.get(controller, key).bind(controller));
+    this.#reducers = _.mapValues(registration.reducers, (key) => _.get(controller, key).bind(controller));
+    this.#creators = _.mapValues(registration.creators, (key) => _.get(controller, key).bind(controller));
+    this.#handlers = _.mapValues(registration.handlers, (key) => _.get(controller, key).bind(controller));
   }
 
   #replay(events: RecordedEvent[], state?: S): S | undefined {
@@ -164,35 +159,6 @@ class Service<S extends Payload, T extends EntityController<S>> implements Entit
 
       await handler(command, entity, publish);
     }
-
-    return this.load(aggregate);
-  };
-
-  react = async (aggregate: AggregateId, event: RecordedEvent<DomainEvent>): Promise<Entity<S> | undefined> => {
-    const events = await this.#store.load(aggregate);
-
-    const current = await this.#load(aggregate, events);
-    if (current === undefined) {
-      return undefined;
-    }
-
-    const handler = this.#policies[event.type];
-    if (handler === undefined) {
-      return current;
-    }
-
-    const publish: EventStore.Publisher = (
-      aggregate: AggregateId,
-      events: DomainEvent | DomainEvent[],
-      options?: EventStore.PublishOptions
-    ) => {
-      const correlationId = options?.correlationId ?? event.metadata?.correlationId ?? `${event.type}/${nanoid(26)}`;
-      return this.#publish(aggregate, events, { ...options, correlationId, causationId: event.id });
-    };
-
-    const previous = events.length === 0 ? current : this.#load(aggregate, events.slice(0, events.length - 1));
-
-    await handler(previous, current, event, publish);
 
     return this.load(aggregate);
   };
