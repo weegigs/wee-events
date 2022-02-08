@@ -1,5 +1,5 @@
 import { Cypher, Tokenizer } from "../types";
-import { AggregateId, Payload } from "@weegigs/wee-events";
+import { AggregateId, Payload } from "@weegigs/events-core";
 
 export const cypher: Cypher = {
   encrypt: async (_streamId: AggregateId, _payload: Payload): Promise<Buffer> => {

@@ -1,7 +1,7 @@
 import * as T from "@effect-ts/core/Effect";
 import { pipe } from "@effect-ts/core";
 
-import { Entity, Payload, Revision } from "@weegigs/wee-events";
+import { Entity, Payload, Revision } from "@weegigs/events-core";
 
 import { AnyRenderer, RenderFailure } from "./types";
 

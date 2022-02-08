@@ -2,7 +2,7 @@ import crypto from "crypto";
 
 import { RSACypher } from "./cypher";
 import { KeyPair, KeySource } from "./keysource";
-import { AggregateId } from "@weegigs/wee-events";
+import { AggregateId } from "@weegigs/events-core";
 
 const createKeySource = (): KeySource => {
   const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });

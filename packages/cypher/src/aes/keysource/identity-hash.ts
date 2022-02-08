@@ -1,5 +1,5 @@
 import { KeySource } from "./types";
-import { AggregateId } from "@weegigs/wee-events";
+import { AggregateId } from "@weegigs/events-core";
 import crypto from "crypto";
 
 export const identityHash: KeySource = async (id: AggregateId) => {

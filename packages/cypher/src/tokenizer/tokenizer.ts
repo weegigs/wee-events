@@ -1,4 +1,4 @@
-import { Payload, List, Value, Primitive } from "@weegigs/wee-events";
+import { Payload, List, Value, Primitive } from "@weegigs/events-core";
 
 import { TokenizeFunction } from "./types";
 

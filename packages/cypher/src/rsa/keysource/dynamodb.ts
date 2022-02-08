@@ -4,7 +4,7 @@ import crypto from "crypto";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
-import { AggregateId } from "@weegigs/wee-events";
+import { AggregateId } from "@weegigs/events-core";
 
 import { KeySource, KeyPair } from "../keysource";
 

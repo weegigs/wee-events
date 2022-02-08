@@ -1,5 +1,5 @@
 import { Cypher, Tokenizer } from "@weegigs/events-cypher";
-import { AggregateId, DomainEvent, RecordedEvent } from "@weegigs/wee-events";
+import { AggregateId, DomainEvent, RecordedEvent } from "@weegigs/events-core";
 import { DateTime } from "luxon";
 import { decodeTime, monotonicFactory } from "ulid";
 import * as z from "zod";

@@ -1,6 +1,6 @@
 import * as T from "@effect-ts/core/Effect";
 
-import { Entity } from "@weegigs/wee-events";
+import { Entity } from "@weegigs/events-core";
 
 import { AnyRenderer } from "./types";
 

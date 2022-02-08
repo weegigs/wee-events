@@ -22,7 +22,7 @@
   },
   "peerDependencies": {
     "@aws-sdk/client-dynamodb": "^3.49.0",
-    "@weegigs/events-core": "workspace:*"
+    "@weegigs/events-core": "workspace:^"
   },
   "dependencies": {
     "@aws-sdk/lib-dynamodb": "^3.49.0",
@@ -35,7 +35,7 @@
     "@aws-sdk/types": "^3.49.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^14.18.10",
-    "@weegigs/events-core": "workspace:^",
+    "@weegigs/events-core": "workspace:*",
     "jest": "^27.5.0",
     "testcontainers": "^8.2.0",
     "ts-jest": "^27.1.3",

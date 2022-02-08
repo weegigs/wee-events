@@ -25,7 +25,7 @@
     "@weegigs/events-core": "workspace:^"
   },
   "devDependencies": {
-    "@effect-ts/core": "^0.55.1",
+    "@effect-ts/core": "^0.55.2",
     "@tsconfig/node14": "^1.0.1",
     "@types/jest": "^27.4.0",
     "@types/node": "^14.18.10",

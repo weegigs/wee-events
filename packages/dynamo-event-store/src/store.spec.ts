@@ -5,7 +5,7 @@ import { Cypher, Tokenizer } from "@weegigs/events-cypher";
 
 import { CreateTableCommand, DynamoDBClient, DescribeTableCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { DomainEvent, Payload, Revision, AggregateId, Errors } from "@weegigs/wee-events";
+import { DomainEvent, Payload, Revision, AggregateId, Errors } from "@weegigs/events-core";
 import { GenericContainer, StartedTestContainer } from "testcontainers";
 
 import { DynamoEventStore } from "./store";

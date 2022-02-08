@@ -1,3 +1,3 @@
-import { AggregateId } from "@weegigs/wee-events";
+import { AggregateId } from "@weegigs/events-core";
 
 export type KeySource = (id: AggregateId) => Promise<Buffer>;

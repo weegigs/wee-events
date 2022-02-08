@@ -1,4 +1,4 @@
-import { RecordedEvent } from "@weegigs/wee-events";
+import { RecordedEvent } from "@weegigs/events-core";
 
 export type EncryptedEvent = RecordedEvent & {
   encrypted: string;

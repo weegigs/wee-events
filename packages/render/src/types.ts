@@ -1,5 +1,5 @@
 import * as T from "@effect-ts/core/Effect";
-import { Entity, Payload } from "@weegigs/wee-events";
+import { Entity, Payload } from "@weegigs/events-core";
 
 export interface RenderFailure {
   readonly description: string;

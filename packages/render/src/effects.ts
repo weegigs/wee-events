@@ -1,7 +1,7 @@
 import * as T from "@effect-ts/core/Effect";
 import { Has, tag } from "@effect-ts/core/Has";
 
-import { Entity } from "@weegigs/wee-events";
+import { Entity } from "@weegigs/events-core";
 import { Resource } from "./resource-renderer";
 import { RenderFailure } from "./types";
 

@@ -23,7 +23,7 @@ import {
   AggregateId,
   ExpectedRevisionConflictError,
   RevisionConflictError,
-} from "@weegigs/wee-events";
+} from "@weegigs/events-core";
 
 export namespace DynamoEventStore {
   export interface Options {

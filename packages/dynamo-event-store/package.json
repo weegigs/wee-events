@@ -41,7 +41,7 @@
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.49.0",
     "@aws-sdk/types": "^3.49.0",
-    "@effect-ts/core": "^0.55.1",
+    "@effect-ts/core": "^0.55.2",
     "@tsconfig/node14": "^1.0.1",
     "@types/jest": "^27.4.0",
     "@types/lodash": "^4.14.178",

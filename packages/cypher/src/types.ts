@@ -1,4 +1,4 @@
-import { AggregateId, Payload } from "@weegigs/wee-events";
+import { AggregateId, Payload } from "@weegigs/events-core";
 
 export * from "./tokenizer/types";
 

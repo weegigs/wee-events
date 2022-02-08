@@ -1,4 +1,4 @@
-import { Payload } from "@weegigs/wee-events";
+import { Payload } from "@weegigs/events-core";
 
 import { TokenizeFunction, Tokenizer } from "./types";
 

@@ -9,7 +9,7 @@ import * as env from "@weegigs/effects/lib/environment";
 import * as dyn from "@weegigs/effects/lib/aws/dynamodb";
 
 import * as s from "./store";
-import * as e from "@weegigs/wee-events";
+import * as e from "@weegigs/events-core";
 
 export const EventStore = tag<e.EventStore>();
 export type HasEventStore = Has<e.EventStore>;
