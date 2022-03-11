@@ -15,9 +15,6 @@
   ],
   "references": [
     {
-      "path": "../effects"
-    },
-    {
       "path": "../events"
     }
   ]

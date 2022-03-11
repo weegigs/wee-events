@@ -88,7 +88,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["prettier", "npm:2.5.1"],
             ["rimraf", "npm:3.0.2"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
-            ["tsconfig-paths", "npm:3.12.0"],
             ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"],
             ["ultra-runner", "npm:3.10.5"]
           ],
@@ -2534,15 +2533,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["@types/json5", [
-        ["npm:0.0.29", {
-          "packageLocation": "../../../../.yarn/berry/cache/@types-json5-npm-0.0.29-f63a7916bd-8.zip/node_modules/@types/json5/",
-          "packageDependencies": [
-            ["@types/json5", "npm:0.0.29"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
       ["@types/lodash", [
         ["npm:4.14.178", {
           "packageLocation": "../../../../.yarn/berry/cache/@types-lodash-npm-4.14.178-5433b9ed68-8.zip/node_modules/@types/lodash/",
@@ -3136,7 +3126,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["prettier", "npm:2.5.1"],
             ["rimraf", "npm:3.0.2"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
-            ["tsconfig-paths", "npm:3.12.0"],
             ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"],
             ["ultra-runner", "npm:3.10.5"]
           ],
@@ -6153,14 +6142,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["json5", [
-        ["npm:1.0.1", {
-          "packageLocation": "../../../../.yarn/berry/cache/json5-npm-1.0.1-647fc8794b-8.zip/node_modules/json5/",
-          "packageDependencies": [
-            ["json5", "npm:1.0.1"],
-            ["minimist", "npm:1.2.5"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:2.2.0", {
           "packageLocation": "../../../../.yarn/berry/cache/json5-npm-2.2.0-da49dc7cb5-8.zip/node_modules/json5/",
           "packageDependencies": [
@@ -7557,13 +7538,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["strip-bom", [
-        ["npm:3.0.0", {
-          "packageLocation": "../../../../.yarn/berry/cache/strip-bom-npm-3.0.0-71e8f81ff9-8.zip/node_modules/strip-bom/",
-          "packageDependencies": [
-            ["strip-bom", "npm:3.0.0"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:4.0.0", {
           "packageLocation": "../../../../.yarn/berry/cache/strip-bom-npm-4.0.0-97d367a64d-8.zip/node_modules/strip-bom/",
           "packageDependencies": [
@@ -7898,19 +7872,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             "@types/swc__wasm",
             "@types/typescript",
             "typescript"
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["tsconfig-paths", [
-        ["npm:3.12.0", {
-          "packageLocation": "../../../../.yarn/berry/cache/tsconfig-paths-npm-3.12.0-b78aadfb3f-8.zip/node_modules/tsconfig-paths/",
-          "packageDependencies": [
-            ["tsconfig-paths", "npm:3.12.0"],
-            ["@types/json5", "npm:0.0.29"],
-            ["json5", "npm:1.0.1"],
-            ["minimist", "npm:1.2.5"],
-            ["strip-bom", "npm:3.0.0"]
           ],
           "linkType": "HARD",
         }]

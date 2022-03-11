@@ -21,10 +21,10 @@
       "path": "../common"
     },
     {
-      "path": "../cypher"
+      "path": "../events"
     },
     {
-      "path": "../events"
+      "path": "../cypher"
     }
   ]
 }

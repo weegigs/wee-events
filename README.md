@@ -1,3 +1,7 @@
+# Wee Events
+
+[![codebeat badge](https://codebeat.co/badges/9d5c522b-d47f-481d-a852-ecaa22577c7a)](https://codebeat.co/projects/github-com-weegigs-wee-events-main)
+
 ## Building `Wee Events`
 
 ### Prerequisites
