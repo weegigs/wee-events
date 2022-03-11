@@ -25,14 +25,14 @@
     "@weegigs/events-core": "workspace:^"
   },
   "dependencies": {
-    "@aws-sdk/lib-dynamodb": "^3.49.0",
-    "@aws-sdk/smithy-client": "^3.49.0"
+    "@aws-sdk/lib-dynamodb": "^3.54.0",
+    "@aws-sdk/smithy-client": "^3.54.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.49.0",
-    "@aws-sdk/lib-dynamodb": "^3.49.0",
-    "@aws-sdk/smithy-client": "^3.49.0",
-    "@aws-sdk/types": "^3.49.0",
+    "@aws-sdk/client-dynamodb": "^3.54.0",
+    "@aws-sdk/lib-dynamodb": "^3.54.0",
+    "@aws-sdk/smithy-client": "^3.54.0",
+    "@aws-sdk/types": "^3.54.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^14.18.10",
     "@weegigs/events-core": "workspace:*",

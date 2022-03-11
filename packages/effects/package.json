@@ -34,10 +34,10 @@
     "@effect-ts/core": "^0.55.1"
   },
   "devDependencies": {
-    "@aws-sdk/client-cloudwatch": "^3.49.0",
-    "@aws-sdk/client-dynamodb": "^3.49.0",
-    "@aws-sdk/client-eventbridge": "^3.49.0",
-    "@aws-sdk/client-sfn": "^3.49.0",
+    "@aws-sdk/client-cloudwatch": "^3.54.0",
+    "@aws-sdk/client-dynamodb": "^3.54.0",
+    "@aws-sdk/client-eventbridge": "^3.54.0",
+    "@aws-sdk/client-sfn": "^3.54.0",
     "@effect-ts/core": "^0.55.2",
     "@tsconfig/node14": "^1.0.1",
     "@types/aws-lambda": "^8.10.92",
