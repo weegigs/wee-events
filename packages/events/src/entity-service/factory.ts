@@ -2,12 +2,33 @@ import { nanoid } from "nanoid";
 
 import { EventStore } from "../store";
 import { AggregateId, Command, DomainEvent, Entity, Payload, RecordedEvent } from "../types";
+import { Loader } from "../loader";
+import { Dispatcher } from "../dispatcher";
 
 import { EntityService } from "./service";
 import { revisionFor } from "./helpers";
 import { CommandHandler, Creator, Initializer, Reducer } from "./types";
-import { Loader } from "../loader";
-import { Dispatcher } from "..";
+
+const createPublisher = (store: EventStore, command: Command) => {
+  let _triggered = false;
+
+  const publish: EventStore.Publisher = async (
+    aggregate: AggregateId,
+    events: DomainEvent | DomainEvent[],
+    options?: EventStore.PublishOptions
+  ) => {
+    const correlationId = options?.correlationId ?? `${command.name}/${nanoid(26)}`;
+    const result = await store.publish(aggregate, events, { ...options, correlationId });
+
+    _triggered = true;
+
+    return result;
+  };
+
+  const triggered = () => _triggered;
+
+  return { publish, triggered };
+};
 
 export const createLoader = <S extends Payload>({
   store,
@@ -78,14 +99,7 @@ export const createDispatcher = <S extends Payload>({
   const execute = async (aggregate: AggregateId, command: Command): Promise<Entity<S> | undefined> => {
     const entity = await loader.load(aggregate);
 
-    const publish: EventStore.Publisher = (
-      aggregate: AggregateId,
-      events: DomainEvent | DomainEvent[],
-      options?: EventStore.PublishOptions
-    ) => {
-      const correlationId = options?.correlationId ?? `${command.name}/${nanoid(26)}`;
-      return store.publish(aggregate, events, { ...options, correlationId });
-    };
+    const { publish, triggered } = createPublisher(store, command);
 
     if (entity === undefined) {
       const handler = creators[command.name];
@@ -103,7 +117,7 @@ export const createDispatcher = <S extends Payload>({
       await handler(command, entity, publish);
     }
 
-    return loader.load(aggregate);
+    return triggered() ? loader.load(aggregate) : entity;
   };
 
   return { execute };
@@ -130,4 +144,55 @@ export const createService = <S extends Payload>({
   const dispatcher = createDispatcher<S>({ store, type, loader, creators, handlers });
 
   return { ...loader, ...dispatcher };
+};
+
+export const createCommandDispatcher = <S extends Payload, C extends Command>({
+  store,
+  loader,
+  handler,
+}: {
+  store: EventStore;
+  type: string;
+  loader: Loader<S>;
+  handler: CommandHandler<S, C>;
+}): Dispatcher<S, C> => {
+  const execute = async (aggregate: AggregateId, command: C): Promise<Entity<S> | undefined> => {
+    const entity = await loader.load(aggregate);
+    if (entity === undefined) {
+      throw new Error(`no entity found for aggregate ${aggregate}`);
+    }
+
+    const { publish, triggered } = createPublisher(store, command);
+
+    await handler(command, entity, publish);
+
+    return triggered() ? loader.load(aggregate) : entity;
+  };
+
+  return { execute };
+};
+
+export const createCreatorDispatcher = <S extends Payload, C extends Command>({
+  store,
+  loader,
+  creator,
+}: {
+  store: EventStore;
+  type: string;
+  loader: Loader<S>;
+  creator: Creator<C>;
+}): Dispatcher<S, C> => {
+  const execute = async (aggregate: AggregateId, command: C): Promise<Entity<S> | undefined> => {
+    const entity = await loader.load(aggregate);
+    if (entity !== undefined) {
+      throw new Error(`entity exists for aggregate ${aggregate}`);
+    }
+
+    const { publish, triggered } = createPublisher(store, command);
+    await creator(command, aggregate, publish);
+
+    return triggered() ? loader.load(aggregate) : undefined;
+  };
+
+  return { execute };
 };
