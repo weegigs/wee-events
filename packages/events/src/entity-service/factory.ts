@@ -3,27 +3,25 @@ import { nanoid } from "nanoid";
 import { EventStore } from "../store";
 import { AggregateId, Command, DomainEvent, Entity, Payload, RecordedEvent } from "../types";
 
-import { Controller } from "./types";
 import { EntityService } from "./service";
 import { revisionFor } from "./helpers";
+import { CommandHandler, Creator, Initializer, Reducer } from "./types";
+import { Loader } from "../loader";
+import { Dispatcher } from "..";
 
-export const createService = <S extends Payload>({
+export const createLoader = <S extends Payload>({
   store,
   type,
   init,
   initializers,
   reducers,
-  creators,
-  handlers,
 }: {
   store: EventStore;
   type: string;
-  init?: (aggregate: AggregateId) => S;
-  initializers: Record<string, Controller.Initializer<S, DomainEvent>>;
-  reducers: Record<string, Controller.Reducer<S, DomainEvent>>;
-  creators: Record<string, Controller.Creator<Command>>;
-  handlers: Record<string, Controller.Handler<S, Command>>;
-}): EntityService<S> => {
+  init?: ((aggregate: AggregateId) => S) | undefined;
+  initializers: Record<string, Initializer<S, DomainEvent>>;
+  reducers: Record<string, Reducer<S, DomainEvent>>;
+}): Loader<S> => {
   const replay = (events: RecordedEvent[], state?: S): S | undefined => {
     let result = state;
 
@@ -62,8 +60,23 @@ export const createService = <S extends Payload>({
     };
   };
 
+  return { load };
+};
+
+export const createDispatcher = <S extends Payload>({
+  store,
+  loader,
+  creators,
+  handlers,
+}: {
+  store: EventStore;
+  type: string;
+  loader: Loader<S>;
+  creators: Record<string, Creator<Command>>;
+  handlers: Record<string, CommandHandler<S, Command>>;
+}): Dispatcher<S, Command> => {
   const execute = async (aggregate: AggregateId, command: Command): Promise<Entity<S> | undefined> => {
-    const entity = await load(aggregate);
+    const entity = await loader.load(aggregate);
 
     const publish: EventStore.Publisher = (
       aggregate: AggregateId,
@@ -90,8 +103,31 @@ export const createService = <S extends Payload>({
       await handler(command, entity, publish);
     }
 
-    return load(aggregate);
+    return loader.load(aggregate);
   };
 
-  return { load, execute };
+  return { execute };
+};
+
+export const createService = <S extends Payload>({
+  store,
+  type,
+  init,
+  initializers,
+  reducers,
+  creators,
+  handlers,
+}: {
+  store: EventStore;
+  type: string;
+  init?: ((aggregate: AggregateId) => S) | undefined;
+  initializers: Record<string, Initializer<S, DomainEvent>>;
+  reducers: Record<string, Reducer<S, DomainEvent>>;
+  creators: Record<string, Creator<Command>>;
+  handlers: Record<string, CommandHandler<S, Command>>;
+}): EntityService<S> => {
+  const loader = createLoader<S>({ store, type, init, initializers, reducers });
+  const dispatcher = createDispatcher<S>({ store, type, loader, creators, handlers });
+
+  return { ...loader, ...dispatcher };
 };

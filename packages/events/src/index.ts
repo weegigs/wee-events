@@ -1,5 +1,5 @@
 export * from "./types";
 export * from "./entity-service";
-export * from "./decorators";
 export * from "./store";
-export * from "./rehydrator";
+export * from "./dispatcher";
+export * from "./loader";

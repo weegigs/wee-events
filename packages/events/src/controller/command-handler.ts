@@ -1,4 +1,5 @@
-import { Constructor, Registry } from "../entity-service";
+import { Registry } from "./registry";
+import { Constructor } from "./constructor";
 
 export const CommandHandler = (command: string): PropertyDecorator => {
   return (target, key) => {

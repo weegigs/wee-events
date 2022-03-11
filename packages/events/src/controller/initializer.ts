@@ -1,4 +1,5 @@
-import { Constructor, Registry } from "../entity-service";
+import { Registry } from "./registry";
+import { Constructor } from "./constructor";
 
 export const Initializer = (event: string): MethodDecorator => {
   return (target, _propertyKey, descriptor) => {

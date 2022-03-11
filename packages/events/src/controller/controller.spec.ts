@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { DomainEvent } from "../types";
-import { EntityService } from "../entity-service";
 import { MemoryStore } from "../store";
 
 import { Events, ExampleController, Commands } from "./example";
+import { Controller } from "./controller";
 
 describe("Entity Service", () => {
   let entries: string[] = [];
@@ -12,7 +12,7 @@ describe("Entity Service", () => {
   const store = new MemoryStore();
   const log = (message: string) => entries.push(message);
 
-  const service = EntityService.fromController(new ExampleController(log), { store });
+  const service = Controller.service(new ExampleController(log), { store });
 
   const events: DomainEvent[] = [
     {

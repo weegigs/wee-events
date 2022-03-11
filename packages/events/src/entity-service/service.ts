@@ -1,14 +1,14 @@
-import { AggregateId, Command, Entity, Payload } from "../types";
+import { Command, Payload } from "../types";
 
-import { fromController as fc } from "./createServiceFromController";
-import { createService } from "./createService";
+import { createDispatcher, createLoader, createService } from "./factory";
+import { Dispatcher } from "../dispatcher";
+import { Loader } from "../loader";
 
-export interface EntityService<S extends Payload> {
-  load(aggregate: AggregateId): Promise<Entity<S> | undefined>;
-  execute(aggregate: AggregateId, command: Command): Promise<Entity<S> | undefined>;
-}
+export interface EntityService<S extends Payload> extends Dispatcher<S, Command>, Loader<S> {}
 
 export namespace EntityService {
-  export const fromController = fc;
   export const create = createService;
 }
+
+export const loader = createLoader;
+export const dispatcher = createDispatcher;

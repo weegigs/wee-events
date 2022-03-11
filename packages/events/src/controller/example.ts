@@ -1,7 +1,8 @@
 import { Command, DomainEvent, EmptyPayload } from "../types";
-import { Reducer, CommandHandler } from "../decorators";
+import * as es from "../entity-service";
 
-import { Controller, Publisher } from "./types";
+import { Controller } from "./controller";
+import { CommandHandler, Reducer } from "./decorators";
 
 export namespace Events {
   export const Incremented = "counter:incremented";
@@ -45,7 +46,7 @@ export class ExampleController implements Controller<State> {
   }
 
   @Reducer(Events.Incremented)
-  readonly applyIncrement: Controller.Reducer<State, Events.Incremented> = (state, event) => {
+  readonly applyIncrement: es.Reducer<State, Events.Incremented> = (state, event) => {
     if (!state.running) {
       this.log(`increment event received but the counter is not running. ignoring`);
       return state;
@@ -55,20 +56,20 @@ export class ExampleController implements Controller<State> {
   };
 
   @Reducer(Events.Stopped)
-  applyStopped: Controller.Reducer<State, Events.Stopped> = (state, _event): State => {
+  applyStopped: es.Reducer<State, Events.Stopped> = (state, _event): State => {
     return { ...state, running: false };
   };
 
   @Reducer(Events.Started)
-  applyStarted: Controller.Reducer<State, Events.Started> = (state, _event) => {
+  applyStarted: es.Reducer<State, Events.Started> = (state, _event) => {
     return { ...state, running: true };
   };
 
   @CommandHandler(Commands.Increment)
-  increment: Controller.Handler<State, Commands.Increment> = async (
+  increment: es.CommandHandler<State, Commands.Increment> = async (
     { data: { count } },
     { state, aggregate },
-    publish: Publisher
+    publish: es.Publisher
   ) => {
     if (state.running) {
       await publish(aggregate, {
@@ -81,7 +82,7 @@ export class ExampleController implements Controller<State> {
   };
 
   @CommandHandler(Commands.Stop)
-  stop: Controller.Handler<State, Commands.Stop> = async (_, { state, aggregate }, publish: Publisher) => {
+  stop: es.CommandHandler<State, Commands.Stop> = async (_, { state, aggregate }, publish: es.Publisher) => {
     if (state.running) {
       await publish(aggregate, {
         type: Events.Stopped,
@@ -91,7 +92,7 @@ export class ExampleController implements Controller<State> {
   };
 
   @CommandHandler(Commands.Start)
-  start: Controller.Handler<State, Commands.Start> = async (_, { state, aggregate }, publish: Publisher) => {
+  start: es.CommandHandler<State, Commands.Start> = async (_, { state, aggregate }, publish: es.Publisher) => {
     if (!state.running) {
       await publish(aggregate, {
         type: Events.Started,

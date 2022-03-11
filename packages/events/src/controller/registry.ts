@@ -1,7 +1,8 @@
 import _ from "lodash";
 
 import { Entity, DomainEvent, RecordedEvent } from "../types";
-import { Constructor, Publisher } from "./types";
+import { Publisher } from "../entity-service/types";
+import { Constructor } from "./constructor";
 
 export namespace Registry {
   export type Policy = (
