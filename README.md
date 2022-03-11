@@ -1,6 +1,6 @@
 # Wee Events
 
-[![codebeat badge](https://codebeat.co/badges/9d5c522b-d47f-481d-a852-ecaa22577c7a)](https://codebeat.co/projects/github-com-weegigs-wee-events-main)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/518416c1092549ab858b18800ccef0e1)](https://www.codacy.com/gh/weegigs/wee-events/dashboard?utm_source=github.com&utm_medium=referral&utm_content=weegigs/wee-events&utm_campaign=Badge_Grade)
 
 ## Building `Wee Events`
 
