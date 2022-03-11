@@ -10,21 +10,12 @@ const ulid = monotonicFactory();
 
 const ts = (id: string) => DateTime.fromMillis(decodeTime(id), { zone: "utc" }).toISO();
 
-async function compress(input: string): Promise<Buffer> {
-  // return snappy.compress(input);
-  return Buffer.from(input, "utf-8");
-}
-
-async function uncompress(compressed: Buffer): Promise<Buffer> {
-  // return snappy.uncompress(compressed);
-  return compressed;
-}
-
 export type ChangeSet = {
   pk: string;
   sk: string;
   events: string;
   revision: string;
+  timestamp: string;
 };
 
 export namespace ChangeSet {
@@ -33,17 +24,18 @@ export namespace ChangeSet {
     sk: z.string().min(1),
     events: z.string(),
     revision: z.string().min(26).max(26),
+    timestamp: z.string(),
   });
 
   export const create = async (aggregate: AggregateId, recorded: RecordedEvent[]) => {
     const { revision } = recorded[recorded.length - 1];
-    const compressed = await compress(JSON.stringify(recorded));
 
     const changeSet: ChangeSet = {
       pk: AggregateId.encode(aggregate),
       sk: `change-set#${revision}`,
-      events: compressed.toString("base64"),
+      events: JSON.stringify(recorded),
       revision: revision,
+      timestamp: ts(revision),
     };
 
     return changeSet;
@@ -53,8 +45,7 @@ export namespace ChangeSet {
 
   export const decoder: (cypher: Cypher) => ChangeSetDecoder =
     (cypher: Cypher) => async (v: ChangeSet, decrypt: boolean) => {
-      const decompressed = await uncompress(Buffer.from(v.events, "base64"));
-      const parsed: RecordedEvent[] = JSON.parse(decompressed.toString("utf-8"));
+      const parsed: RecordedEvent[] = JSON.parse(v.events);
 
       const decrypted = decrypt
         ? parsed.map(async (event) => {
