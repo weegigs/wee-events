@@ -11,7 +11,7 @@ export namespace Rehydrator {
     events: EventStore;
   };
 
-  export function create<S extends Payload, C extends Controller<S>>(
+  export function createFromController<S extends Payload, C extends Controller<S>>(
     controller: C,
     { events }: Configuration
   ): Rehydrator<S> {

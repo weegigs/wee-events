@@ -12,7 +12,7 @@ describe("Entity Service", () => {
   const store = new MemoryStore();
   const log = (message: string) => entries.push(message);
 
-  const service = EntityService.create(new ExampleController(log), { store });
+  const service = EntityService.fromController(new ExampleController(log), { store });
 
   const events: DomainEvent[] = [
     {

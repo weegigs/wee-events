@@ -6,7 +6,7 @@
 
 ### Prerequisites
 
-- Yarn - https://yarnpkg.com/getting-started
+- Yarn https://yarnpkg.com/getting-started
 - Docker (for testing) https://www.testcontainers.org/supported_docker_environment/
 
 ### Building
