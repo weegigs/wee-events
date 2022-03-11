@@ -21,11 +21,11 @@
     "fix": "yarn run ws:fix"
   },
   "peerDependencies": {
-    "@effect-ts/core": "^0.55.1",
+    "@effect-ts/core": "^0.58.0",
     "@weegigs/events-core": "workspace:^"
   },
   "devDependencies": {
-    "@effect-ts/core": "^0.55.2",
+    "@effect-ts/core": "^0.58.0",
     "@tsconfig/node14": "^1.0.1",
     "@types/jest": "^27.4.1",
     "@types/node": "^14.18.12",

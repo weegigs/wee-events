@@ -1357,28 +1357,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@effect-ts/core@npm:^0.55.2":
-  version: 0.55.2
-  resolution: "@effect-ts/core@npm:0.55.2"
+"@effect-ts/core@npm:^0.58.0":
+  version: 0.58.0
+  resolution: "@effect-ts/core@npm:0.58.0"
   dependencies:
-    "@effect-ts/system": ^0.52.2
-  checksum: 956e504bcdcac6e8a4f0377679c92fe905c71b3acf72b13bd5957a16f73070fa12038a091e63ecd43b2861c6651ada520743f1e4e69d38287a8689231e34cfaa
+    "@effect-ts/system": ^0.55.0
+  checksum: d3cc0d2f99f90e6a93844124fa5e51c4552a1c9286190b7aba81890d17282c16c301b5c80c64668bdf7e434253b8dddd8dfebacfc2c105400247b6432a418fa8
   languageName: node
   linkType: hard
 
-"@effect-ts/node@npm:^0.36.0":
-  version: 0.36.0
-  resolution: "@effect-ts/node@npm:0.36.0"
+"@effect-ts/node@npm:^0.38.3":
+  version: 0.38.3
+  resolution: "@effect-ts/node@npm:0.38.3"
   peerDependencies:
-    "@effect-ts/core": ^0.53.0
-  checksum: 3f4f6668dfd643f532561cfd0dd7e4ab979a6df9b34113ef879f40a129b8c897f432082c52654bda1cb455463e32699405371b0e214e04020a548a8e660e3c14
+    "@effect-ts/core": ^0.58.0
+  checksum: 7e4402283eb4ffd2d02f20e4d1b6f4b8eb9928c778d15e075dc9e47ca5f2d703c3e7107f59e7d8b234e41826c0aa6aa3e5aaf98e39aabdf089d08fc39780f7c0
   languageName: node
   linkType: hard
 
-"@effect-ts/system@npm:^0.52.2":
-  version: 0.52.2
-  resolution: "@effect-ts/system@npm:0.52.2"
-  checksum: 9f482a9e5c2936140886806ba9da056968d711b6334b481429b55d43f755ca948695e6c612cd8a03141a09940e64ced716eedb70c974a4ddab169e533823cfb4
+"@effect-ts/system@npm:^0.55.0":
+  version: 0.55.0
+  resolution: "@effect-ts/system@npm:0.55.0"
+  checksum: 22638c977324f859c8efbf1366cd284505ab9e6427ff8a7d373fb108a99434e5f9ff380aca24229a7d7b97d60d8b6a69918bc517243aebeab549ec9bf7ef4a2f
   languageName: node
   linkType: hard
 
@@ -2137,8 +2137,8 @@ __metadata:
     "@aws-sdk/service-error-classification": ^3.54.0
     "@aws-sdk/smithy-client": ^3.54.0
     "@aws-sdk/types": ^3.54.0
-    "@effect-ts/core": ^0.55.2
-    "@effect-ts/node": ^0.36.0
+    "@effect-ts/core": ^0.58.0
+    "@effect-ts/node": ^0.38.3
     "@tsconfig/node14": ^1.0.1
     "@types/jest": ^27.4.1
     "@types/lodash": ^4.14.179
@@ -2157,8 +2157,8 @@ __metadata:
     ulid: ^2.3.0
     zod: ^3.13.4
   peerDependencies:
-    "@aws-sdk/client-dynamodb": ^3.49.0
-    "@effect-ts/core": ^0.55.1
+    "@aws-sdk/client-dynamodb": ^3.54.0
+    "@effect-ts/core": ^0.58.0
     "@weegigs/events-core": "workspace:^"
     "@weegigs/events-cypher": "workspace:^"
   languageName: unknown
@@ -2172,8 +2172,8 @@ __metadata:
     "@aws-sdk/client-dynamodb": ^3.54.0
     "@aws-sdk/client-eventbridge": ^3.54.0
     "@aws-sdk/client-sfn": ^3.54.0
-    "@effect-ts/core": ^0.55.2
-    "@effect-ts/node": ^0.36.0
+    "@effect-ts/core": ^0.58.0
+    "@effect-ts/node": ^0.38.3
     "@middy/core": ^2.5.7
     "@middy/do-not-wait-for-empty-event-loop": ^2.5.7
     "@tsconfig/node14": ^1.0.1
@@ -2186,11 +2186,11 @@ __metadata:
     ts-node: ^10.7.0
     typescript: ^4.5.5
   peerDependencies:
-    "@aws-sdk/client-cloudwatch": ^3.49.0
-    "@aws-sdk/client-dynamodb": ^3.49.0
-    "@aws-sdk/client-eventbridge": ^3.49.0
-    "@aws-sdk/client-sfn": ^3.49.0
-    "@effect-ts/core": ^0.55.1
+    "@aws-sdk/client-cloudwatch": ^3.54.0
+    "@aws-sdk/client-dynamodb": ^3.54.0
+    "@aws-sdk/client-eventbridge": ^3.54.0
+    "@aws-sdk/client-sfn": ^3.54.0
+    "@effect-ts/core": ^0.58.0
   languageName: unknown
   linkType: soft
 
@@ -2212,7 +2212,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@weegigs/events-core@workspace:packages/events"
   dependencies:
-    "@effect-ts/core": ^0.55.2
+    "@effect-ts/core": ^0.58.0
     "@tsconfig/node14": ^1.0.1
     "@types/jest": ^27.4.1
     "@types/lodash": ^4.14.179
@@ -2227,7 +2227,7 @@ __metadata:
     ulid: ^2.3.0
     zod: ^3.13.4
   peerDependencies:
-    "@effect-ts/core": ^0.55.1
+    "@effect-ts/core": ^0.58.0
   languageName: unknown
   linkType: soft
 
@@ -2247,7 +2247,7 @@ __metadata:
     ts-jest: ^27.1.3
     typescript: ^4.5.5
   peerDependencies:
-    "@aws-sdk/client-dynamodb": ^3.49.0
+    "@aws-sdk/lib-dynamodb": ^3.54.0
     "@weegigs/events-core": "workspace:^"
   languageName: unknown
   linkType: soft
@@ -2256,7 +2256,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@weegigs/events-logging@workspace:packages/logging"
   dependencies:
-    "@effect-ts/core": ^0.55.2
+    "@effect-ts/core": ^0.58.0
     "@types/jest": ^27.4.1
     "@types/node": ^14.18.12
     "@weegigs/effects": "workspace:^"
@@ -2266,7 +2266,7 @@ __metadata:
     ts-jest: ^27.1.3
     typescript: ^4.5.5
   peerDependencies:
-    "@effect-ts/core": ^0.55.1
+    "@effect-ts/core": ^0.58.0
     "@weegigs/events-core": "workspace:^"
   languageName: unknown
   linkType: soft
@@ -2297,7 +2297,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@weegigs/events-render@workspace:packages/render"
   dependencies:
-    "@effect-ts/core": ^0.55.2
+    "@effect-ts/core": ^0.58.0
     "@tsconfig/node14": ^1.0.1
     "@types/jest": ^27.4.1
     "@types/node": ^14.18.12
@@ -2306,7 +2306,7 @@ __metadata:
     ts-jest: ^27.1.3
     typescript: ^4.5.5
   peerDependencies:
-    "@effect-ts/core": ^0.55.1
+    "@effect-ts/core": ^0.58.0
     "@weegigs/events-core": "workspace:^"
   languageName: unknown
   linkType: soft
@@ -2315,7 +2315,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@weegigs/events-tools@workspace:tools/events"
   dependencies:
-    "@effect-ts/core": ^0.55.2
+    "@effect-ts/core": ^0.58.0
     "@types/jest": ^27.4.1
     "@types/lodash": ^4.14.179
     "@types/node": ^14.18.12

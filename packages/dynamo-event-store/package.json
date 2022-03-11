@@ -24,7 +24,7 @@
     "@aws-sdk/lib-dynamodb": "^3.54.0",
     "@aws-sdk/service-error-classification": "^3.54.0",
     "@aws-sdk/smithy-client": "^3.54.0",
-    "@effect-ts/node": "^0.36.0",
+    "@effect-ts/node": "^0.38.3",
     "@weegigs/effects": "workspace:*",
     "@weegigs/events-common": "workspace:*",
     "lodash": "^4.17.21",
@@ -33,15 +33,15 @@
     "zod": "^3.13.4"
   },
   "peerDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.49.0",
-    "@effect-ts/core": "^0.55.1",
+    "@aws-sdk/client-dynamodb": "^3.54.0",
+    "@effect-ts/core": "^0.58.0",
     "@weegigs/events-core": "workspace:^",
     "@weegigs/events-cypher": "workspace:^"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.54.0",
     "@aws-sdk/types": "^3.54.0",
-    "@effect-ts/core": "^0.55.2",
+    "@effect-ts/core": "^0.58.0",
     "@tsconfig/node14": "^1.0.1",
     "@types/jest": "^27.4.1",
     "@types/lodash": "^4.14.179",

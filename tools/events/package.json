@@ -21,7 +21,7 @@
     "fix": "yarn run ws:fix"
   },
   "dependencies": {
-    "@effect-ts/core": "^0.55.2",
+    "@effect-ts/core": "^0.58.0",
     "@weegigs/dynamo-event-store": "workspace:^",
     "@weegigs/events-core": "workspace:^",
     "commander": "^9.0.0",

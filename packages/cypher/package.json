@@ -21,7 +21,7 @@
     "fix": "yarn run ws:fix"
   },
   "peerDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.49.0",
+    "@aws-sdk/lib-dynamodb": "^3.54.0",
     "@weegigs/events-core": "workspace:^"
   },
   "dependencies": {
