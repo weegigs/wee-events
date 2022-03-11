@@ -5,10 +5,10 @@ import { pipe } from "@effect-ts/core";
 
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
-import * as env from "@weegigs/effects/lib/environment";
-import * as dyn from "@weegigs/effects/lib/aws/dynamodb";
+import * as env from "./environment";
+import * as dyn from "./aws/dynamodb";
 
-import * as s from "./store";
+import * as s from "@weegigs/dynamo-event-store";
 import * as e from "@weegigs/events-core";
 
 export const EventStore = tag<e.EventStore>();

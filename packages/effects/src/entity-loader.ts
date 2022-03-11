@@ -2,8 +2,8 @@ import * as T from "@effect-ts/core/Effect";
 import { pipe } from "@effect-ts/core";
 import * as Case from "@effect-ts/core/Case";
 
-import { EntityService } from "./entity-service";
-import { AggregateId, Entity, Payload } from "./types";
+import { EntityService } from "@weegigs/events-core/src/entity-service";
+import { AggregateId, Entity, Payload } from "@weegigs/events-core/src/types";
 
 export interface EntityLoader {
   load(aggregate: AggregateId): T.Effect<unknown, EntityLoader.Error, Entity>;

@@ -13,18 +13,5 @@
     "./lib/**/*",
     "./.vscode/**/*"
   ],
-  "references": [
-    {
-      "path": "../effects"
-    },
-    {
-      "path": "../common"
-    },
-    {
-      "path": "../events"
-    },
-    {
-      "path": "../cypher"
-    }
-  ]
+  "references": []
 }

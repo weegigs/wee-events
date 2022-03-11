@@ -6,7 +6,8 @@
     "outDir": "./lib"
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "../effects/entity-loader.ts"
   ],
   "exclude": [
     "./node_modules/**/*",

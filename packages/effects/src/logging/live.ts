@@ -3,7 +3,7 @@ import * as L from "@effect-ts/core/Effect/Layer";
 
 import SenseLog from "senselogs";
 
-import { Stage } from "@weegigs/effects/lib/environment";
+import { Stage } from "../environment";
 
 import { Log } from "./effects";
 
