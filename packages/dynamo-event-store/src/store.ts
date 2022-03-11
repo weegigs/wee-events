@@ -48,6 +48,7 @@ type LatestRecord = {
   pk: string;
   sk: string;
   revision: string;
+  timestamp: string;
 };
 
 function latestFor(changeSet: ChangeSet): LatestRecord {
@@ -55,6 +56,7 @@ function latestFor(changeSet: ChangeSet): LatestRecord {
     pk: changeSet.pk,
     sk: `latest-revision`,
     revision: changeSet.revision,
+    timestamp: changeSet.timestamp,
   };
 }
 
