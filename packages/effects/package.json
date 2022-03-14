@@ -20,7 +20,7 @@
     "publish": "yarn run ws:publish"
   },
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@effect-ts/node": "^0.38.3",
     "@middy/core": "^2.5.7",

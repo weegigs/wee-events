@@ -2,7 +2,7 @@
   "name": "@weegigs/events-common",
   "version": "0.15.0",
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
-  "license": "ISC",
+  "license": "MIT",
   "description": "Common utilities for Wee Events",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
