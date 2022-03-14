@@ -32,6 +32,9 @@
       "path": "packages/common"
     },
     {
+      "path": "packages/core"
+    },
+    {
       "path": "packages/cypher"
     },
     {
@@ -41,13 +44,7 @@
       "path": "packages/effects"
     },
     {
-      "path": "packages/events"
-    },
-    {
-      "path": "packages/logging"
-    },
-    {
-      "path": "packages/render"
+      "path": "tools/events"
     }
   ]
 }

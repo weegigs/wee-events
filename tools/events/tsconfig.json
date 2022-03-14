@@ -18,7 +18,7 @@
       "path": "../../packages/dynamo-event-store"
     },
     {
-      "path": "../../packages/events"
+      "path": "../../packages/core"
     }
   ]
 }

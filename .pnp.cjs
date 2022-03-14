@@ -27,6 +27,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/common"
       },
       {
+        "name": "@weegigs/events-core",
+        "reference": "workspace:packages/core"
+      },
+      {
         "name": "@weegigs/events-cypher",
         "reference": "workspace:packages/cypher"
       },
@@ -39,10 +43,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/effects"
       },
       {
-        "name": "@weegigs/events-core",
-        "reference": "workspace:packages/events"
-      },
-      {
         "name": "@weegigs/events-tools",
         "reference": "workspace:tools/events"
       }
@@ -53,7 +53,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@weegigs/dynamo-event-store", ["virtual:764d0d6952e06edc7a9acb85fdcec29a225754d84cb01cc6fcd78f0e7b0723b3f29bfa57b39d507e266cb262b364ec1a0aac3920a980d07cef84cfd06972459c#workspace:packages/dynamo-event-store", "workspace:packages/dynamo-event-store"]],
       ["@weegigs/effects", ["workspace:packages/effects"]],
       ["@weegigs/events-common", ["workspace:packages/common"]],
-      ["@weegigs/events-core", ["workspace:packages/events"]],
+      ["@weegigs/events-core", ["workspace:packages/core"]],
       ["@weegigs/events-cypher", ["virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/cypher", "workspace:packages/cypher"]],
       ["@weegigs/events-monorepo", ["workspace:."]],
       ["@weegigs/events-tools", ["workspace:tools/events"]]
@@ -2876,7 +2876,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/weegigs__events-core", null],
             ["@types/weegigs__events-cypher", null],
             ["@weegigs/events-common", "workspace:packages/common"],
-            ["@weegigs/events-core", "workspace:packages/events"],
+            ["@weegigs/events-core", "workspace:packages/core"],
             ["@weegigs/events-cypher", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/cypher"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.1"],
             ["lodash", "npm:4.17.21"],
@@ -2911,7 +2911,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/luxon", "npm:2.3.0"],
             ["@types/node", "npm:14.18.12"],
             ["@weegigs/events-common", "workspace:packages/common"],
-            ["@weegigs/events-core", "workspace:packages/events"],
+            ["@weegigs/events-core", "workspace:packages/core"],
             ["@weegigs/events-cypher", "virtual:2e6c72097cd0054b2725e0f406ee6a1e421c68563a090d5781afea6578d38a25cc11f4ab100020abb49f532938cbf5ff61b367d1cfa3d91042aa69f74f6d7e5b#workspace:packages/cypher"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.1"],
             ["lodash", "npm:4.17.21"],
@@ -2943,7 +2943,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/jest", "npm:27.4.1"],
             ["@types/node", "npm:14.18.12"],
             ["@weegigs/dynamo-event-store", "virtual:764d0d6952e06edc7a9acb85fdcec29a225754d84cb01cc6fcd78f0e7b0723b3f29bfa57b39d507e266cb262b364ec1a0aac3920a980d07cef84cfd06972459c#workspace:packages/dynamo-event-store"],
-            ["@weegigs/events-core", "workspace:packages/events"],
+            ["@weegigs/events-core", "workspace:packages/core"],
             ["aws-lambda", "npm:1.0.7"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.1"],
             ["senselogs", "npm:1.0.2"],
@@ -2971,10 +2971,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@weegigs/events-core", [
-        ["workspace:packages/events", {
-          "packageLocation": "./packages/events/",
+        ["workspace:packages/core", {
+          "packageLocation": "./packages/core/",
           "packageDependencies": [
-            ["@weegigs/events-core", "workspace:packages/events"],
+            ["@weegigs/events-core", "workspace:packages/core"],
             ["@tsconfig/node14", "npm:1.0.1"],
             ["@types/jest", "npm:27.4.1"],
             ["@types/lodash", "npm:4.14.179"],
@@ -3005,7 +3005,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/jest", "npm:27.4.1"],
             ["@types/node", "npm:14.18.12"],
             ["@types/weegigs__events-core", null],
-            ["@weegigs/events-core", "workspace:packages/events"],
+            ["@weegigs/events-core", "workspace:packages/core"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.1"],
             ["testcontainers", "npm:8.4.0"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
@@ -3029,7 +3029,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@aws-sdk/types", "npm:3.54.0"],
             ["@types/jest", "npm:27.4.1"],
             ["@types/node", "npm:14.18.12"],
-            ["@weegigs/events-core", "workspace:packages/events"],
+            ["@weegigs/events-core", "workspace:packages/core"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.1"],
             ["testcontainers", "npm:8.4.0"],
             ["ts-jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.1.3"],
@@ -3072,7 +3072,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/lodash", "npm:4.14.179"],
             ["@types/node", "npm:14.18.12"],
             ["@weegigs/dynamo-event-store", "virtual:764d0d6952e06edc7a9acb85fdcec29a225754d84cb01cc6fcd78f0e7b0723b3f29bfa57b39d507e266cb262b364ec1a0aac3920a980d07cef84cfd06972459c#workspace:packages/dynamo-event-store"],
-            ["@weegigs/events-core", "workspace:packages/events"],
+            ["@weegigs/events-core", "workspace:packages/core"],
             ["commander", "npm:9.0.0"],
             ["jest", "virtual:711a8afaac9b51a956b87c3548fc8242eb1f9a8ed5b806f723d358edded09c4e603d4291dbb90836640c31f88043f10ab1f943fa177cf5546e5f083d0b8d2833#npm:27.5.1"],
             ["lodash", "npm:4.17.21"],

@@ -13,5 +13,15 @@
     "./lib/**/*",
     "./.vscode/**/*"
   ],
-  "references": []
+  "references": [
+    {
+      "path": "../common"
+    },
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../cypher"
+    }
+  ]
 }

@@ -2209,9 +2209,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@weegigs/events-core@workspace:*, @weegigs/events-core@workspace:^, @weegigs/events-core@workspace:packages/events":
+"@weegigs/events-core@workspace:*, @weegigs/events-core@workspace:^, @weegigs/events-core@workspace:packages/core":
   version: 0.0.0-use.local
-  resolution: "@weegigs/events-core@workspace:packages/events"
+  resolution: "@weegigs/events-core@workspace:packages/core"
   dependencies:
     "@tsconfig/node14": ^1.0.1
     "@types/jest": ^27.4.1

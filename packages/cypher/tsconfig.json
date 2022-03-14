@@ -16,7 +16,7 @@
   ],
   "references": [
     {
-      "path": "../events"
+      "path": "../core"
     }
   ]
 }

@@ -13,5 +13,12 @@
     "./lib/**/*",
     "./.vscode/**/*"
   ],
-  "references": []
+  "references": [
+    {
+      "path": "../dynamo-event-store"
+    },
+    {
+      "path": "../core"
+    }
+  ]
 }
