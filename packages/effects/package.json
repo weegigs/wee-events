@@ -16,7 +16,8 @@
     "test": "yarn ws:test",
     "lint": "yarn ws:lint",
     "doctor": "yarn ws:doctor",
-    "fix": "yarn run ws:fix"
+    "fix": "yarn run ws:fix",
+    "publish": "yarn run ws:publish"
   },
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
   "license": "ISC",

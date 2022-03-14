@@ -18,7 +18,8 @@
     "test": "yarn ws:test",
     "lint": "yarn ws:lint",
     "doctor": "yarn ws:doctor",
-    "fix": "yarn run ws:fix"
+    "fix": "yarn run ws:fix",
+    "publish": "yarn run ws:publish"
   },
   "peerDependencies": {
     "@aws-sdk/lib-dynamodb": "^3.54.0",

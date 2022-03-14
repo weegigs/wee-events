@@ -19,13 +19,15 @@
     "fix": "ultra -r fix && yarn fix:typescript-references",
     "fix:typescript-references": "yarn dlx -p @monorepo-utils/workspaces-to-typescript-project-references workspaces-to-typescript-project-references --root --includesRoot",
     "doctor": "yarn dlx @yarnpkg/doctor",
+    "publish": "ultra -r --rebuild publish",
     "ws:build": "cd ${INIT_CWD} && yarn clean && yarn lint && yarn compile && yarn test",
     "ws:clean": "cd ${INIT_CWD} && rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
     "ws:lint": "cd ${INIT_CWD} && eslint \"src/**/*.ts\" --cache",
     "ws:compile": "cd ${INIT_CWD} && tsc --build",
     "ws:test": "cd ${INIT_CWD} && jest --passWithNoTests",
     "ws:doctor": "cd ${INIT_CWD} && yarn dlx @yarnpkg/doctor",
-    "ws:fix": "cd ${INIT_CWD} && prettier -w ./src && eslint \"src/**/*.ts\" --fix"
+    "ws:fix": "cd ${INIT_CWD} && prettier -w ./src && eslint \"src/**/*.ts\" --fix",
+    "ws:publish": "cd ${INIT_CWD} && yarn build && yarn npm publish --access public"
   },
   "engines": {
     "node": ">=14.15.0"
