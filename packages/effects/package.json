@@ -22,11 +22,11 @@
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
   "license": "MIT",
   "dependencies": {
-    "@effect-ts/node": "^0.38.3",
+    "@effect-ts/node": "^0.38.4",
     "@middy/core": "^2.5.7",
     "@middy/do-not-wait-for-empty-event-loop": "^2.5.7",
     "aws-lambda": "^1.0.7",
-    "senselogs": "^1.0.2"
+    "senselogs": "^1.0.3"
   },
   "peerDependencies": {
     "@aws-sdk/client-cloudwatch": "^3.54.0",
@@ -38,21 +38,21 @@
     "@weegigs/events-core": "workspace:^"
   },
   "devDependencies": {
-    "@aws-sdk/client-cloudwatch": "^3.54.0",
-    "@aws-sdk/client-dynamodb": "^3.54.0",
-    "@aws-sdk/client-eventbridge": "^3.54.0",
-    "@aws-sdk/client-sfn": "^3.54.0",
-    "@effect-ts/core": "^0.58.0",
+    "@aws-sdk/client-cloudwatch": "^3.95.0",
+    "@aws-sdk/client-dynamodb": "^3.95.0",
+    "@aws-sdk/client-eventbridge": "^3.95.0",
+    "@aws-sdk/client-sfn": "^3.95.0",
+    "@effect-ts/core": "^0.58.1",
     "@tsconfig/node14": "^1.0.1",
-    "@types/aws-lambda": "^8.10.93",
-    "@types/jest": "^27.4.1",
-    "@types/node": "^14.18.12",
+    "@types/aws-lambda": "^8.10.97",
+    "@types/jest": "^27.5.1",
+    "@types/node": "^14.18.18",
     "@weegigs/dynamo-event-store": "workspace:^",
     "@weegigs/events-core": "workspace:^",
     "jest": "^27.5.1",
-    "ts-jest": "^27.1.3",
+    "ts-jest": "^27.1.5",
     "ts-node": "^10.7.0",
-    "typescript": "^4.5.5"
+    "typescript": "^4.6.4"
   },
   "publishConfig": {
     "access": "public",
