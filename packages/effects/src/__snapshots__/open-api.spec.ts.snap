@@ -1,0 +1,205 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`describe service specification should describe valid service specification 1`] = `
+"openapi: 3.0.0
+info:
+  title: A Sample Receipt Service
+  version: 1.0.0
+  description: A sample service for managing receipts
+components:
+  schemas:
+    Resource:
+      type: object
+      properties:
+        $self:
+          type: string
+        $type:
+          type: string
+        $revision:
+          type: string
+      required:
+        - $self
+        - $type
+        - $revision
+      description: An object with a type discriminator, location and revision
+    Receipt:
+      allOf:
+        - $ref: \\"#/components/schemas/Resource\\"
+        - type: object
+          properties:
+            total:
+              type: number
+              minimum: 0
+          required:
+            - total
+          description: A receipt
+      description: A Receipt Resource
+    NotFound:
+      type: object
+      properties:
+        code:
+          type: string
+          enum:
+            - \\"404\\"
+        message:
+          type: string
+          enum:
+            - receipt not found
+      required:
+        - code
+        - message
+      description: The requested receipt was not found
+    Conflict:
+      type: object
+      properties:
+        code:
+          type: string
+          enum:
+            - \\"409\\"
+        message:
+          type: string
+          enum:
+            - conflict detected while processing request
+      required:
+        - code
+        - message
+      description: The request could not be completed due to a conflict
+    RateLimit:
+      type: object
+      properties:
+        code:
+          type: string
+          enum:
+            - \\"429\\"
+        message:
+          type: string
+          enum:
+            - rate limit exceeded
+      required:
+        - code
+        - message
+      description: The request could not be completed due to a rate limit
+    Add:
+      type: object
+      properties:
+        amount:
+          type: number
+          minimum: 1
+      required:
+        - amount
+      description: Add money to the receipt
+    Deduct:
+      type: object
+      properties:
+        amount:
+          type: number
+          minimum: 1
+      required:
+        - amount
+      description: Deduct money from the receipt
+  parameters:
+    ReceiptId:
+      in: path
+      name: id
+      schema:
+        type: string
+        example: \\"1212121\\"
+      required: true
+paths:
+  \\"receipt/{id}\\":
+    get:
+      parameters:
+        - $ref: \\"#/components/parameters/ReceiptId\\"
+      responses:
+        \\"200\\":
+          description: A Receipt Resource
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/Receipt\\"
+        \\"404\\":
+          description: The requested receipt was not found
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/NotFound\\"
+        \\"429\\":
+          description: The request could not be completed due to a rate limit
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/RateLimit\\"
+  \\"receipt/{id}/add\\":
+    post:
+      parameters:
+        - $ref: \\"#/components/parameters/ReceiptId\\"
+      requestBody:
+        description: Add money to the receipt
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: \\"#/components/schemas/Add\\"
+      responses:
+        \\"200\\":
+          description: A Receipt Resource
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/Receipt\\"
+        \\"404\\":
+          description: The requested receipt was not found
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/NotFound\\"
+        \\"409\\":
+          description: The request could not be completed due to a conflict
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/Conflict\\"
+        \\"429\\":
+          description: The request could not be completed due to a rate limit
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/RateLimit\\"
+  \\"receipt/{id}/deduct\\":
+    post:
+      parameters:
+        - $ref: \\"#/components/parameters/ReceiptId\\"
+      requestBody:
+        description: Deduct money from the receipt
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: \\"#/components/schemas/Deduct\\"
+      responses:
+        \\"200\\":
+          description: A Receipt Resource
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/Receipt\\"
+        \\"404\\":
+          description: The requested receipt was not found
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/NotFound\\"
+        \\"409\\":
+          description: The request could not be completed due to a conflict
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/Conflict\\"
+        \\"429\\":
+          description: The request could not be completed due to a rate limit
+          content:
+            application/json:
+              schema:
+                $ref: \\"#/components/schemas/RateLimit\\"
+"
+`;

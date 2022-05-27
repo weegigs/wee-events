@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`describe receipt service should load an entity 1`] = `
+Object {
+  "aggregate": Object {
+    "key": "test",
+    "type": "receipt",
+  },
+  "state": Object {
+    "total": 10,
+  },
+  "type": "receipt",
+}
+`;
+
+exports[`describe receipt service should update an entity 1`] = `
+Object {
+  "aggregate": Object {
+    "key": "test",
+    "type": "receipt",
+  },
+  "state": Object {
+    "total": 15,
+  },
+  "type": "receipt",
+}
+`;

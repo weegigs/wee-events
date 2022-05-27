@@ -1,18 +1,14 @@
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { pipe } from "@effect-ts/core";
 import * as T from "@effect-ts/core/Effect";
 import * as L from "@effect-ts/core/Effect/Layer";
-import { tag, Has } from "@effect-ts/core/Has";
-import { pipe } from "@effect-ts/core";
-
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-
-import * as env from "./environment";
-import * as dyn from "./aws/dynamodb";
+import { tag } from "@effect-ts/core/Has";
 
 import * as s from "@weegigs/dynamo-event-store";
-import * as e from "@weegigs/events-core";
+import * as dyn from "./aws/dynamodb";
 
-export const EventStore = tag<e.EventStore>();
-export type HasEventStore = Has<e.EventStore>;
+import * as env from "./environment";
+import { EventStore } from "./event-store";
 
 export interface DynamoEventStoreConfig {
   readonly client: DynamoDBClient;
