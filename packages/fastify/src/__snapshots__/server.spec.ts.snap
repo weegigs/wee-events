@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`fastify server should load an entity 1`] = `
+Object {
+  "$type": "receipt",
+  "total": 10,
+}
+`;
+
+exports[`fastify server should reject bad updates 1`] = `
+Object {
+  "error": "Bad Request",
+  "message": "insufficient balance available",
+  "statusCode": 400,
+}
+`;
+
+exports[`fastify server should return a 404 if the entity is not found 1`] = `
+Object {
+  "error": "Not Found",
+  "message": "Entity of type receipt not available from aggregate receipt.missing",
+  "statusCode": 404,
+}
+`;
+
+exports[`fastify server should update an entity 1`] = `
+Object {
+  "$type": "receipt",
+  "total": 15,
+}
+`;
