@@ -19,7 +19,8 @@
     "lint": "yarn ws:lint",
     "doctor": "yarn ws:doctor",
     "fix": "yarn run ws:fix",
-    "publish": "yarn run ws:publish"
+    "publish": "yarn run ws:publish",
+    "prepack": "yarn run ws:prepack"
   },
   "dependencies": {
     "lodash": "^4.17.21"

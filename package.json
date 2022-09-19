@@ -27,7 +27,8 @@
     "ws:test": "cd ${INIT_CWD} && jest --passWithNoTests",
     "ws:doctor": "cd ${INIT_CWD} && yarn dlx @yarnpkg/doctor",
     "ws:fix": "cd ${INIT_CWD} && prettier -w ./src && eslint \"src/**/*.ts\" --fix",
-    "ws:publish": "cd ${INIT_CWD} && yarn build && yarn npm publish --access public"
+    "ws:publish": "cd ${INIT_CWD} && yarn build && yarn npm publish --access public",
+    "ws:prepack": "cd ${INIT_CWD} && yarn clean && yarn compile"
   },
   "engines": {
     "node": ">=14.15.0"
