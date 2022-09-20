@@ -5,7 +5,7 @@ import * as T from "@effect-ts/core/Effect";
 import { pipe } from "@effect-ts/core/Function";
 
 import * as fast from "fastify";
-import * as errors from "http-errors"
+import * as errors from "http-errors";
 
 import { Payload } from "@weegigs/events-core";
 import { ServiceDescription, State } from "@weegigs/effects/lib/service/service";
@@ -18,10 +18,10 @@ import { CommandValidationError, HandlerNotFound } from "@weegigs/effects/lib/se
 
 // export function run<R, E, A extends State>(environment: L.Layer<unknown, unknown, R & Has<EventLoader>>) {}
 
-
 export function create<R, E, A extends State>(
   description: ServiceDescription<R, E, A>,
-  errorMapper: (error: E) => errors.HttpError = (e) => new errors.InternalServerError(e instanceof Error ? e.message : String(e)),
+  errorMapper: (error: E) => errors.HttpError = (e) =>
+    new errors.InternalServerError(e instanceof Error ? e.message : String(e))
 ): T.Effect<R & Has<EventLoader>, never, fast.FastifyInstance> {
   const service = description.service();
   const et = description.info.entity.name;
@@ -29,11 +29,11 @@ export function create<R, E, A extends State>(
   const get = (id: AggregateId) =>
     pipe(
       service.load(id),
-      T.map(e => ({
-          $type: e.type,
-          $revision: e.revision,
-          ...e.state
-        })),
+      T.map((e) => ({
+        $type: e.type,
+        $revision: e.revision,
+        ...e.state,
+      })),
       T.catchAll((e): T.Effect<unknown, never, errors.HttpError> => {
         if (e instanceof EntityNotAvailableError) {
           return T.succeed(new errors.NotFound(e.message));
@@ -46,11 +46,12 @@ export function create<R, E, A extends State>(
   const execute = (path: string, target: AggregateId, command: Payload) =>
     pipe(
       service.execute(path, target, command),
-       T.map(e => ({
-          $type: e.type,
-          $revision: e.revision,
-          ...e.state
-        })),T.catchAll((e) => {
+      T.map((e) => ({
+        $type: e.type,
+        $revision: e.revision,
+        ...e.state,
+      })),
+      T.catchAll((e) => {
         if (e instanceof EntityNotAvailableError) {
           return T.succeed(new errors.NotFound(e.message));
         }
@@ -60,7 +61,7 @@ export function create<R, E, A extends State>(
         }
 
         if (e instanceof HandlerNotFound || e instanceof LoaderError) {
-          return T.succeed(new errors.InternalServerError(e.message))
+          return T.succeed(new errors.InternalServerError(e.message));
         }
 
         return T.succeed(errorMapper(e));

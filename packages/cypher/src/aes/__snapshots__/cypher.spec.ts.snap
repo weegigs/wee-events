@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`aes cypher should encrypt payloads 1`] = `
-Object {
-  "data": Array [
+{
+  "data": [
     123,
     34,
     110,

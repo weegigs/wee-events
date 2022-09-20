@@ -14,31 +14,31 @@ describe("fastify server", () => {
   const id = { key: "test", type: "receipt" };
   const ms = new MemoryStore();
   const el = T.provideService(EventLoader)(ms);
-  const pu = T.provideService(EventPublisher)(ms)
+  const pu = T.provideService(EventPublisher)(ms);
   const app = create(description, (e) => {
     switch (e.constructor) {
       case InsufficientBalanceError:
-        return new errors.BadRequest(e.message)
-    
+        return new errors.BadRequest(e.message);
+
       case ExpectedRevisionConflictError:
       case RevisionConflictError:
-        return new errors.Conflict(e.message)        
+        return new errors.Conflict(e.message);
 
       default:
-        return new errors.InternalServerError(e.message)
+        return new errors.InternalServerError(e.message);
     }
   });
   const program = pipe(app, el, pu);
 
-  let server: FastifyInstance
+  let server: FastifyInstance;
 
-  beforeEach(() => ms.clear())
+  beforeEach(() => ms.clear());
   beforeAll(async () => {
     server = await T.runPromise(program);
-  })
+  });
   afterAll(async () => {
-    await server.close()
-  })
+    await server.close();
+  });
 
   it("should create a server from a service description", async () => {
     expect(server).toBeDefined();
@@ -73,7 +73,7 @@ describe("fastify server", () => {
     const response = await server.inject({
       method: "POST",
       url: "/receipt/test/add",
-      payload: { amount: 5 }
+      payload: { amount: 5 },
     });
 
     expect(response.statusCode).toEqual(200);
@@ -86,11 +86,10 @@ describe("fastify server", () => {
     const response = await server.inject({
       method: "POST",
       url: "/receipt/test/deduct",
-      payload: { amount: 15 }
+      payload: { amount: 15 },
     });
 
     expect(response.statusCode).toEqual(400);
     expect(_.omit(JSON.parse(response.body), "$revision")).toMatchSnapshot();
   });
-
 });

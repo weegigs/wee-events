@@ -15,6 +15,7 @@ open.extendZodWithOpenApi(z);
 
 export const Receipt = z
   .object({
+    id: z.string().min(0),
     total: z.number().int().min(0),
   })
   .openapi({
@@ -25,24 +26,19 @@ export type Receipt = z.infer<typeof Receipt>;
 // events
 export const Added = z.object({ amount: z.number().int().min(1) });
 export type Added = z.TypeOf<typeof Added>;
-const addedInitializer: ldr.Initializer<Receipt, "added", Added> = (event) => ({
-  total: event.data.amount,
-});
 const addedReducer: ldr.Reducer<Receipt, "added", Added> = (state, event) => ({
+  ...state,
   total: state.total + event.data.amount,
 });
 
 export const Deducted = z.object({ amount: z.number().int().min(1) });
 export type Deducted = z.TypeOf<typeof Deducted>;
-const deductedInitializer: ldr.Initializer<Receipt, "deducted", Added> = (event) => ({
-  total: -event.data.amount,
-});
 const deductedReducer: ldr.Reducer<Receipt, "deducted", Deducted> = (state, event) => ({
+  ...state,
   total: state.total - event.data.amount,
 });
 
-const loader = ldr.EntityLoader.initializer("receipt", "added", Added, addedInitializer)
-  .initializer("deducted", Deducted, deductedInitializer)
+const loader = ldr.EntityLoader.init("receipt", (id): Receipt => ({ id: `${id.type}.${id.key}`, total: 0 }))
   .reducer("added", Added, addedReducer)
   .reducer("deducted", Deducted, deductedReducer);
 

@@ -59,10 +59,12 @@ function validated<R, E, S extends Payload, C extends Payload>(
     );
 }
 
+export type Target<T extends Payload = Payload> = wee.Entity<T> | wee.AggregateId;
+
 export interface Dispatcher<R, E, State extends Payload> {
   dispatch(
     path: string,
-    entity: wee.Entity<State>,
+    entity: Target<State>,
     command: Command
   ): T.Effect<R, E | HandlerNotFound | CommandValidationError, void>;
 

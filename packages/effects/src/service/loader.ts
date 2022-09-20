@@ -51,7 +51,9 @@ interface InitializingLoader<A extends State> extends InitializedLoader<A> {
 }
 
 export interface EntityLoader<A extends State> {
-  load(id: wee.AggregateId): T.Effect<Has<store.EventLoader>, store.LoaderError | EntityNotAvailableError, wee.Entity<A>>;
+  load(
+    id: wee.AggregateId
+  ): T.Effect<Has<store.EventLoader>, store.LoaderError | EntityNotAvailableError, wee.Entity<A>>;
   events(): Record<string, z.Schema>;
 }
 

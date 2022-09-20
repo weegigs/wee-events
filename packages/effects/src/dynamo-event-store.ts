@@ -8,7 +8,9 @@ import * as s from "@weegigs/dynamo-event-store";
 import * as dyn from "./aws/dynamodb";
 
 import * as env from "./environment";
-import { EventStore } from "./event-store";
+import * as es from "./event-store";
+
+import * as wee from "@weegigs/events-core";
 
 export interface DynamoEventStoreConfig {
   readonly client: DynamoDBClient;
@@ -29,7 +31,9 @@ const _configL = L.fromEffect(DynamoEventStoreConfig)(config);
 
 export const dynamoStore = T.gen(function* (_) {
   const config = yield* _(DynamoEventStoreConfig);
-  return new s.DynamoEventStore(config.table, { client: () => config.client });
+  const es: wee.EventStore = new s.DynamoEventStore(config.table, { client: () => config.client });
+
+  return es;
 });
 
-export const live = _configL[">>>"](L.fromEffect(EventStore)(dynamoStore));
+export const live = _configL[">>>"](L.fromEffect(es.EventStore)(dynamoStore));

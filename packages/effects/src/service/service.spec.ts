@@ -6,7 +6,7 @@ import { pipe } from "@effect-ts/core/Function";
 import * as wee from "@weegigs/events-core";
 
 import * as dispatcher from "./dispatcher";
-import * as loader from "./loader";
+// import * as loader from "./loader";
 import * as store from "../event-store";
 
 import * as receipts from "./sample/receipts";
@@ -17,19 +17,23 @@ const ms = new wee.MemoryStore();
 describe("describe receipt service", () => {
   beforeEach(() => ms.clear());
 
-  it("should fail if entity can't be created", async () => {
+  it("should load an empty entity", async () => {
     const program = pipe(receipts.service.load(id), T.provideService(store.EventLoader)(ms));
 
-    expect(T.runPromise(program)).rejects.toBeInstanceOf(loader.EntityNotAvailableError);
+    const result = await T.runPromise(program);
+
+    expect(result.state.total).toEqual(0);
+    expect(result.revision).toEqual(wee.Revision.Initial);
+    expect(result).toMatchSnapshot();
   });
 
-  it("should load an entity", async () => {
+  it("should load an entity with existing events", async () => {
     ms.publish(id, { type: "added", data: { amount: 10 } });
 
     const program = pipe(receipts.service.load(id), T.provideService(store.EventLoader)(ms));
     const result = await T.runPromise(program);
 
-    expect(result.state).toEqual({ total: 10 });
+    expect(result.state.total).toEqual(10);
     expect(result.revision).not.toEqual(wee.Revision.Initial);
     expect(_.omit(result, "revision")).toMatchSnapshot();
   });
@@ -60,7 +64,18 @@ describe("describe receipt service", () => {
     const program = pipe(update, T.provideService(store.EventLoader)(ms), T.provideService(store.EventPublisher)(ms));
     const result = await T.runPromise(program);
 
-    expect(result.state).toEqual({ total: 15 });
+    expect(result.state.total).toEqual(15);
+    expect(result.revision).not.toEqual(wee.Revision.Initial);
+    expect(_.omit(result, "revision")).toMatchSnapshot();
+  });
+
+  it("should create an entity", async () => {
+    const update = receipts.service.execute("add", id, { amount: 5 });
+
+    const program = pipe(update, T.provideService(store.EventLoader)(ms), T.provideService(store.EventPublisher)(ms));
+    const result = await T.runPromise(program);
+
+    expect(result.state.total).toEqual(5);
     expect(result.revision).not.toEqual(wee.Revision.Initial);
     expect(_.omit(result, "revision")).toMatchSnapshot();
   });
@@ -69,7 +84,6 @@ describe("describe receipt service", () => {
     ms.publish(id, { type: "added", data: { amount: 10 } });
 
     const update = receipts.service.execute("deduct", id, { amount: 15 });
-
     const program = pipe(update, T.provideService(store.EventLoader)(ms), T.provideService(store.EventPublisher)(ms));
 
     expect(T.runPromise(program)).rejects.toBeInstanceOf(receipts.InsufficientBalanceError);

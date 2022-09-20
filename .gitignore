@@ -1,3 +1,4 @@
+.DS_Store
 node_modules/
 .env
 .docker
@@ -10,6 +11,7 @@ cdk.out
 .vscode
 .build
 *.js
+!.eslintrc.js
 *.js.map
 *.d.ts
 tsconfig.tsbuildinfo
@@ -23,3 +25,5 @@ coverage
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+
+package.tgz

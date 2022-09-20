@@ -8,13 +8,13 @@ export const EventStore = tag<wee.EventStore>();
 export type HasEventStore = Has<wee.EventStore>;
 
 export interface EventPublisher {
-  publish: wee.Publisher
-} ;
+  publish: wee.Publisher;
+}
 export const EventPublisher = tag<EventPublisher>();
 
 export interface EventLoader {
-  load: wee.EventStore.Loader
-};
+  load: wee.EventStore.Loader;
+}
 export const EventLoader = tag<EventLoader>();
 
 export class LoaderError extends Error {
