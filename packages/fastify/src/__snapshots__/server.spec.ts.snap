@@ -1,14 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`fastify server should load an entity 1`] = `
-Object {
+{
   "$type": "receipt",
+  "id": "receipt.test",
   "total": 10,
 }
 `;
 
 exports[`fastify server should reject bad updates 1`] = `
-Object {
+{
   "error": "Bad Request",
   "message": "insufficient balance available",
   "statusCode": 400,
@@ -24,8 +25,9 @@ Object {
 `;
 
 exports[`fastify server should update an entity 1`] = `
-Object {
+{
   "$type": "receipt",
+  "id": "receipt.test",
   "total": 15,
 }
 `;

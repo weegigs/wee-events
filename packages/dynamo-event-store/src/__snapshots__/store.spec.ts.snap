@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`dynamo store encryption should tokenize the content of encrypted events 1`] = `
-Object {
-  "array": Array [
+{
+  "array": [
     "array.0:one",
   ],
   "boolean": true,
-  "nested": Object {
+  "nested": {
     "number": -105807839,
     "string": "nested.string:a nested string",
   },

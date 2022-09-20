@@ -24,13 +24,18 @@ components:
       description: An object with a type discriminator, location and revision
     Receipt:
       allOf:
-        - $ref: \\"#/components/schemas/Resource\\"
+        - allOf:
+            - $ref: "#/components/schemas/Resource"
+            - description: An object with a type discriminator, location and revision
         - type: object
           properties:
+            id:
+              type: string
             total:
               type: number
               minimum: 0
           required:
+            - id
             - total
           description: A receipt
       description: A Receipt Resource
@@ -40,7 +45,7 @@ components:
         code:
           type: string
           enum:
-            - \\"404\\"
+            - "404"
         message:
           type: string
           enum:
@@ -55,7 +60,7 @@ components:
         code:
           type: string
           enum:
-            - \\"409\\"
+            - "409"
         message:
           type: string
           enum:
@@ -70,7 +75,7 @@ components:
         code:
           type: string
           enum:
-            - \\"429\\"
+            - "429"
         message:
           type: string
           enum:
@@ -103,103 +108,129 @@ components:
       name: id
       schema:
         type: string
-        example: \\"1212121\\"
+        example: "1212121"
       required: true
 paths:
-  \\"receipt/{id}\\":
+  "receipt/{id}":
     get:
       parameters:
-        - $ref: \\"#/components/parameters/ReceiptId\\"
+        - $ref: "#/components/parameters/ReceiptId"
       responses:
-        \\"200\\":
+        "200":
           description: A Receipt Resource
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/Receipt\\"
-        \\"404\\":
+                allOf:
+                  - $ref: "#/components/schemas/Receipt"
+                  - description: A Receipt Resource
+        "404":
           description: The requested receipt was not found
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/NotFound\\"
-        \\"429\\":
+                allOf:
+                  - $ref: "#/components/schemas/NotFound"
+                  - description: The requested receipt was not found
+        "429":
           description: The request could not be completed due to a rate limit
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/RateLimit\\"
-  \\"receipt/{id}/add\\":
+                allOf:
+                  - $ref: "#/components/schemas/RateLimit"
+                  - description: The request could not be completed due to a rate limit
+  "receipt/{id}/add":
     post:
       parameters:
-        - $ref: \\"#/components/parameters/ReceiptId\\"
+        - $ref: "#/components/parameters/ReceiptId"
       requestBody:
         description: Add money to the receipt
         required: true
         content:
           application/json:
             schema:
-              $ref: \\"#/components/schemas/Add\\"
+              allOf:
+                - $ref: "#/components/schemas/Add"
+                - description: Add money to the receipt
       responses:
-        \\"200\\":
+        "200":
           description: A Receipt Resource
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/Receipt\\"
-        \\"404\\":
+                allOf:
+                  - $ref: "#/components/schemas/Receipt"
+                  - description: A Receipt Resource
+        "404":
           description: The requested receipt was not found
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/NotFound\\"
-        \\"409\\":
+                allOf:
+                  - $ref: "#/components/schemas/NotFound"
+                  - description: The requested receipt was not found
+        "409":
           description: The request could not be completed due to a conflict
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/Conflict\\"
-        \\"429\\":
+                allOf:
+                  - $ref: "#/components/schemas/Conflict"
+                  - description: The request could not be completed due to a conflict
+        "429":
           description: The request could not be completed due to a rate limit
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/RateLimit\\"
-  \\"receipt/{id}/deduct\\":
+                allOf:
+                  - $ref: "#/components/schemas/RateLimit"
+                  - description: The request could not be completed due to a rate limit
+  "receipt/{id}/deduct":
     post:
       parameters:
-        - $ref: \\"#/components/parameters/ReceiptId\\"
+        - $ref: "#/components/parameters/ReceiptId"
       requestBody:
         description: Deduct money from the receipt
         required: true
         content:
           application/json:
             schema:
-              $ref: \\"#/components/schemas/Deduct\\"
+              allOf:
+                - $ref: "#/components/schemas/Deduct"
+                - description: Deduct money from the receipt
       responses:
-        \\"200\\":
+        "200":
           description: A Receipt Resource
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/Receipt\\"
-        \\"404\\":
+                allOf:
+                  - $ref: "#/components/schemas/Receipt"
+                  - description: A Receipt Resource
+        "404":
           description: The requested receipt was not found
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/NotFound\\"
-        \\"409\\":
+                allOf:
+                  - $ref: "#/components/schemas/NotFound"
+                  - description: The requested receipt was not found
+        "409":
           description: The request could not be completed due to a conflict
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/Conflict\\"
-        \\"429\\":
+                allOf:
+                  - $ref: "#/components/schemas/Conflict"
+                  - description: The request could not be completed due to a conflict
+        "429":
           description: The request could not be completed due to a rate limit
           content:
             application/json:
               schema:
-                $ref: \\"#/components/schemas/RateLimit\\"
+                allOf:
+                  - $ref: "#/components/schemas/RateLimit"
+                  - description: The request could not be completed due to a rate limit
 "
 `;

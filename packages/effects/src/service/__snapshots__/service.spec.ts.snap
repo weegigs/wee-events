@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`describe receipt service should create an entity 1`] = `
-Object {
-  "aggregate": Object {
+{
+  "aggregate": {
     "key": "test",
     "type": "receipt",
   },
-  "state": Object {
+  "state": {
     "id": "receipt.test",
     "total": 5,
   },
@@ -15,13 +15,13 @@ Object {
 `;
 
 exports[`describe receipt service should load an empty entity 1`] = `
-Object {
-  "aggregate": Object {
+{
+  "aggregate": {
     "key": "test",
     "type": "receipt",
   },
   "revision": "00000000000000000000000000",
-  "state": Object {
+  "state": {
     "id": "receipt.test",
     "total": 0,
   },
@@ -30,12 +30,12 @@ Object {
 `;
 
 exports[`describe receipt service should load an entity with existing events 1`] = `
-Object {
-  "aggregate": Object {
+{
+  "aggregate": {
     "key": "test",
     "type": "receipt",
   },
-  "state": Object {
+  "state": {
     "id": "receipt.test",
     "total": 10,
   },
@@ -44,12 +44,12 @@ Object {
 `;
 
 exports[`describe receipt service should update an entity 1`] = `
-Object {
-  "aggregate": Object {
+{
+  "aggregate": {
     "key": "test",
     "type": "receipt",
   },
-  "state": Object {
+  "state": {
     "id": "receipt.test",
     "total": 15,
   },
