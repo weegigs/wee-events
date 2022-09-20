@@ -8,7 +8,6 @@ import { pipe } from "@effect-ts/core/Function";
 type Payload = wee.Payload;
 
 export type Command = wee.Payload;
-export type State = Payload;
 
 export type Handler<R, E, S extends Payload, C extends Command> = (
   entity: wee.Entity<S>,

@@ -2,10 +2,10 @@ import _ from "lodash";
 import * as T from "@effect-ts/core/Effect";
 
 import { create } from "./server";
-import { description, InsufficientBalanceError } from "@weegigs/effects/lib/service/sample/receipts";
+import { description, InsufficientBalanceError } from "@weegigs/events-effects/lib/service/sample/receipts";
 import { pipe } from "@effect-ts/core/Function";
 import { MemoryStore } from "@weegigs/events-core/lib/store/memory-store";
-import { EventLoader, EventPublisher } from "@weegigs/effects/lib/event-store";
+import { EventLoader, EventPublisher } from "@weegigs/events-effects/lib/event-store";
 import { FastifyInstance } from "fastify";
 import * as errors from "http-errors";
 import { ExpectedRevisionConflictError, RevisionConflictError } from "@weegigs/events-core";

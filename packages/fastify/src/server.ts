@@ -8,13 +8,13 @@ import * as fast from "fastify";
 import * as errors from "http-errors";
 
 import { Payload, Revision } from "@weegigs/events-core";
-import { ServiceDescription, State } from "@weegigs/effects/lib/service/service";
-import { EntityNotAvailableError } from "@weegigs/effects/lib/service/loader";
-import { EventLoader, LoaderError } from "@weegigs/effects/lib/event-store";
+import { ServiceDescription, State } from "@weegigs/events-effects/lib/service/service";
+import { EntityNotAvailableError } from "@weegigs/events-effects/lib/service/loader";
+import { EventLoader, LoaderError } from "@weegigs/events-effects/lib/event-store";
 
 import { Has } from "@effect-ts/core/Has";
 import { AggregateId } from "@weegigs/events-core";
-import { CommandValidationError, HandlerNotFound } from "@weegigs/effects/lib/service/dispatcher";
+import { CommandValidationError, HandlerNotFound } from "@weegigs/events-effects/lib/service/dispatcher";
 
 // export function run<R, E, A extends State>(environment: L.Layer<unknown, unknown, R & Has<EventLoader>>) {}
 

@@ -25,8 +25,8 @@
   "dependencies": {
     "@effect-ts/core": "^0.60.4",
     "@fastify/sensible": "^4.1.0",
-    "@weegigs/effects": "workspace:^",
     "@weegigs/events-core": "workspace:^",
+    "@weegigs/events-effects": "workspace:^",
     "fastify": "^4.6.0",
     "http-errors": "^2.0.0",
     "lodash": "^4.17.21",
