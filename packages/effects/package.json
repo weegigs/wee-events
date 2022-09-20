@@ -1,5 +1,5 @@
 {
-  "name": "@weegigs/effects",
+  "name": "@weegigs/events-effects",
   "version": "0.16.0",
   "description": "Effects utilities for Wee Events",
   "main": "lib/index.js",
