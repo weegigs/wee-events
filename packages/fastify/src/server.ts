@@ -7,7 +7,7 @@ import { pipe } from "@effect-ts/core/Function";
 import * as fast from "fastify";
 import * as errors from "http-errors";
 
-import { Payload } from "@weegigs/events-core";
+import { Payload, Revision } from "@weegigs/events-core";
 import { ServiceDescription, State } from "@weegigs/effects/lib/service/service";
 import { EntityNotAvailableError } from "@weegigs/effects/lib/service/loader";
 import { EventLoader, LoaderError } from "@weegigs/effects/lib/event-store";
@@ -29,11 +29,16 @@ export function create<R, E, A extends State>(
   const get = (id: AggregateId) =>
     pipe(
       service.load(id),
-      T.map((e) => ({
-        $type: e.type,
-        $revision: e.revision,
-        ...e.state,
-      })),
+      T.map((e): T.Effect<unknown, never, errors.HttpError | ({ $type: string; $revision: string } & A)> => {
+        return Revision.isInitial(e.revision)
+          ? T.succeed(new errors.NotFound())
+          : T.succeed({
+              $type: e.type,
+              $revision: e.revision,
+              ...e.state,
+            });
+      }),
+      T.flatten,
       T.catchAll((e): T.Effect<unknown, never, errors.HttpError> => {
         if (e instanceof EntityNotAvailableError) {
           return T.succeed(new errors.NotFound(e.message));
