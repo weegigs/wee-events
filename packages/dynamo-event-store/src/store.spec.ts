@@ -58,6 +58,7 @@ describe("dynamo store", () => {
     const dynamo = new DynamoDBClient({
       endpoint: `http://${dbc.getHost()}:${dbc.getMappedPort(8000)}`,
       credentials: { accessKeyId: "fake-key", secretAccessKey: "fake-secret" },
+      region: "us-east-1",
     });
 
     const create = new CreateTableCommand({
