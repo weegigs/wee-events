@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-fastify",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
   "license": "MIT",
   "description": "Fastify services based on wee-events",
