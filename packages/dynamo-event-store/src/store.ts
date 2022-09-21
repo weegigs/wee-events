@@ -173,9 +173,48 @@ export class DynamoEventStore implements EventStore {
       throw new Error(`expected at least one event to be published`);
     }
 
+    const { expectedRevision } = options;
+
+    try {
+      return await retry(
+        async (): Promise<Revision> => this.#publish(aggregate, _events, options),
+        (e: Error | Revision) => {
+          if (!_.isError(e)) {
+            return false;
+          }
+          if (
+            e.name === "TransactionCanceledException" &&
+            (e as any).CancellationReasons?.[0]?.Code === "ConditionalCheckFailed"
+          ) {
+            return expectedRevision === undefined;
+          }
+
+          return isRetryableError(e);
+        },
+        { limit: 5, delay: 37 }
+      );
+    } catch (e: unknown) {
+      if (_.isError(e) && isConditionCheckFailed(e)) {
+        if (expectedRevision !== undefined) {
+          throw new ExpectedRevisionConflictError(expectedRevision);
+        }
+
+        throw new RevisionConflictError();
+      }
+
+      throw e;
+    }
+  }
+
+  async #publish(
+    aggregate: AggregateId,
+    events: DomainEvent[],
+    options: EventStore.PublishOptions = {}
+  ): Promise<Revision> {
     const { encrypt, expectedRevision } = options;
+
     const recorded: RecordedEvent[] = await Promise.all(
-      _events
+      events
         .map((event) => DomainEvent.schema.parse(event))
         .map((event) =>
           this.#encoder(aggregate, event, _.pick(options, "correlationId", "causationId"), encrypt ?? false)
@@ -183,9 +222,7 @@ export class DynamoEventStore implements EventStore {
     );
 
     const changeSet = await ChangeSet.create(aggregate, recorded);
-    await this.#write(changeSet, expectedRevision);
-
-    return changeSet.revision;
+    return this.#write(changeSet, expectedRevision);
   }
 
   async #write(changeSet: ChangeSet, expectedRevision?: string): Promise<Revision> {
@@ -212,38 +249,7 @@ export class DynamoEventStore implements EventStore {
       ],
     });
 
-    try {
-      await retry(
-        async () => {
-          await this.#client.send(write);
-        },
-        (e: Error | void) => {
-          if (!_.isError(e)) {
-            return false;
-          }
-
-          if (
-            e.name === "TransactionCanceledException" &&
-            (e as any).CancellationReasons?.[0]?.Code === "ConditionalCheckFailed"
-          ) {
-            return expectedRevision === undefined;
-          }
-
-          return isRetryableError(e);
-        },
-        { limit: 5, delay: 37 }
-      );
-    } catch (e: any) {
-      if (isConditionCheckFailed(e)) {
-        if (expectedRevision !== undefined) {
-          throw new ExpectedRevisionConflictError(expectedRevision);
-        }
-
-        throw new RevisionConflictError();
-      }
-
-      throw e;
-    }
+    await this.#client.send(write);
 
     return changeSet.revision;
   }
