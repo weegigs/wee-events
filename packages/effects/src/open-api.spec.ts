@@ -5,7 +5,5 @@ describe("describe service specification", () => {
   it("should describe valid service specification", () => {
     const result = api.spec(receipts.description);
     expect(result).toMatchSnapshot();
-
-    console.log(result);
   });
 });
