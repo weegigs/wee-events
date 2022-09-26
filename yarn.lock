@@ -1670,18 +1670,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/sensible@npm:^4.1.0":
-  version: 4.1.0
-  resolution: "@fastify/sensible@npm:4.1.0"
+"@fastify/sensible@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@fastify/sensible@npm:5.1.1"
   dependencies:
     fast-deep-equal: ^3.1.1
-    fastify-plugin: ^3.0.0
+    fastify-plugin: ^4.0.0
     forwarded: ^0.2.0
     http-errors: ^2.0.0
     ms: ^2.1.3
     type-is: ^1.6.18
     vary: ^1.1.2
-  checksum: 13b71b3fb338d03cb4bdd42a0340dfadc5c8532da1208caff05b28fd0b69e0ecfa3cb0d02b858f4ea59f8f6ea7e11eb8bf787cd5943703b2510b9b082d52209c
+  checksum: 25719212b91d9b96a99e14f22bd1ac534e29d1cae0752fbdb41152cce5b06c34848bf033914c83727b61bb312a425262dbe6f891f1d02a3263fd20de1f3637fd
   languageName: node
   linkType: hard
 
@@ -2667,7 +2667,7 @@ __metadata:
   resolution: "@weegigs/events-fastify@workspace:packages/fastify"
   dependencies:
     "@effect-ts/core": ^0.60.4
-    "@fastify/sensible": ^4.1.0
+    "@fastify/sensible": ^5.1.1
     "@types/http-errors": ^1.8.2
     "@types/jest": ^29.0.3
     "@types/lodash": ^4.14.185
@@ -4209,10 +4209,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify-plugin@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "fastify-plugin@npm:3.0.1"
-  checksum: 131ba0a388f777829c3fb0fd5b75cf057688ce6d0ca354fb1ebf829767a8c853b0825762b9185b5200097454df0ede2f3095da2efe1aa1b3736d07f194e6d374
+"fastify-plugin@npm:^4.0.0":
+  version: 4.2.1
+  resolution: "fastify-plugin@npm:4.2.1"
+  checksum: 01eaa6644f21a50c0a83a8ac0dceea8f2d35bafd233788a10a7b60803bb0b27068677b718e05ce14f4e97778f0966389eedbbb16b4f3886d7fbbb6125788d681
   languageName: node
   linkType: hard
 
