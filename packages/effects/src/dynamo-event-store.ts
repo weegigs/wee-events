@@ -1,4 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+
 import { pipe } from "@effect-ts/core";
 import * as T from "@effect-ts/core/Effect";
 import * as L from "@effect-ts/core/Effect/Layer";
@@ -31,7 +33,9 @@ const _configL = L.fromEffect(DynamoEventStoreConfig)(config);
 
 export const dynamoStore = T.gen(function* (_) {
   const config = yield* _(DynamoEventStoreConfig);
-  const es: wee.EventStore = new s.DynamoEventStore(config.table, { client: () => config.client });
+  const es: wee.EventStore = new s.DynamoEventStore(config.table, {
+    client: () => DynamoDBDocumentClient.from(config.client),
+  });
 
   return es;
 });
