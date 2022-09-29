@@ -37,12 +37,12 @@
     "zod-to-json-schema": "^3.18.1"
   },
   "peerDependencies": {
-    "@aws-sdk/client-cloudwatch": "^3.54.0",
-    "@aws-sdk/client-dynamodb": "^3.54.0",
-    "@aws-sdk/client-eventbridge": "^3.54.0",
-    "@aws-sdk/client-sfn": "^3.54.0",
-    "@aws-sdk/lib-dynamodb": "*",
-    "@effect-ts/core": "^0.60.1",
+    "@aws-sdk/client-cloudwatch": "^3.179.0",
+    "@aws-sdk/client-dynamodb": "^3.179.0",
+    "@aws-sdk/client-eventbridge": "^3.179.0",
+    "@aws-sdk/client-sfn": "^3.179.0",
+    "@aws-sdk/lib-dynamodb": "^3.179.0",
+    "@effect-ts/core": "^0.60.4",
     "@weegigs/dynamo-event-store": "workspace:^",
     "@weegigs/events-core": "workspace:^"
   },

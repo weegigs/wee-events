@@ -79,12 +79,12 @@ export namespace EntityLoader {
 
       for (const event of events) {
         if (result === undefined) {
-          const { initializer } = initializers[event.type];
+          const { initializer } = initializers[event.type] ?? { initializer: undefined };
           if (initializer !== undefined) {
             result = initializer(event);
           }
         } else {
-          const { reducer } = reducers[event.type];
+          const { reducer } = reducers[event.type]  ?? { reducer: undefined };
           if (reducer !== undefined) {
             result = reducer(result, event);
           }

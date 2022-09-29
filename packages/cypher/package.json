@@ -23,12 +23,8 @@
     "publish": "yarn run ws:publish"
   },
   "peerDependencies": {
-    "@aws-sdk/lib-dynamodb": "^3.54.0",
-    "@weegigs/events-core": "workspace:^"
-  },
-  "dependencies": {
     "@aws-sdk/lib-dynamodb": "^3.179.0",
-    "@aws-sdk/smithy-client": "^3.178.0"
+    "@weegigs/events-core": "workspace:^"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.179.0",

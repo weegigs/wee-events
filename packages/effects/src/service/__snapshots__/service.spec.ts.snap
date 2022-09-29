@@ -43,6 +43,20 @@ exports[`describe receipt service should load an entity with existing events 1`]
 }
 `;
 
+exports[`describe receipt service should skip unknown event types 1`] = `
+{
+  "aggregate": {
+    "key": "test",
+    "type": "receipt",
+  },
+  "state": {
+    "id": "receipt.test",
+    "total": 10,
+  },
+  "type": "receipt",
+}
+`;
+
 exports[`describe receipt service should update an entity 1`] = `
 {
   "aggregate": {
