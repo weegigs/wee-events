@@ -27,7 +27,7 @@ describe("describe receipt service", () => {
     expect(result).toMatchSnapshot();
   });
 
-  it("should load an empty entity if the aggregate only contains unknown events", async () => {
+  it.skip("should load an empty entity if the aggregate only contains unknown events", async () => {
     ms.publish(id, { type: "unknown", data: { value: "something" } });
 
     const program = pipe(receipts.service.load(id), T.provideService(store.EventLoader)(ms));
@@ -60,7 +60,6 @@ describe("describe receipt service", () => {
     expect(result.revision).not.toEqual(wee.Revision.Initial);
     expect(_.omit(result, "revision")).toMatchSnapshot();
   });
-
 
   it("should reject unknown paths", async () => {
     ms.publish(id, { type: "added", data: { amount: 10 } });
