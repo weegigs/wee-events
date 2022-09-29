@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "removeComments": true,
     "sourceMap": true,
+    "inlineSources": true,
     "declaration": true,
     "declarationMap": true,
     "experimentalDecorators": true,
