@@ -20,7 +20,7 @@ export namespace EntityLoader {
     readonly isNotFound = this.type === "not-found";
 
     static notFound = new Error({ type: "not-found" });
-    static noteServiced = new Error({ type: "not-serviced" });
+    static notServiced = new Error({ type: "not-serviced" });
     static loaderError = (root: unknown) => new Error({ type: "loader-error", root });
   }
 
@@ -33,7 +33,7 @@ export namespace EntityLoader {
       load(aggregate: AggregateId): T.Effect<unknown, EntityLoader.Error, Entity> {
         const service = services[aggregate.type];
         if (service === undefined) {
-          return T.fail(Error.noteServiced);
+          return T.fail(Error.notServiced);
         }
 
         return pipe(
