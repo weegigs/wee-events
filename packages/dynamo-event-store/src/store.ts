@@ -92,28 +92,28 @@ const isConditionCheckFailed = (error: Error) =>
   (error as any).CancellationReasons?.[0]?.Code === "ConditionalCheckFailed";
 
 export class DynamoEventStore implements EventStore {
-  readonly #client: DynamoDBDocumentClient;
-  readonly #table: string;
-  readonly #encoder: ChangeSet.EventEncoder;
-  readonly #decoder: ChangeSet.ChangeSetDecoder;
+  private readonly $client: DynamoDBDocumentClient;
+  private readonly $table: string;
+  private readonly $encoder: ChangeSet.EventEncoder;
+  private readonly $decoder: ChangeSet.ChangeSetDecoder;
 
   constructor(table: string, options: Partial<DynamoEventStore.Options> = {}) {
     const { client, cypher, tokenizer } = { ...defaults, ...options };
 
-    this.#client = client();
-    this.#table = table;
-    this.#encoder = ChangeSet.encoder(cypher, tokenizer);
-    this.#decoder = ChangeSet.decoder(cypher);
+    this.$client = client();
+    this.$table = table;
+    this.$encoder = ChangeSet.encoder(cypher, tokenizer);
+    this.$decoder = ChangeSet.decoder(cypher);
   }
 
-  #read = async (
+  private $read = async (
     key: string,
     decrypt: boolean,
     _after?: Revision,
     cursor: any = undefined
   ): Promise<{ events: RecordedEvent[]; next: any }> => {
     const query = new QueryCommand({
-      TableName: this.#table,
+      TableName: this.$table,
       ScanIndexForward: true,
       ExclusiveStartKey: cursor,
       KeyConditionExpression: "#pk = :aggregate And begins_with(#sk, :change_set_prefix)",
@@ -128,7 +128,7 @@ export class DynamoEventStore implements EventStore {
     });
 
     const { Items, LastEvaluatedKey } = await retry(
-      async () => this.#client.send(query),
+      async () => this.$client.send(query),
       (e: Error | QueryCommandOutput) => {
         return _.isError(e) ? isRetryableError(e) : false;
       },
@@ -138,7 +138,7 @@ export class DynamoEventStore implements EventStore {
     const events: RecordedEvent[][] = await Promise.all(
       (Items ?? [])
         .map((item: any) => ChangeSet.schema.parse(item))
-        .map((changeSet) => this.#decoder(changeSet, decrypt))
+        .map((changeSet) => this.$decoder(changeSet, decrypt))
     );
 
     return { events: events.flat(), next: LastEvaluatedKey };
@@ -152,7 +152,7 @@ export class DynamoEventStore implements EventStore {
     let cursor: any | undefined = undefined;
     do {
       const { events: page, next } = await retry(
-        () => this.#read(key, decrypt, after, cursor),
+        () => this.$read(key, decrypt, after, cursor),
         (result) => _.isError(result) && isRetryableError(result)
       );
 
@@ -177,7 +177,7 @@ export class DynamoEventStore implements EventStore {
 
     try {
       return await retry(
-        async (): Promise<Revision> => this.#publish(aggregate, _events, options),
+        async (): Promise<Revision> => this.$publish(aggregate, _events, options),
         (e: Error | Revision) => {
           if (!_.isError(e)) {
             return false;
@@ -206,7 +206,7 @@ export class DynamoEventStore implements EventStore {
     }
   }
 
-  async #publish(
+  private async $publish(
     aggregate: AggregateId,
     events: DomainEvent[],
     options: EventStore.PublishOptions = {}
@@ -217,16 +217,16 @@ export class DynamoEventStore implements EventStore {
       events
         .map((event) => DomainEvent.schema.parse(event))
         .map((event) =>
-          this.#encoder(aggregate, event, _.pick(options, "correlationId", "causationId"), encrypt ?? false)
+          this.$encoder(aggregate, event, _.pick(options, "correlationId", "causationId"), encrypt ?? false)
         )
     );
 
     const changeSet = await ChangeSet.create(aggregate, recorded);
-    return this.#write(changeSet, expectedRevision);
+    return this.$write(changeSet, expectedRevision);
   }
 
-  async #write(changeSet: ChangeSet, expectedRevision?: string): Promise<Revision> {
-    const TableName = this.#table;
+  private async $write(changeSet: ChangeSet, expectedRevision?: string): Promise<Revision> {
+    const TableName = this.$table;
 
     const latest = latestFor(changeSet);
     const latestCheck = latestCondition(changeSet, expectedRevision);
@@ -249,7 +249,7 @@ export class DynamoEventStore implements EventStore {
       ],
     });
 
-    await this.#client.send(write);
+    await this.$client.send(write);
 
     return changeSet.revision;
   }
