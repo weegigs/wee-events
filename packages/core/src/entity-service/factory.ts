@@ -6,7 +6,7 @@ import { Loader } from "../loader";
 import { Dispatcher } from "../dispatcher";
 
 import { EntityService } from "./service";
-import { revisionFor } from "./helpers";
+import { revisionFrom } from "./helpers";
 import { CommandHandler, Creator, Initializer, Reducer } from "./types";
 
 const createPublisher = (store: EventStore, command: Command) => {
@@ -71,7 +71,7 @@ export const createLoader = <S extends Payload>({
       return undefined;
     }
 
-    const revision = revisionFor(events);
+    const revision = revisionFrom(events);
 
     return {
       aggregate,

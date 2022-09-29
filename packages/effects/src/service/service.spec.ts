@@ -6,15 +6,14 @@ import { pipe } from "@effect-ts/core/Function";
 import * as wee from "@weegigs/events-core";
 
 import * as dispatcher from "./dispatcher";
-// import * as loader from "./loader";
 import * as store from "../event-store";
 
 import * as receipts from "./sample/receipts";
 
-const id = { key: "test", type: "receipt" };
-const ms = new wee.MemoryStore();
-
 describe("describe receipt service", () => {
+  const id = { key: "test", type: "receipt" };
+  const ms = new wee.MemoryStore();
+
   beforeEach(() => ms.clear());
 
   it("should load an empty entity", async () => {
@@ -27,7 +26,7 @@ describe("describe receipt service", () => {
     expect(result).toMatchSnapshot();
   });
 
-  it.skip("should load an empty entity if the aggregate only contains unknown events", async () => {
+  it("should load an empty entity if the aggregate only contains unknown events", async () => {
     ms.publish(id, { type: "unknown", data: { value: "something" } });
 
     const program = pipe(receipts.service.load(id), T.provideService(store.EventLoader)(ms));

@@ -29,6 +29,21 @@ exports[`describe receipt service should load an empty entity 1`] = `
 }
 `;
 
+exports[`describe receipt service should load an empty entity if the aggregate only contains unknown events 1`] = `
+{
+  "aggregate": {
+    "key": "test",
+    "type": "receipt",
+  },
+  "revision": "00000000000000000000000000",
+  "state": {
+    "id": "receipt.test",
+    "total": 0,
+  },
+  "type": "receipt",
+}
+`;
+
 exports[`describe receipt service should load an entity with existing events 1`] = `
 {
   "aggregate": {

@@ -4,7 +4,6 @@ import { Has } from "@effect-ts/core/Has";
 import * as store from "../event-store";
 
 import * as wee from "@weegigs/events-core";
-import { revisionFor } from "@weegigs/events-core/lib/entity-service/helpers";
 
 import { z } from "zod";
 import { pipe } from "@effect-ts/core";
@@ -74,24 +73,27 @@ export namespace EntityLoader {
   const $make = <A extends State>(loader: $Loader<A>): EntityLoader<A> => {
     const { init, initializers, reducers, type } = loader;
 
-    const replay = (events: wee.RecordedEvent[], state?: A): A | undefined => {
+    const replay = (events: wee.RecordedEvent[], state?: A): [A | undefined, wee.Revision] => {
       let result = state;
+      let revision = wee.Revision.Initial;
 
       for (const event of events) {
         if (result === undefined) {
           const { initializer } = initializers[event.type] ?? { initializer: undefined };
           if (initializer !== undefined) {
             result = initializer(event);
+            revision = event.revision;
           }
         } else {
-          const { reducer } = reducers[event.type]  ?? { reducer: undefined };
+          const { reducer } = reducers[event.type] ?? { reducer: undefined };
           if (reducer !== undefined) {
             result = reducer(result, event);
+            revision = event.revision;
           }
         }
       }
 
-      return result;
+      return [result, revision];
     };
 
     const events: () => Record<string, z.Schema> = () => {
@@ -104,7 +106,7 @@ export namespace EntityLoader {
         T.bind("events", () => store.load(id)),
         T.bind("entity", ({ events }) =>
           T.suspend(() => {
-            const state = replay(events, typeof init == "function" ? init(id) : undefined);
+            const [state, revision] = replay(events, typeof init == "function" ? init(id) : undefined);
             if (state === undefined) {
               return T.fail(new EntityNotAvailableError(id, type));
             }
@@ -112,7 +114,7 @@ export namespace EntityLoader {
               aggregate: id,
               type,
               state,
-              revision: revisionFor(events),
+              revision,
             };
 
             return T.succeed(entity);
