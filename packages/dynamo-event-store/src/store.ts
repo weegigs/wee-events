@@ -144,7 +144,7 @@ export class DynamoEventStore implements EventStore {
     return { events: events.flat(), next: LastEvaluatedKey };
   };
 
-  async load(aggregate: AggregateId, options: EventStore.LoadOptions = {}): Promise<RecordedEvent[]> {
+  load = async (aggregate: AggregateId, options: EventStore.LoadOptions = {}): Promise<RecordedEvent[]> => {
     const key = AggregateId.encode(aggregate);
     const { decrypt, afterRevision: after } = { decrypt: false, ...options };
 
@@ -161,13 +161,13 @@ export class DynamoEventStore implements EventStore {
     } while (cursor);
 
     return events;
-  }
+  };
 
-  async publish(
+  publish = async (
     aggregate: AggregateId,
     events: DomainEvent | DomainEvent[],
     options: EventStore.PublishOptions = {}
-  ): Promise<Revision> {
+  ): Promise<Revision> => {
     const _events = Array.isArray(events) ? events : [events];
     if (_events.length === 0) {
       throw new Error(`expected at least one event to be published`);
@@ -204,7 +204,7 @@ export class DynamoEventStore implements EventStore {
 
       throw e;
     }
-  }
+  };
 
   private async $publish(
     aggregate: AggregateId,
