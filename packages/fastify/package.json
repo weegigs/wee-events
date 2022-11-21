@@ -27,7 +27,7 @@
     "@fastify/sensible": "^5.1.1",
     "@weegigs/events-core": "workspace:^",
     "@weegigs/events-effects": "workspace:^",
-    "fastify": "^4.6.0",
+    "fastify": "^4.10.2",
     "http-errors": "^2.0.0",
     "lodash": "^4.17.21",
     "ts-pattern": "^4.0.5"
