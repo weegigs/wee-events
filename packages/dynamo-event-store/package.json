@@ -25,7 +25,7 @@
   "dependencies": {
     "@aws-sdk/service-error-classification": "^3.178.0",
     "lodash": "^4.17.21",
-    "luxon": "^3.0.4",
+    "luxon": "^3.2.1",
     "ulid": "^2.3.0",
     "zod": "^3.19.1"
   },
