@@ -19,7 +19,7 @@ tsconfig.tsbuildinfo
 .eslintcache
 lib
 coverage
-
+.direnv
 .pnp.*
 .yarn/*
 !.yarn/patches
