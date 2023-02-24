@@ -1,0 +1,12 @@
+{
+  "useWorkspaces": true,
+
+  "version": "0.17.0",
+  "command": {
+    "version": {
+      "allowBranch": "main",
+      "conventionalCommits": true
+    }
+  },
+  "packages": ["packages/*", "tools/*"]
+}

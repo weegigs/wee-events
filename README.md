@@ -6,7 +6,12 @@
 
 ### Prerequisites
 
-- Yarn https://yarnpkg.com/getting-started
+The repository includes a nix file which includes system dependencies other than docker. If it's
+useful for you "huzzah". Otherwise you'll need to ensure that the following are installed.
+
+- Nodejs version 16.x
+- PNPM
+- Lerna
 - Docker (for testing) https://www.testcontainers.org/supported_docker_environment/
 
 ### Building
@@ -14,10 +19,6 @@
 Make sure you
 
 ```sh
-yarn install
-yarn build
+pnpm install
+pnpm build
 ```
-
-### IDE Setup
-
-For instructions on using PnP with various editors see https://yarnpkg.com/getting-started/editor-sdks

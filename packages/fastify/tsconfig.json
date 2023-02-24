@@ -15,10 +15,10 @@
   ],
   "references": [
     {
-      "path": "../effects"
+      "path": "../core"
     },
     {
-      "path": "../core"
+      "path": "../effects"
     }
   ]
 }

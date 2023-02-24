@@ -6,21 +6,17 @@
   "license": "MIT",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "pnpm@3.2.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/weegigs/wee-events.git"
   },
   "scripts": {
-    "build": "yarn ws:build",
-    "clean": "yarn ws:clean",
-    "compile": "yarn ws:compile",
-    "test": "yarn ws:test",
-    "lint": "yarn ws:lint",
-    "doctor": "yarn ws:doctor",
-    "fix": "yarn run ws:fix",
-    "prepack": "yarn run ws:prepack",
-    "publish": "yarn run ws:publish"
+    "build": "pnpm clean && pnpm lint && pnpm compile && pnpm test",
+    "clean": "pnpm exec rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
+    "compile": "pnpm exec tsc --build",
+    "test": "pnpm exec jest --passWithNoTests",
+    "lint": "pnpm exec eslint \"src/**/*.ts\" --cache"
   },
   "dependencies": {
     "@aws-sdk/service-error-classification": "^3.178.0",
