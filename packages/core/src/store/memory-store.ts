@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { monotonicFactory } from "ulid";
 
-import { DomainEvent, RecordedEvent, Revision, AggregateId } from "../types";
+import { AggregateId, DomainEvent, RecordedEvent, Revision } from "../types";
 import { EventStore } from "./types";
 
 const ulid = monotonicFactory();
@@ -22,6 +22,9 @@ export class MemoryStore implements EventStore {
     const revision = current[current.length - 1]?.revision ?? Revision.Initial;
 
     const e = Array.isArray(events) ? events : [events];
+    if (e.length == 0) {
+      return revision;
+    }
 
     const recorded: RecordedEvent[] = e.map((event) => {
       return {
@@ -34,8 +37,9 @@ export class MemoryStore implements EventStore {
       };
     });
 
-    this.aggregates[AggregateId.encode(aggregate)] = current.concat(...recorded);
+    const updated = current.concat(...recorded);
+    this.aggregates[AggregateId.encode(aggregate)] = updated;
 
-    return revision;
+    return updated[updated.length - 1].revision;
   }
 }
