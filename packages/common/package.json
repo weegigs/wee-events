@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-common",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
   "license": "MIT",
   "description": "Common utilities for Wee Events",

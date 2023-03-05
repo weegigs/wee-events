@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.1](https://github.com/weegigs/wee-events/compare/v0.18.0...v0.18.1) (2023-03-05)
+
+### Bug Fixes
+
+- correct revision returned by memory store when publishing multiple events ([00d4c2e](https://github.com/weegigs/wee-events/commit/00d4c2e4030a4b6053f29c214bc859d8bfdc3e95))
+
 # 0.18.0 (2023-02-24)
 
 ### Bug Fixes
