@@ -17,7 +17,9 @@
     "compile": "pnpm exec lerna run compile",
     "test": "pnpm compile && jest --coverage",
     "fix": "pnpm fix:typescript-references",
-    "fix:typescript-references": "pnpm dlx @monorepo-utils/workspaces-to-typescript-project-references workspaces-to-typescript-project-references --root --includesRoot"
+    "fix:typescript-references": "pnpm dlx @monorepo-utils/workspaces-to-typescript-project-references workspaces-to-typescript-project-references --root --includesRoot",
+    "prepublish": "pnpm clean && pnpm build"
+
   },
   "engines": {
     "node": ">=16.14.2"
