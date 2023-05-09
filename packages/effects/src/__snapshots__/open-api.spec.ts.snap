@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`describe service specification should describe valid service specification 1`] = `
-"openapi: 3.0.0
-info:
+"info:
   title: A Sample Receipt Service
   version: 1.0.0
   description: A sample service for managing receipts
+openapi: 3.0.3
 components:
   schemas:
     Resource:
@@ -13,10 +13,14 @@ components:
       properties:
         $self:
           type: string
+          format: uri
         $type:
           type: string
+          minLength: 1
         $revision:
           type: string
+          minLength: 26
+          maxLength: 26
       required:
         - $self
         - $type
@@ -24,15 +28,14 @@ components:
       description: An object with a type discriminator, location and revision
     Receipt:
       allOf:
-        - allOf:
-            - $ref: "#/components/schemas/Resource"
-            - description: An object with a type discriminator, location and revision
+        - $ref: "#/components/schemas/Resource"
         - type: object
           properties:
             id:
               type: string
+              minLength: 0
             total:
-              type: number
+              type: integer
               minimum: 0
           required:
             - id
@@ -88,7 +91,7 @@ components:
       type: object
       properties:
         amount:
-          type: number
+          type: integer
           minimum: 1
       required:
         - amount
@@ -97,7 +100,7 @@ components:
       type: object
       properties:
         amount:
-          type: number
+          type: integer
           minimum: 1
       required:
         - amount
@@ -121,116 +124,86 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/Receipt"
-                  - description: A Receipt Resource
+                $ref: "#/components/schemas/Receipt"
         "404":
-          description: The requested receipt was not found
+          description: A Not Found Error
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/NotFound"
-                  - description: The requested receipt was not found
+                $ref: "#/components/schemas/NotFound"
         "429":
-          description: The request could not be completed due to a rate limit
+          description: A Rate Limit Error
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/RateLimit"
-                  - description: The request could not be completed due to a rate limit
+                $ref: "#/components/schemas/RateLimit"
   "receipt/{id}/add":
     post:
       parameters:
         - $ref: "#/components/parameters/ReceiptId"
       requestBody:
-        description: Add money to the receipt
-        required: true
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: "#/components/schemas/Add"
-                - description: Add money to the receipt
+              $ref: "#/components/schemas/Add"
       responses:
         "200":
           description: A Receipt Resource
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/Receipt"
-                  - description: A Receipt Resource
+                $ref: "#/components/schemas/Receipt"
         "404":
-          description: The requested receipt was not found
+          description: A Not Found Error
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/NotFound"
-                  - description: The requested receipt was not found
+                $ref: "#/components/schemas/NotFound"
         "409":
-          description: The request could not be completed due to a conflict
+          description: A Conflict Error
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/Conflict"
-                  - description: The request could not be completed due to a conflict
+                $ref: "#/components/schemas/Conflict"
         "429":
-          description: The request could not be completed due to a rate limit
+          description: A Rate Limit Error
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/RateLimit"
-                  - description: The request could not be completed due to a rate limit
+                $ref: "#/components/schemas/RateLimit"
   "receipt/{id}/deduct":
     post:
       parameters:
         - $ref: "#/components/parameters/ReceiptId"
       requestBody:
-        description: Deduct money from the receipt
-        required: true
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: "#/components/schemas/Deduct"
-                - description: Deduct money from the receipt
+              $ref: "#/components/schemas/Deduct"
       responses:
         "200":
           description: A Receipt Resource
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/Receipt"
-                  - description: A Receipt Resource
+                $ref: "#/components/schemas/Receipt"
         "404":
-          description: The requested receipt was not found
+          description: A Not Found Error
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/NotFound"
-                  - description: The requested receipt was not found
+                $ref: "#/components/schemas/NotFound"
         "409":
-          description: The request could not be completed due to a conflict
+          description: A Conflict Error
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/Conflict"
-                  - description: The request could not be completed due to a conflict
+                $ref: "#/components/schemas/Conflict"
         "429":
-          description: The request could not be completed due to a rate limit
+          description: A Rate Limit Error
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/RateLimit"
-                  - description: The request could not be completed due to a rate limit
+                $ref: "#/components/schemas/RateLimit"
 "
 `;

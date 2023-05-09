@@ -1,14 +1,32 @@
-import { Cypher, Tokenizer } from "@weegigs/events-cypher";
-import { AggregateId, DomainEvent, RecordedEvent } from "@weegigs/events-core";
 import { DateTime } from "luxon";
-import { decodeTime, monotonicFactory } from "ulid";
+import {
+  decodeTime,
+  monotonicFactory,
+} from "ulid";
 import * as z from "zod";
+
+import {
+  AggregateId,
+  DomainEvent,
+  RecordedEvent,
+} from "@weegigs/events-core";
+import {
+  Cypher,
+  Tokenizer,
+} from "@weegigs/events-cypher";
 
 import { EncryptedEvent } from "./types";
 
 const ulid = monotonicFactory();
 
-const ts = (id: string) => DateTime.fromMillis(decodeTime(id), { zone: "utc" }).toISO();
+const ts = (id: string) => {
+  const timestamp = DateTime.fromMillis(decodeTime(id), { zone: "utc" }).toISO();
+  if (!timestamp) {
+    throw new Error(`Could not parse timestamp from ulid ${id}`);
+  }
+
+  return timestamp;
+};
 
 export type ChangeSet = {
   pk: string;

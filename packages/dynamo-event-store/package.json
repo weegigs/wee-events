@@ -18,11 +18,11 @@
     "lint": "pnpm exec eslint \"src/**/*.ts\" --cache"
   },
   "dependencies": {
-    "@aws-sdk/service-error-classification": "^3.178.0",
+    "@aws-sdk/service-error-classification": "^3.329.0",
     "lodash": "^4.17.21",
-    "luxon": "^3.0.4",
+    "luxon": "^3.3.0",
     "ulid": "^2.3.0",
-    "zod": "^3.19.1"
+    "zod": "^3.21.4"
   },
   "peerDependencies": {
     "@aws-sdk/client-dynamodb": "^3.179.0",
@@ -32,22 +32,22 @@
     "@weegigs/events-cypher": "workspace:^"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.179.0",
-    "@aws-sdk/lib-dynamodb": "^3.179.0",
-    "@aws-sdk/smithy-client": "^3.178.0",
-    "@aws-sdk/types": "^3.178.0",
+    "@aws-sdk/client-dynamodb": "^3.329.0",
+    "@aws-sdk/lib-dynamodb": "^3.329.0",
+    "@aws-sdk/smithy-client": "^3.329.0",
+    "@aws-sdk/types": "^3.329.0",
     "@tsconfig/node16": "^1.0.3",
-    "@types/jest": "^29.0.3",
-    "@types/lodash": "^4.14.185",
-    "@types/luxon": "^3.0.1",
-    "@types/node": "^16.11.62",
+    "@types/jest": "^29.5.1",
+    "@types/lodash": "^4.14.194",
+    "@types/luxon": "^3.3.0",
+    "@types/node": "^18.16.6",
     "@weegigs/events-common": "workspace:*",
     "@weegigs/events-core": "workspace:*",
     "@weegigs/events-cypher": "workspace:*",
-    "jest": "^29.0.3",
-    "testcontainers": "^8.14.0",
-    "ts-jest": "^29.0.2",
-    "typescript": "^4.8.3"
+    "jest": "^29.5.0",
+    "testcontainers": "^9.6.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.4"
   },
   "files": [
     "lib"

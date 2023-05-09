@@ -1,7 +1,12 @@
 import { DateTime } from "luxon";
 import { monotonicFactory } from "ulid";
 
-import { AggregateId, DomainEvent, RecordedEvent, Revision } from "../types";
+import {
+  AggregateId,
+  DomainEvent,
+  RecordedEvent,
+  Revision,
+} from "../types";
 import { EventStore } from "./types";
 
 const ulid = monotonicFactory();
@@ -27,12 +32,19 @@ export class MemoryStore implements EventStore {
     }
 
     const recorded: RecordedEvent[] = e.map((event) => {
+      const revision = ulid()
+      const timestamp = DateTime.now().toISO()
+
+      if (timestamp == null) {
+        throw new Error("unexpected invalid timestamp")
+      }
+
       return {
         ...event,
-        id: ulid(),
-        revision: ulid(),
+        id: revision,
+        revision,
         aggregate: aggregate,
-        timestamp: DateTime.now().toISO(),
+        timestamp,
         metadata: {},
       };
     });

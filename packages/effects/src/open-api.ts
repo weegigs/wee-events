@@ -1,10 +1,14 @@
-import * as z from "zod";
-import * as schema from "@asteasolutions/zod-to-openapi";
-import * as yaml from "yaml";
 import * as cc from "change-case";
+import * as yaml from "yaml";
+import * as z from "zod";
+
+import * as schema from "@asteasolutions/zod-to-openapi";
+import {
+  Payload,
+  Revision,
+} from "@weegigs/events-core";
 
 import { ServiceDescription } from "./service/service";
-import { Payload, Revision } from "@weegigs/events-core";
 
 schema.extendZodWithOpenApi(z);
 
@@ -88,16 +92,22 @@ export const spec = <S extends Payload>(service: ServiceDescription<any, any, S>
     },
     responses: {
       200: {
-        mediaType: "application/json",
-        schema: resource,
+        description: `A ${cc.pascalCase(name)} Resource`,
+        content: {
+          "application/json": { schema: resource },
+        },
       },
       404: {
-        mediaType: "application/json",
-        schema: notFound,
+        description: `A Not Found Error`,
+        content: {
+          "application/json": { schema: notFound },
+        },
       },
       429: {
-        mediaType: "application/json",
-        schema: rateLimit,
+        description: `A Rate Limit Error`,
+        content: {
+          "application/json": { schema: rateLimit },
+        },
       },
     },
   });
@@ -110,36 +120,49 @@ export const spec = <S extends Payload>(service: ServiceDescription<any, any, S>
       path: `${name}/{id}/${command}`,
       request: {
         params: z.object({ id: Id }),
-        body: ref,
+        body: {
+          content: {
+            "application/json": {
+              schema: ref,
+            },
+          },
+        },
       },
       responses: {
         200: {
-          mediaType: "application/json",
-          schema: resource,
+          description: `A ${cc.pascalCase(name)} Resource`,
+          content: {
+            "application/json": { schema: resource },
+          },
         },
         404: {
-          mediaType: "application/json",
-          schema: notFound,
+          description: `A Not Found Error`,
+          content: {
+            "application/json": { schema: notFound },
+          },
         },
         409: {
-          mediaType: "application/json",
-          schema: conflict,
+          description: `A Conflict Error`,
+          content: {
+            "application/json": { schema: conflict },
+          },
         },
         429: {
-          mediaType: "application/json",
-          schema: rateLimit,
+          description: `A Rate Limit Error`,
+          content: {
+            "application/json": { schema: rateLimit },
+          },
         },
       },
     });
   }
 
-  const generator = new schema.OpenAPIGenerator(registry.definitions);
+  const generator = new schema.OpenAPIGenerator(registry.definitions, "3.0.3");
 
   const serviceName = title ?? `${cc.capitalCase(name)} Service`;
   const info =
     undefined != description ? { title: serviceName, version, description } : { title: serviceName, version };
   const api = generator.generateDocument({
-    openapi: "3.0.0",
     info,
   });
 
