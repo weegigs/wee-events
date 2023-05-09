@@ -15,7 +15,7 @@
     {
       devShell = pkgs.mkShell {
         packages = with pkgs; [
-          nodejs-16_x
+          nodejs
           nodePackages.pnpm
           nodePackages.lerna
           sops
