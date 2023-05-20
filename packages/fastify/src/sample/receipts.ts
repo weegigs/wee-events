@@ -1,15 +1,9 @@
 import * as z from "zod";
-import * as open from "@asteasolutions/zod-to-openapi";
 
+import * as open from "@asteasolutions/zod-to-openapi";
 import * as T from "@effect-ts/core/Effect";
 import { pipe } from "@effect-ts/core/Function";
-
 import * as wee from "@weegigs/events-core";
-
-import * as dsptchr from "../dispatcher";
-import * as ldr from "../loader";
-import * as srvc from "../service";
-import * as es from "../../event-store";
 
 open.extendZodWithOpenApi(z);
 
@@ -24,12 +18,14 @@ export const Receipt = z
 export type Receipt = z.infer<typeof Receipt>;
 
 // events
-export const Added = z.object({ amount: z.number().int().min(1) });
-export type Added = z.TypeOf<typeof Added>;
-const addedReducer: ldr.Reducer<Receipt, "added", Added> = (state, event) => ({
-  ...state,
-  total: state.total + event.data.amount,
-});
+export namespace Added {
+  export const schema = z.object({ amount: z.number().int().min(1) });
+  export const reducer: wee.Reducer<Receipt, wee.DomainEvent<"added", Added>> = (state, event) => ({
+    ...state,
+    total: state.total + event.data.amount,
+  });
+}
+export type Added = z.TypeOf<typeof Added.schema>;
 
 export const Deducted = z.object({ amount: z.number().int().min(1) });
 export type Deducted = z.TypeOf<typeof Deducted>;
@@ -38,7 +34,7 @@ const deductedReducer: ldr.Reducer<Receipt, "deducted", Deducted> = (state, even
   total: state.total - event.data.amount,
 });
 
-const loader = ldr.EntityLoader.init("receipt", (id): Receipt => ({ id: `${id.type}.${id.key}`, total: 0 }))
+const loader = EntityLoader.init("receipt", (id): Receipt => ({ id: `${id.type}.${id.key}`, total: 0 }))
   .reducer("added", Added, addedReducer)
   .reducer("deducted", Deducted, deductedReducer);
 

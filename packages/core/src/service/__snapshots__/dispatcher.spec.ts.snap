@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`dispatcher should allow a dispatcher to be created with a single handler 1`] = `
+{
+  "counter.1": [
+    {
+      "data": {
+        "amount": 1,
+      },
+      "type": "added",
+    },
+  ],
+}
+`;
+
+exports[`dispatcher should allow a dispatcher to be created with multiple handlers 1`] = `
+{
+  "counter.1": [
+    {
+      "data": {
+        "amount": 1,
+      },
+      "type": "added",
+    },
+    {
+      "data": {
+        "amount": -2,
+      },
+      "type": "subtracted",
+    },
+  ],
+}
+`;
