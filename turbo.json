@@ -1,0 +1,27 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["lib/**"]
+    },
+    "compile": {
+      "dependsOn": ["^compile"],
+      "outputs": ["lib/**", "tsconfig.tsbuildinfo"]
+    },
+    "test": {
+      "dependsOn": ["compile"],
+      "outputs": ["coverage/**"]
+    },
+    "lint": {
+      "outputs": [".eslintcache"]
+    },
+    "clean": {
+      "cache": false
+    }
+  },
+  "globalDependencies": [
+    "tsconfig.json",
+    "jest.config.js"
+  ]
+}
