@@ -13,7 +13,7 @@
   "scripts": {
     "build": "pnpm clean && pnpm lint && pnpm compile && pnpm test",
     "clean": "pnpm exec rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
-    "compile": "pnpm exec tsc --build",
+    "compile": "pnpm exec swc src --out-dir lib --extensions .ts --ignore '**/*.spec.ts' '**/*.test.ts' --strip-leading-paths -C module.type=commonjs && pnpm exec tsc --emitDeclarationOnly",
     "test": "pnpm exec jest --passWithNoTests",
     "lint": "pnpm exec eslint \"src/**/*.ts\" --cache"
   },
@@ -25,18 +25,22 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@swc/jest": "^0.2.38",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.14.194",
     "@types/node": "^22.15.0",
     "jest": "^29.7.0",
-    "ts-jest": "^29.3.4",
     "typescript": "^5.8.3"
   },
   "files": [
     "lib"
   ],
   "jest": {
-    "preset": "ts-jest",
+    "transform": {
+      "^.+\\.ts$": [
+        "@swc/jest"
+      ]
+    },
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "**/*.{ts,tsx}",

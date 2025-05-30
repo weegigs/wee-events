@@ -23,8 +23,8 @@ describe("retry", () => {
         },
         () => false
       );
-    } catch (e: any) {
-      expect(e.message).toEqual("rejected");
+    } catch (e: unknown) {
+      expect((e as Error).message).toEqual("rejected");
       failed = true;
     }
 
@@ -44,7 +44,7 @@ describe("retry", () => {
         },
         { limit: 5 }
       );
-    } catch (e: any) {
+    } catch {
       failed = true;
     }
 
@@ -65,7 +65,7 @@ describe("retry", () => {
         () => true,
         { limit: 3 }
       );
-    } catch (e: any) {
+    } catch {
       failed = true;
     }
 
@@ -84,7 +84,7 @@ describe("retry", () => {
         },
         () => true
       );
-    } catch (e: any) {
+    } catch {
       failed = true;
     }
 
@@ -104,8 +104,8 @@ describe("retry", () => {
         () => true,
         { limit: 2 }
       );
-    } catch (e: any) {
-      expect(e.message).toEqual("rejected 2");
+    } catch (e: unknown) {
+      expect((e as Error).message).toEqual("rejected 2");
       failed = true;
     }
 
@@ -128,7 +128,7 @@ describe("retry", () => {
           limit: 31,
         }
       );
-    } catch (e: any) {
+    } catch {
       failed = true;
     }
 
@@ -146,7 +146,7 @@ describe("retry", () => {
         count++;
         return count > 1 ? Promise.resolve(true) : Promise.reject(new Error(`rejected`));
       });
-    } catch (e: any) {
+    } catch {
       failed = true;
     }
 
@@ -168,8 +168,8 @@ describe("retry", () => {
         DEFAULT_SHOULD_RETRY,
         { limit: Number.MAX_SAFE_INTEGER }
       );
-    } catch (e: any) {
-      expect(e.message).toEqual(`limit must be <= ${MAX_LIMIT}`);
+    } catch (e: unknown) {
+      expect((e as Error).message).toEqual(`limit must be <= ${MAX_LIMIT}`);
       failed = true;
     }
 

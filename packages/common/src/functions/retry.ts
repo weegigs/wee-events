@@ -27,11 +27,11 @@ export function chained<T>(
     throw new Error(`limit must be <= ${MAX_LIMIT}`);
   }
 
-  const next = (outcome: "resolved" | "rejected", iteration: number, result: any): Promise<T> => {
+  const next = (outcome: "resolved" | "rejected", iteration: number, result: T | Error): Promise<T> => {
     const retry = shouldRetry(result);
     if (!retry || iteration >= limit - 1) {
       return new Promise<T>((resolve, reject) => {
-        return outcome === "resolved" ? resolve(result) : reject(result);
+        return outcome === "resolved" ? resolve(result as T) : reject(result);
       });
     }
 

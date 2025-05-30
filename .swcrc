@@ -2,14 +2,29 @@
   "jsc": {
     "parser": {
       "syntax": "typescript",
+      "tsx": false,
       "decorators": true,
       "dynamicImport": true
     },
     "target": "es2022",
-    "loose": false
+    "loose": false,
+    "externalHelpers": false,
+    "keepClassNames": true,
+    "preserveAllComments": false
   },
   "module": {
-    "type": "commonjs"
+    "type": "commonjs",
+    "strict": false,
+    "strictMode": true,
+    "lazy": false,
+    "noInterop": false
   },
-  "sourceMaps": true
+  "minify": false,
+  "sourceMaps": true,
+  "exclude": [
+    "node_modules",
+    "lib",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
 }

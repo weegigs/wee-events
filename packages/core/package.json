@@ -13,7 +13,7 @@
   "scripts": {
     "build": "pnpm clean && pnpm lint && pnpm compile && pnpm test",
     "clean": "pnpm exec rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
-    "compile": "pnpm exec tsc --build",
+    "compile": "pnpm exec swc src --out-dir lib --extensions .ts --ignore '**/*.spec.ts' '**/*.test.ts' --strip-leading-paths -C module.type=commonjs && pnpm exec tsc --emitDeclarationOnly",
     "test": "pnpm exec jest --passWithNoTests",
     "lint": "pnpm exec eslint \"src/**/*.ts\" --cache"
   },

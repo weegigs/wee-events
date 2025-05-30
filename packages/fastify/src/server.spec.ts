@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { FastifyInstance } from "fastify";
 
-import { MemoryStore } from "@weegigs/events-core/lib/store/memory-store";
+import { MemoryStore } from "@weegigs/events-core/lib";
 
 describe("fastify server", () => {
   const id = { key: "test", type: "receipt" };
