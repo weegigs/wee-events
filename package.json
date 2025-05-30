@@ -2,6 +2,7 @@
   "name": "@weegigs/events-monorepo",
   "version": "0.0.0",
   "description": "",
+  "type": "module",
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
   "private": true,
   "packageManager": "pnpm@10.11.0",

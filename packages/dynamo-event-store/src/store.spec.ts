@@ -122,11 +122,11 @@ describe("dynamo store", () => {
         await store.publish(testStream(), sampleEvent, {
           expectedRevision: "bob",
         });
-        fail("expected publish to fail");
-      } catch (e: any) {
-        expect(e.message).toEqual("revision did not match the expected revision of bob");
-        expect(e.name).toEqual("expected-revision-conflict");
-        expect(Errors.isExpectedRevisionConflict(e)).toBeTruthy();
+        throw new Error("expected publish to fail");
+      } catch (e: unknown) {
+        expect((e as Error).message).toEqual("revision did not match the expected revision of bob");
+        expect((e as any).name).toEqual("expected-revision-conflict");
+        expect(Errors.isExpectedRevisionConflict(e as any)).toBeTruthy();
       }
     });
 
@@ -138,11 +138,11 @@ describe("dynamo store", () => {
         await store.publish(testStream(), sampleEvent, {
           expectedRevision: Revision.Initial,
         });
-        fail("expected publish to fail");
-      } catch (e: any) {
-        expect(e.message).toEqual("revision did not match the expected revision of 00000000000000000000000000");
-        expect(e.name).toEqual("expected-revision-conflict");
-        expect(Errors.isExpectedRevisionConflict(e)).toBeTruthy();
+        throw new Error("expected publish to fail");
+      } catch (e: unknown) {
+        expect((e as Error).message).toEqual("revision did not match the expected revision of 00000000000000000000000000");
+        expect((e as any).name).toEqual("expected-revision-conflict");
+        expect(Errors.isExpectedRevisionConflict(e as any)).toBeTruthy();
       }
     });
 
@@ -161,9 +161,9 @@ describe("dynamo store", () => {
     it("rejects events with invalid data", async () => {
       const store = createStore();
       try {
-        await store.publish(testStream(), { type: "invalid-data", data: { value: null as any } });
-        fail("expected publish to fail");
-      } catch (e: any) {
+        await store.publish(testStream(), { type: "invalid-data", data: { value: null } } as any);
+        throw new Error("expected publish to fail");
+      } catch (e: unknown) {
         expect(e).toMatchSnapshot();
       }
     });
@@ -172,8 +172,8 @@ describe("dynamo store", () => {
       const store = createStore();
       try {
         await store.publish(testStream(), { type: "", data: {} });
-        fail("expected publish to fail");
-      } catch (e: any) {
+        throw new Error("expected publish to fail");
+      } catch (e: unknown) {
         expect(e).toMatchSnapshot();
       }
     });
