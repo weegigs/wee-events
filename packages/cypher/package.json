@@ -26,19 +26,21 @@
     "@aws-sdk/lib-dynamodb": "^3.329.0",
     "@aws-sdk/smithy-client": "^3.329.0",
     "@aws-sdk/types": "^3.329.0",
-    "@types/jest": "^29.5.1",
-    "@types/node": "^18.16.6",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.0",
     "@weegigs/events-core": "workspace:*",
-    "jest": "^29.5.0",
+    "jest": "^29.7.0",
     "testcontainers": "^9.6.0",
-    "ts-jest": "^29.1.0",
-    "typescript": "^5.0.4"
+    "@swc/jest": "^0.2.29",
+    "typescript": "^5.8.3"
   },
   "files": [
     "lib"
   ],
   "jest": {
-    "preset": "ts-jest",
+    "transform": {
+      "^.+\\.ts$": ["@swc/jest"]
+    },
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "**/*.{ts,tsx}",

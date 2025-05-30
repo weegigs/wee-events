@@ -21,7 +21,6 @@
     "@effect-ts/core": "^0.60.5",
     "@fastify/sensible": "^5.2.0",
     "@weegigs/events-core": "workspace:^",
-    "@weegigs/events-effects": "workspace:^",
     "fastify": "^4.17.0",
     "http-errors": "^2.0.0",
     "lodash": "^4.17.21",
@@ -29,12 +28,12 @@
   },
   "devDependencies": {
     "@types/http-errors": "^2.0.1",
-    "@types/jest": "^29.5.1",
+    "@types/jest": "^29.5.14",
     "@types/lodash": "^4.14.194",
-    "@types/node": "^18.16.6",
-    "jest": "^29.5.0",
-    "ts-jest": "^29.1.0",
-    "typescript": "^5.0.4"
+    "@types/node": "^22.15.0",
+    "jest": "^29.7.0",
+    "@swc/jest": "^0.2.29",
+    "typescript": "^5.8.3"
   },
   "publishConfig": {
     "access": "public"
@@ -43,7 +42,9 @@
     "lib"
   ],
   "jest": {
-    "preset": "ts-jest",
+    "transform": {
+      "^.+\\.ts$": ["@swc/jest"]
+    },
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "**/*.{ts,tsx}",
