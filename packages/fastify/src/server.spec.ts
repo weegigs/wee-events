@@ -1,41 +1,22 @@
 import _ from "lodash";
-import * as T from "@effect-ts/core/Effect";
+
+import { ServiceDescription } from "@weegigs/events-core";
+import { MemoryStore } from "@weegigs/events-core/lib/store/memory-store";
 
 import { create } from "./server";
-import { description, InsufficientBalanceError } from "@weegigs/events-effects/lib/service/sample/receipts";
-import { pipe } from "@effect-ts/core/Function";
-import { MemoryStore } from "@weegigs/events-core/lib/store/memory-store";
-import { EventLoader, EventPublisher } from "@weegigs/events-effects/lib/event-store";
-import { FastifyInstance } from "fastify";
-import * as errors from "http-errors";
-import { ExpectedRevisionConflictError, RevisionConflictError } from "@weegigs/events-core";
 
 describe("fastify server", () => {
   const id = { key: "test", type: "receipt" };
   const ms = new MemoryStore();
-  const el = T.provideService(EventLoader)(ms);
-  const pu = T.provideService(EventPublisher)(ms);
-  const app = create(description, (e) => {
-    switch (e.constructor) {
-      case InsufficientBalanceError:
-        return new errors.BadRequest(e.message);
 
-      case ExpectedRevisionConflictError:
-      case RevisionConflictError:
-        return new errors.Conflict(e.message);
 
-      default:
-        return new errors.InternalServerError(e.message);
-    }
-  });
-  const program = pipe(app, el, pu);
+  const service = ServiceDescription.create({
 
-  let server: FastifyInstance;
+
+  const server: FastifyInstance = create()(ms, {});
 
   beforeEach(() => ms.clear());
-  beforeAll(async () => {
-    server = await T.runPromise(program);
-  });
+
   afterAll(async () => {
     await server.close();
   });

@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`describe service specification should describe valid service specification 1`] = `
-"info:
+"openapi: 3.0.3
+info:
   title: A Sample Receipt Service
   version: 1.0.0
   description: A sample service for managing receipts
-openapi: 3.0.3
 components:
   schemas:
     Resource:
@@ -105,16 +105,18 @@ components:
       required:
         - amount
       description: Deduct money from the receipt
+    ReceiptId:
+      type: string
+      example: "1212121"
   parameters:
     ReceiptId:
-      in: path
-      name: id
       schema:
-        type: string
-        example: "1212121"
+        $ref: "#/components/schemas/ReceiptId"
       required: true
+      name: id
+      in: path
 paths:
-  "receipt/{id}":
+  receipt/{id}:
     get:
       parameters:
         - $ref: "#/components/parameters/ReceiptId"
@@ -137,7 +139,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RateLimit"
-  "receipt/{id}/add":
+  receipt/{id}/add:
     post:
       parameters:
         - $ref: "#/components/parameters/ReceiptId"
@@ -171,7 +173,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RateLimit"
-  "receipt/{id}/deduct":
+  receipt/{id}/deduct:
     post:
       parameters:
         - $ref: "#/components/parameters/ReceiptId"

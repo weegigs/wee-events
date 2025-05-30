@@ -32,6 +32,10 @@ function testStream(suffix = ""): AggregateId {
   return { type: "test", key: `${id}${suffix}` };
 }
 
+beforeEach(() => {
+  id = Date.now().toString() + Math.random().toString(36).substring(2);
+});
+
 const tokenizer: Tokenizer = Tokenizer.create(async (path, value) => {
   return `${path}:${value}`;
 });

@@ -2,7 +2,7 @@ import * as cc from "change-case";
 import * as yaml from "yaml";
 import * as z from "zod";
 
-import * as schema from "@asteasolutions/zod-to-openapi";
+import { extendZodWithOpenApi, OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 import {
   Payload,
   Revision,
@@ -10,7 +10,7 @@ import {
 
 import { ServiceDescription } from "./service/service";
 
-schema.extendZodWithOpenApi(z);
+extendZodWithOpenApi(z);
 
 export const spec = <S extends Payload>(service: ServiceDescription<any, any, S>): string => {
   const {
@@ -20,7 +20,7 @@ export const spec = <S extends Payload>(service: ServiceDescription<any, any, S>
     description,
   } = service.info;
 
-  const registry = new schema.OpenAPIRegistry();
+  const registry = new OpenAPIRegistry();
   const commands = service.commands();
 
   z.intersection;
@@ -157,12 +157,13 @@ export const spec = <S extends Payload>(service: ServiceDescription<any, any, S>
     });
   }
 
-  const generator = new schema.OpenAPIGenerator(registry.definitions, "3.0.3");
+  const generator = new OpenApiGeneratorV3(registry.definitions);
 
   const serviceName = title ?? `${cc.capitalCase(name)} Service`;
   const info =
     undefined != description ? { title: serviceName, version, description } : { title: serviceName, version };
   const api = generator.generateDocument({
+    openapi: "3.0.3",
     info,
   });
 

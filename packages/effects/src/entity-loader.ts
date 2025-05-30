@@ -2,8 +2,7 @@ import * as T from "@effect-ts/core/Effect";
 import { pipe } from "@effect-ts/core";
 import * as Case from "@effect-ts/core/Case";
 
-import { EntityService } from "@weegigs/events-core/src/entity-service";
-import { AggregateId, Entity, Payload } from "@weegigs/events-core/src/types";
+import { AggregateId, Entity, Payload, Service } from "@weegigs/events-core";
 
 export interface EntityLoader {
   load(aggregate: AggregateId): T.Effect<unknown, EntityLoader.Error, Entity>;
@@ -28,7 +27,7 @@ export namespace EntityLoader {
     return v instanceof Error;
   };
 
-  export const fromServices = (services: Record<string, EntityService<Payload>>): T.UIO<EntityLoader> => {
+  export const fromServices = (services: Record<string, Service<Payload>>): T.UIO<EntityLoader> => {
     return T.succeed({
       load(aggregate: AggregateId): T.Effect<unknown, EntityLoader.Error, Entity> {
         const service = services[aggregate.type];
@@ -39,7 +38,7 @@ export namespace EntityLoader {
         return pipe(
           T.tryPromise(() => service.load(aggregate)),
           T.catchAll((e) => T.fail(Error.loaderError(e))),
-          T.chain((v) => (v !== undefined ? T.succeed(v) : T.fail(Error.notFound)))
+          T.chain((v) => (v !== undefined && v !== null ? T.succeed(v) : T.fail(Error.notFound)))
         );
       },
     });

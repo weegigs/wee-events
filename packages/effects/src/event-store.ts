@@ -8,7 +8,7 @@ export const EventStore = tag<wee.EventStore>();
 export type HasEventStore = Has<wee.EventStore>;
 
 export interface EventPublisher {
-  publish: wee.Publisher;
+  publish: wee.EventStore.Publisher;
 }
 export const EventPublisher = tag<EventPublisher>();
 
@@ -18,7 +18,7 @@ export interface EventLoader {
 export const EventLoader = tag<EventLoader>();
 
 export class LoaderError extends Error {
-  constructor(public readonly cause: unknown) {
+  constructor(public override readonly cause: unknown) {
     super(cause instanceof Error ? cause.message : String(cause));
     this.name = "LoaderError";
 
@@ -40,7 +40,7 @@ export const load = (id: wee.AggregateId): T.Effect<Has<EventLoader>, LoaderErro
   );
 
 export class PublisherError extends Error {
-  constructor(public readonly cause: unknown) {
+  constructor(public override readonly cause: unknown) {
     super(cause instanceof Error ? cause.message : String(cause));
     this.name = "PublisherError";
 

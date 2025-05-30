@@ -19,14 +19,7 @@ import { EncryptedEvent } from "./types";
 
 const ulid = monotonicFactory();
 
-const ts = (id: string) => {
-  const timestamp = DateTime.fromMillis(decodeTime(id), { zone: "utc" }).toISO();
-  if (!timestamp) {
-    throw new Error(`Could not parse timestamp from ulid ${id}`);
-  }
-
-  return timestamp;
-};
+const ts = (id: string) => DateTime.fromMillis(decodeTime(id), { zone: "utc" }).toISO() ?? new Date().toISOString();
 
 export type ChangeSet = {
   pk: string;

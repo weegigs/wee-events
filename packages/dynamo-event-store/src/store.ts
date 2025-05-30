@@ -1,4 +1,5 @@
 import _ from "lodash";
+import * as z from "zod";
 
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand, TransactWriteCommand, QueryCommandOutput } from "@aws-sdk/lib-dynamodb";
@@ -83,12 +84,12 @@ function latestCondition(changeset: ChangeSet, expectedVersion?: string) {
   };
 }
 
-const isRetryableError = (error: Error) => {
-  return isRetryableByTrait(error) || isClockSkewError(error) || isThrottlingError(error) || isTransientError(error);
+const isRetryableError = (error: unknown) => {
+  return isRetryableByTrait(error as any) || isClockSkewError(error as any) || isThrottlingError(error as any) || isTransientError(error as any);
 };
 
-const isConditionCheckFailed = (error: Error) =>
-  error.name === "TransactionCanceledException" &&
+const isConditionCheckFailed = (error: unknown) =>
+  (error as any)?.name === "TransactionCanceledException" &&
   (error as any).CancellationReasons?.[0]?.Code === "ConditionalCheckFailed";
 
 export class DynamoEventStore implements EventStore {
@@ -215,7 +216,14 @@ export class DynamoEventStore implements EventStore {
 
     const recorded: RecordedEvent[] = await Promise.all(
       events
-        .map((event) => DomainEvent.schema.parse(event))
+        .map((event) => {
+          // Validate that the event has the basic DomainEvent structure
+          const genericDomainEventSchema = z.object({
+            type: z.string(),
+            data: z.record(z.any())
+          });
+          return genericDomainEventSchema.parse(event);
+        })
         .map((event) =>
           this.$encoder(aggregate, event, _.pick(options, "correlationId", "causationId"), encrypt ?? false)
         )

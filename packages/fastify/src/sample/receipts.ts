@@ -1,16 +1,11 @@
 import * as z from "zod";
 
-import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+import * as open from "@asteasolutions/zod-to-openapi";
 import * as T from "@effect-ts/core/Effect";
 import { pipe } from "@effect-ts/core/Function";
 import * as wee from "@weegigs/events-core";
 
-import * as s from "../../event-store";
-import * as d from "../dispatcher";
-import * as l from "../loader";
-import * as srv from "../service";
-
-extendZodWithOpenApi(z);
+open.extendZodWithOpenApi(z);
 
 export const Receipt = z
   .object({
@@ -32,31 +27,32 @@ export namespace Added {
 }
 export type Added = z.TypeOf<typeof Added.schema>;
 
-export namespace Deducted {
-  export const schema = z.object({ amount: z.number().int().min(1) });
-  export const reducer: wee.Reducer<Receipt, wee.DomainEvent<"deducted", Deducted>> = (state, event) => ({
-    ...state,
-    total: state.total - event.data.amount,
-  });
-}
-export type Deducted = z.TypeOf<typeof Deducted.schema>;
+export const Deducted = z.object({ amount: z.number().int().min(1) });
+export type Deducted = z.TypeOf<typeof Deducted>;
+const deductedReducer: ldr.Reducer<Receipt, "deducted", Deducted> = (state, event) => ({
+  ...state,
+  total: state.total - event.data.amount,
+});
 
-const loader = l.EntityLoader.init("receipt", (id: wee.AggregateId): Receipt => ({ id: `${id.type}.${id.key}`, total: 0 }))
-  .reducer("added", Added.schema, Added.reducer)
-  .reducer("deducted", Deducted.schema, Deducted.reducer);
+const loader = EntityLoader.init("receipt", (id): Receipt => ({ id: `${id.type}.${id.key}`, total: 0 }))
+  .reducer("added", Added, addedReducer)
+  .reducer("deducted", Deducted, deductedReducer);
+
+// const simple = loader.EntityLoader.init<Receipt>("receipt", () => ({ total: 0 }))
+//   .reducer("added", Added, addedReducer)
+//   .reducer("deducted", Deducted, deductedReducer);
 
 // commands
+
+const done = () => T.unit;
+const finished = T.map(() => void 0);
 
 export const Add = z.object({ amount: z.number().int().min(1) }).openapi({
   description: "Add money to the receipt",
 });
 export type Add = z.TypeOf<typeof Add>;
-
 const addHandler = (entity: wee.Entity<Receipt>, command: Add) =>
-  pipe(
-    s.publish(entity.aggregate, { type: "added", data: { amount: command.amount } }),
-    T.map(() => void 0)
-  );
+  T.chain_(es.publish(entity.aggregate, { type: "added", data: { amount: command.amount } }), done);
 
 export class InsufficientBalanceError extends Error {
   constructor(public readonly requested: number, public readonly balance: number) {
@@ -71,7 +67,6 @@ export const Deduct = z.object({ amount: z.number().int().min(1) }).openapi({
   description: "Deduct money from the receipt",
 });
 export type Deduct = z.TypeOf<typeof Deduct>;
-
 const deductHandler = (entity: wee.Entity<Receipt>, command: Deduct) =>
   pipe(
     T.do,
@@ -81,18 +76,18 @@ const deductHandler = (entity: wee.Entity<Receipt>, command: Deduct) =>
           return T.fail(new InsufficientBalanceError(command.amount, entity.state.total));
         }
 
-        return T.succeed({ type: "deducted", data: { amount: command.amount } } as const);
+        return T.succeed({ type: "deducted", data: { amount: command.amount } });
       })
     ),
-    T.bind("_", ({ event }) => s.publish(entity.aggregate, event, { expectedRevision: entity.revision })),
-    T.map(() => void 0)
+    T.bind("_", ({ event }) => es.publish(entity.aggregate, event, { expectedRevision: entity.revision })),
+    finished
   );
 
-const dispatcher = d.Dispatcher.create<Receipt>()
+const dispatcher = dsptchr.Dispatcher.create<Receipt>()
   .handler("add", Add, addHandler)
   .handler("deduct", Deduct, deductHandler);
 
-export const description = srv.description(
+export const description = srvc.description(
   {
     version: "1.0.0",
     title: "A Sample Receipt Service",
