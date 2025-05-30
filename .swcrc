@@ -1,0 +1,15 @@
+{
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "decorators": true,
+      "dynamicImport": true
+    },
+    "target": "es2022",
+    "loose": false
+  },
+  "module": {
+    "type": "commonjs"
+  },
+  "sourceMaps": true
+}

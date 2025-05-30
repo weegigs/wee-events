@@ -29,3 +29,6 @@ coverage
 !.yarn/versions
 
 package.tgz
+
+# Turborepo
+.turbo/
