@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`entity service should load an empty entity from the store 1`] = `
+{
+  "aggregate": {
+    "key": "1",
+    "type": "test",
+  },
+  "revision": "00000000000000000000000000",
+  "state": {
+    "total": 0,
+  },
+  "type": "calculator",
+}
+`;

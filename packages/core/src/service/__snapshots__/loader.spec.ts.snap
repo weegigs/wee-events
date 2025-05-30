@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`loaders with init function should return an initialized entity if no events are available 1`] = `
+{
+  "aggregate": {
+    "key": "1",
+    "type": "test",
+  },
+  "revision": "00000000000000000000000000",
+  "state": {
+    "total": 0,
+  },
+  "type": "calculator",
+}
+`;

@@ -46,6 +46,10 @@ export namespace AggregateId {
     <Type extends string>(type: Type) =>
     (value: unknown) =>
       schema(type).parse(value);
+
+  export function create<const T extends string>(type: T, key: string): AggregateId<T> {
+    return { type, key } as const;
+  }
 }
 
 export interface DomainEvent<Type extends string = string, Data extends Payload = Payload> {
@@ -54,10 +58,11 @@ export interface DomainEvent<Type extends string = string, Data extends Payload 
 }
 
 export namespace DomainEvent {
-  export const schema = z.object({
-    type: z.string().min(1),
-    data: Payload.schema,
-  });
+  export const schema = <S extends z.Schema>(type: string, data: S) =>
+    z.object({
+      type: z.literal(type),
+      data,
+    });
 }
 
 export interface RecordedEvent<E extends DomainEvent = DomainEvent> {
@@ -102,59 +107,6 @@ export namespace RecordedEvent {
     causationId?: string;
     correlationId?: string;
   };
-}
-
-export interface Command<Name extends string = string, Data extends Payload = Payload> {
-  name: Name;
-  data: Data;
-}
-
-export namespace Command {
-  export const schema = <Name extends string = string, Data extends Payload = Payload>(
-    name: string,
-    schema: z.Schema<Data>
-  ): z.Schema<Command<Name, Data>> => {
-    return z.object({
-      name: z.literal(name),
-      data: schema,
-    }) as unknown as z.Schema<Command<Name, Data>>;
-  };
-
-  export const validator = <Name extends string = string, Data extends Payload = Payload>(
-    name: string,
-    schema: z.Schema<Data>
-  ): ((value: unknown) => value is Command<Name, Data>) => {
-    const _schema = Command.schema(name, schema);
-
-    return (value: unknown): value is Command<Name, Data> => {
-      return _schema.safeParse(value).success;
-    };
-  };
-
-  export const parser = <Name extends string = string, Data extends Payload = Payload>(
-    name: string,
-    schema: z.Schema<Data>
-  ): ((value: unknown) => Command<Name, Data>) => {
-    const _schema = Command.schema(name, schema);
-
-    return (value: unknown): Command<Name, Data> => {
-      return _schema.parse(value) as Command<Name, Data>;
-    };
-  };
-
-  const _rawSchema: z.Schema<Command> = z.object({
-    name: z.string().min(1),
-    data: Payload.schema,
-  });
-
-  export const parse = (value: unknown): Command => {
-    return _rawSchema.parse(value);
-  };
-
-  export const factory =
-    <Name extends string, Data extends Payload>(name: Name, schema: z.Schema<Data>) =>
-    (data: Data): Command<Name, Data> =>
-      parser<Name, Data>(name, schema)(data);
 }
 
 export type Revision = string;
