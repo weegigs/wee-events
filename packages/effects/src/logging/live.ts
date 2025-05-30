@@ -1,5 +1,5 @@
-import * as T from "@effect-ts/core/Effect";
-import * as L from "@effect-ts/core/Effect/Layer";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
 
 import SenseLog from "senselogs";
 
@@ -7,7 +7,7 @@ import { Stage } from "../environment";
 
 import { Log } from "./effects";
 
-const _log = T.gen(function* (_) {
+const _log = Effect.gen(function* (_) {
   const stage = yield* _(Stage);
 
   const log = new SenseLog().addContext({ stage });
@@ -32,4 +32,4 @@ const _log = T.gen(function* (_) {
   return log;
 });
 
-export const live = L.fromEffect(Log)(_log);
+export const live = Layer.effect(Log, _log);

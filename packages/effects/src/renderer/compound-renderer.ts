@@ -1,5 +1,5 @@
-import * as T from "@effect-ts/core/Effect";
-import { pipe } from "@effect-ts/core";
+import * as Effect from "effect/Effect";
+import { pipe } from "effect";
 
 import { Entity } from "@weegigs/events-core";
 
@@ -10,11 +10,11 @@ export namespace CompoundRenderer {
   export const create = (renderers: Record<string, AnyRenderer.IO>): AnyRenderer.IO => {
     const renderer = (entity: Entity) => renderers[entity.type] ?? defaultRenderer;
 
-    return T.succeed((entity: Entity) =>
+    return Effect.succeed((entity: Entity) =>
       pipe(
         renderer(entity),
-        T.chain((r) => r(entity))
-      )
+        Effect.flatMap((r) => r(entity))
+      ) as any
     );
   };
 }

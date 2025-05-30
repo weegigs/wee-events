@@ -1,6 +1,5 @@
-import * as T from "@effect-ts/core/Effect";
-
-import { tag, Has } from "@effect-ts/core/Has";
+import * as Effect from "effect/Effect";
+import * as Context from "effect/Context";
 
 export interface Log {
   child(context?: Record<string, unknown>): Log;
@@ -15,17 +14,16 @@ export interface Log {
   warn(message: string | Error, context?: Record<string, unknown>): void;
 }
 
-export const Log = tag<Log>();
-export type HasLog = Has<Log>;
+export const Log = Context.GenericTag<Log>("Log");
 
 export const error = (message: string | Error, context: Record<string, unknown> = {}) =>
-  T.accessService(Log)((l) => l.error(message, context));
+  Effect.flatMap(Log, (l) => Effect.sync(() => l.error(message, context)));
 
 export const warn = (message: string | Error, context: Record<string, unknown> = {}) =>
-  T.accessService(Log)((l) => l.warn(message, context));
+  Effect.flatMap(Log, (l) => Effect.sync(() => l.warn(message, context)));
 
 export const info = (message: string, context: Record<string, unknown> = {}) =>
-  T.accessService(Log)((l) => l.info(message, context));
+  Effect.flatMap(Log, (l) => Effect.sync(() => l.info(message, context)));
 
 export const debug = (message: string, context: Record<string, unknown> = {}) =>
-  T.accessService(Log)((l) => l.debug(message, context));
+  Effect.flatMap(Log, (l) => Effect.sync(() => l.debug(message, context)));

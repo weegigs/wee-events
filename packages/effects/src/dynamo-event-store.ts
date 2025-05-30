@@ -1,10 +1,9 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
-import { pipe } from "@effect-ts/core";
-import * as T from "@effect-ts/core/Effect";
-import * as L from "@effect-ts/core/Effect/Layer";
-import { tag } from "@effect-ts/core/Has";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
+import * as Context from "effect/Context";
 
 import * as s from "@weegigs/dynamo-event-store";
 import * as dyn from "./aws/dynamodb";
@@ -18,21 +17,18 @@ export interface DynamoEventStoreConfig {
   readonly client: DynamoDBClient;
   readonly table: string;
 }
-export const DynamoEventStoreConfig = tag<DynamoEventStoreConfig>();
+export const DynamoEventStoreConfig = Context.GenericTag<DynamoEventStoreConfig>("DynamoEventStoreConfig");
 
-const config = pipe(
-  T.do,
-  T.bindAllPar(() => ({
-    client: T.service(dyn.Dynamo),
-    table: env.text("EVENT_STORE_TABLE"),
-  })),
-  T.map(({ client, table }): DynamoEventStoreConfig => ({ client, table }))
-);
+const config = Effect.gen(function* () {
+  const client = yield* dyn.DynamoDB;
+  const table = yield* env.text("EVENT_STORE_TABLE");
+  return { client, table };
+});
 
-const _configL = L.fromEffect(DynamoEventStoreConfig)(config);
+const _configL = Layer.effect(DynamoEventStoreConfig, config);
 
-export const dynamoStore = T.gen(function* (_) {
-  const config = yield* _(DynamoEventStoreConfig);
+export const dynamoStore = Effect.gen(function* () {
+  const config = yield* DynamoEventStoreConfig;
   const es: wee.EventStore = new s.DynamoEventStore(config.table, {
     client: () => DynamoDBDocumentClient.from(config.client),
   });
@@ -40,4 +36,4 @@ export const dynamoStore = T.gen(function* (_) {
   return es;
 });
 
-export const live = _configL[">>>"](L.fromEffect(es.EventStore)(dynamoStore));
+export const live = Layer.effect(es.EventStore, dynamoStore).pipe(Layer.provide(_configL));

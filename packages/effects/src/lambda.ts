@@ -1,68 +1,109 @@
-import * as T from "@effect-ts/core/Effect";
-import * as L from "@effect-ts/core/Effect/Layer";
-import * as Q from "@effect-ts/core/Effect/Queue";
-import * as P from "@effect-ts/core/Effect/Promise";
-
-import * as R from "@effect-ts/node/Runtime";
-
-import { pipe } from "@effect-ts/core";
+import { Effect, Layer, Queue, Deferred, Runtime, Fiber } from "effect";
+import { pipe } from "effect/Function";
 
 import middy from "@middy/core";
 import dontWait from "@middy/do-not-wait-for-empty-event-loop";
 import { Handler } from "aws-lambda";
 
-export type EventHandler<R, E, I, O> = (event: I) => T.Effect<R, E, O>;
+export type EventHandler<R, E, I, O> = (event: I) => Effect.Effect<O, E, R>;
 
 export const create = <R, E, I, O>(handler: EventHandler<R, E, I, O>) => {
   type RequestContext<I, O> = {
     readonly event: I;
-    readonly response: P.Promise<E, O>;
+    readonly response: Deferred.Deferred<O, E>;
   };
 
-  const queue = Q.unsafeMakeUnbounded<RequestContext<I, O>>();
+  const queue = Effect.runSync(Queue.unbounded<RequestContext<I, O>>());
 
   const run: Handler<I, O> = async (event: I): Promise<O> => {
+    const runtime = Runtime.defaultRuntime;
     return pipe(
-      P.make<E, O>(),
-      T.tap((response) => Q.offer({ event, response })(queue)),
-      T.chain(P.await),
-      T.sandbox,
-      R.runPromise
+      Deferred.make<O, E>(),
+      Effect.tap((response) => Queue.offer(queue, { event, response })),
+      Effect.flatMap(Deferred.await),
+      Effect.sandbox,
+      Runtime.runPromise(runtime)
     );
   };
 
-  const _main = T.accessM((environment: R) =>
-    pipe(
+  const _main = Effect.gen(function* () {
+    return yield* pipe(
       // poll from the request queue waiting in case no requests are present
-      Q.take(queue),
+      Queue.take(queue),
       // fork each request in it's own fiber and start processing
       // here we are forking inside the parent scope so in case the
       // parent is interrupted each of the child will also trigger
       // interruption
-      T.chain(({ event, response }) => T.fork(P.complete(T.provideAll(environment)(handler(event)))(response))),
+      Effect.flatMap(({ event, response }) => 
+        Effect.fork(pipe(
+          handler(event),
+          Effect.flatMap((result) => Deferred.succeed(response, result)),
+          Effect.catchAll((error) => Deferred.fail(response, error))
+        ))
+      ),
       // loop forever
-      T.forever,
+      Effect.forever,
       // handle teardown
-      T.ensuring(
+      Effect.ensuring(
         pipe(
-          Q.takeAll(queue),
-          T.tap(() => Q.shutdown(queue)),
-          T.chain(T.forEachPar(({ response }) => T.to(response)(T.interrupt)))
+          Queue.takeAll(queue),
+          Effect.tap(() => Queue.shutdown(queue)),
+          Effect.flatMap(Effect.forEach(({ response }) => Deferred.interrupt(response), { concurrency: "unbounded" }))
         )
       )
-    )
-  );
+    );
+  });
 
   const _handler = middy(run as any).use(dontWait()) as Handler<I, O>;
 
   return { handler: _handler, main: _main };
 };
 
-export function run<R, E, I, O>(program: EventHandler<R, E, I, O>, environment: L.Layer<unknown, unknown, R>) {
+// Enhanced run function with better error handling and graceful shutdown
+export function run<R, E, I, O>(
+  program: EventHandler<R, E, I, O>, 
+  environment: Layer.Layer<R>,
+  options: {
+    readonly runtime?: Runtime.Runtime<never>;
+    readonly onError?: (error: unknown) => Effect.Effect<void>;
+    readonly timeout?: number;
+  } = {}
+) {
   const { handler, main } = create(program);
+  const runtime = options.runtime ?? Runtime.defaultRuntime;
+  
+  // Enhanced main program with error handling
+  const mainWithErrorHandling = pipe(
+    main,
+    Effect.provide(environment),
+    Effect.catchAllCause((cause) => {
+      if (options.onError) {
+        return pipe(
+          options.onError(cause),
+          Effect.orElse(() => Effect.logError("Lambda handler error", cause))
+        );
+      }
+      return Effect.logError("Lambda handler error", cause);
+    }),
+    options.timeout ? Effect.timeout(options.timeout) : (x: any) => x
+  );
 
-  // start the process engine
-  R.runMain(pipe(main, T.provideLayer(environment)));
+  // Start the process engine with proper error handling
+  const fiber = Runtime.runFork(runtime)(mainWithErrorHandling);
+  
+  // Add graceful shutdown on process termination
+  const cleanup = () => {
+    Runtime.runSync(runtime)(Fiber.interrupt(fiber));
+  };
+  
+  process.on('SIGTERM', cleanup);
+  process.on('SIGINT', cleanup);
+  process.on('beforeExit', cleanup);
 
   return handler;
+}
+
+// Simplified run function for backward compatibility
+export function runSimple<R, E, I, O>(program: EventHandler<R, E, I, O>, environment: Layer.Layer<R>) {
+  return run(program, environment);
 }

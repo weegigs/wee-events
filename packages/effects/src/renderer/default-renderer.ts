@@ -1,7 +1,7 @@
-import * as T from "@effect-ts/core/Effect";
+import * as Effect from "effect/Effect";
 
 import { Entity } from "@weegigs/events-core";
 
 import { AnyRenderer } from "./types";
 
-export const defaultRenderer: AnyRenderer.IO = T.succeed((e: Entity) => T.succeed(e.state));
+export const defaultRenderer: AnyRenderer.IO = Effect.succeed((e: Entity) => Effect.succeed(e.state));

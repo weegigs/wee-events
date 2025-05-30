@@ -1,11 +1,9 @@
-import * as T from "@effect-ts/core/Effect";
-import { pipe } from "@effect-ts/core";
-import * as Case from "@effect-ts/core/Case";
+import { Effect, pipe, Data } from "effect";
 
 import { AggregateId, Entity, Payload, Service } from "@weegigs/events-core";
 
 export interface EntityLoader {
-  load(aggregate: AggregateId): T.Effect<unknown, EntityLoader.Error, Entity>;
+  load(aggregate: AggregateId): Effect.Effect<Entity, EntityLoader.Error>;
 }
 
 export namespace EntityLoader {
@@ -15,30 +13,31 @@ export namespace EntityLoader {
 
   export type Cause = NotFound | NotServiced | LoaderError;
 
-  export class Error extends Case.Tagged(Symbol())<{ readonly type: Cause; readonly root?: unknown }> {
-    readonly isNotFound = this.type === "not-found";
+  export class Error extends Data.TaggedError("EntityLoaderError")<{
+    readonly type: Cause;
+    readonly root?: unknown;
+  }> {}
 
-    static notFound = new Error({ type: "not-found" });
-    static notServiced = new Error({ type: "not-serviced" });
-    static loaderError = (root: unknown) => new Error({ type: "loader-error", root });
-  }
+  export const notFound = new Error({ type: "not-found" });
+  export const notServiced = new Error({ type: "not-serviced" });
+  export const loaderError = (root: unknown) => new Error({ type: "loader-error", root });
 
   export const isLoaderError = (v: unknown): v is Error => {
     return v instanceof Error;
   };
 
-  export const fromServices = (services: Record<string, Service<Payload>>): T.UIO<EntityLoader> => {
-    return T.succeed({
-      load(aggregate: AggregateId): T.Effect<unknown, EntityLoader.Error, Entity> {
+  export const fromServices = (services: Record<string, Service<Payload>>): Effect.Effect<EntityLoader> => {
+    return Effect.succeed({
+      load(aggregate: AggregateId): Effect.Effect<Entity, EntityLoader.Error> {
         const service = services[aggregate.type];
         if (service === undefined) {
-          return T.fail(Error.notServiced);
+          return Effect.fail(notServiced);
         }
 
         return pipe(
-          T.tryPromise(() => service.load(aggregate)),
-          T.catchAll((e) => T.fail(Error.loaderError(e))),
-          T.chain((v) => (v !== undefined && v !== null ? T.succeed(v) : T.fail(Error.notFound)))
+          Effect.tryPromise(() => service.load(aggregate)),
+          Effect.catchAll((e) => Effect.fail(loaderError(e))),
+          Effect.flatMap((v) => (v !== undefined && v !== null ? Effect.succeed(v) : Effect.fail(notFound)))
         );
       },
     });

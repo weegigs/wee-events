@@ -1,5 +1,4 @@
-import * as T from "@effect-ts/core/Effect";
-import { pipe } from "@effect-ts/core";
+import { Effect } from "effect";
 
 import { Entity, Payload, Revision } from "@weegigs/events-core";
 
@@ -16,25 +15,18 @@ export type Locator = (entity: Entity) => string[];
 export const resourceRenderer = <R>(
   self: Locator,
   render: AnyRenderer<R>
-): T.Effect<R, never, (entity: Entity) => T.Effect<unknown, RenderFailure, Resource[]>> =>
-  T.access(
-    (e: R) => (entity: Entity) =>
-      pipe(
-        T.do,
-        T.let("locations", () => self(entity)),
-        T.bind("body", () =>
-          pipe(
-            render,
-            T.chain((r) => r(entity))
-          )
-        ),
-        T.map(($): Resource[] => {
-          const { type: $type, revision: $revision } = entity;
+): Effect.Effect<(entity: Entity<Payload>) => Effect.Effect<Resource[], RenderFailure, never>, never, R> =>
+  Effect.gen(function* () {
+    const env = yield* Effect.context<R>();
+    return (entity: Entity<Payload>) =>
+      Effect.gen(function* () {
+        const locations = self(entity);
+        const renderFn = yield* render;
+        const body = yield* renderFn(entity);
+        const { type: $type, revision: $revision } = entity;
 
-          return $.locations.map((location) => {
-            return { ...$.body, $self: location, $type, $revision };
-          });
-        }),
-        T.provideAll(e)
-      )
-  );
+        return locations.map((location) => {
+          return { ...body, $self: location, $type, $revision };
+        });
+      }).pipe(Effect.provide(env)) as Effect.Effect<Resource[], RenderFailure, never>;
+  });

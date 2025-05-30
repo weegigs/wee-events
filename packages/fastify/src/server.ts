@@ -40,7 +40,7 @@ export function create<R extends Environment, S extends State>(
         return service.execute(path, target, command);
       } catch (e) {
         if (e instanceof EntityNotAvailableError) {
-          new errors.NotFound(e.message);
+          return new errors.NotFound(e.message);
         }
 
         if (e instanceof CommandValidationError) {
@@ -48,7 +48,7 @@ export function create<R extends Environment, S extends State>(
         }
 
         if (e instanceof HandlerNotFound) {
-          new errors.InternalServerError(e.message);
+          return new errors.InternalServerError(e.message);
         }
 
         return errorMapper(e);
@@ -73,7 +73,7 @@ export function create<R extends Environment, S extends State>(
         if (!payload.success) {
           return new errors.BadRequest(payload.error.message);
         }
-        execute(command, id, payload.data);
+        return execute(command, id, payload.data);
       });
     }
 

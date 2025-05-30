@@ -1,8 +1,8 @@
 import * as z from "zod";
 
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
-import * as T from "@effect-ts/core/Effect";
-import { pipe } from "@effect-ts/core/Function";
+import { Effect } from "effect";
+import { pipe } from "effect";
 import * as wee from "@weegigs/events-core";
 
 import * as s from "../../event-store";
@@ -55,7 +55,7 @@ export type Add = z.TypeOf<typeof Add>;
 const addHandler = (entity: wee.Entity<Receipt>, command: Add) =>
   pipe(
     s.publish(entity.aggregate, { type: "added", data: { amount: command.amount } }),
-    T.map(() => void 0)
+    Effect.map(() => void 0)
   );
 
 export class InsufficientBalanceError extends Error {
@@ -73,20 +73,18 @@ export const Deduct = z.object({ amount: z.number().int().min(1) }).openapi({
 export type Deduct = z.TypeOf<typeof Deduct>;
 
 const deductHandler = (entity: wee.Entity<Receipt>, command: Deduct) =>
-  pipe(
-    T.do,
-    T.bind("event", () =>
-      T.suspend(() => {
-        if (entity.state.total - command.amount < 0) {
-          return T.fail(new InsufficientBalanceError(command.amount, entity.state.total));
-        }
+  Effect.gen(function* () {
+    const event = yield* Effect.suspend(() => {
+      if (entity.state.total - command.amount < 0) {
+        return Effect.fail(new InsufficientBalanceError(command.amount, entity.state.total));
+      }
 
-        return T.succeed({ type: "deducted", data: { amount: command.amount } } as const);
-      })
-    ),
-    T.bind("_", ({ event }) => s.publish(entity.aggregate, event, { expectedRevision: entity.revision })),
-    T.map(() => void 0)
-  );
+      return Effect.succeed({ type: "deducted", data: { amount: command.amount } } as const);
+    });
+    
+    yield* s.publish(entity.aggregate, event, { expectedRevision: entity.revision });
+    return void 0;
+  });
 
 const dispatcher = d.Dispatcher.create<Receipt>()
   .handler("add", Add, addHandler)

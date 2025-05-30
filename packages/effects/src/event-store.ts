@@ -1,21 +1,19 @@
-import * as T from "@effect-ts/core/Effect";
-import { Has, tag } from "@effect-ts/core/Has";
-import { pipe } from "@effect-ts/core";
+import { Effect, Context } from "effect";
 
 import * as wee from "@weegigs/events-core";
 
-export const EventStore = tag<wee.EventStore>();
-export type HasEventStore = Has<wee.EventStore>;
+export const EventStore = Context.GenericTag<wee.EventStore>("EventStore");
+export type HasEventStore = wee.EventStore;
 
 export interface EventPublisher {
   publish: wee.EventStore.Publisher;
 }
-export const EventPublisher = tag<EventPublisher>();
+export const EventPublisher = Context.GenericTag<EventPublisher>("EventPublisher");
 
 export interface EventLoader {
   load: wee.EventStore.Loader;
 }
-export const EventLoader = tag<EventLoader>();
+export const EventLoader = Context.GenericTag<EventLoader>("EventLoader");
 
 export class LoaderError extends Error {
   constructor(public override readonly cause: unknown) {
@@ -26,18 +24,15 @@ export class LoaderError extends Error {
   }
 }
 
-export const load = (id: wee.AggregateId): T.Effect<Has<EventLoader>, LoaderError, wee.RecordedEvent[]> =>
-  pipe(
-    T.do,
-    T.bind("loader", () => T.service(EventLoader)),
-    T.bind("events", ({ loader }) =>
-      T.tryCatchPromise(
-        () => loader.load(id),
-        (e) => new LoaderError(e)
-      )
-    ),
-    T.map(({ events }) => events)
-  );
+export const load = (id: wee.AggregateId): Effect.Effect<wee.RecordedEvent[], LoaderError, EventLoader> =>
+  Effect.gen(function* () {
+    const loader = yield* EventLoader;
+    const events = yield* Effect.tryPromise({
+      try: () => loader.load(id),
+      catch: (e) => new LoaderError(e)
+    });
+    return events;
+  });
 
 export class PublisherError extends Error {
   constructor(public override readonly cause: unknown) {
@@ -51,21 +46,18 @@ export const publish = (
   aggregate: wee.AggregateId,
   events: wee.DomainEvent | wee.DomainEvent[],
   options?: wee.EventStore.PublishOptions
-): T.Effect<
-  Has<EventPublisher>,
+): Effect.Effect<
+  wee.Revision,
   wee.ExpectedRevisionConflictError | wee.RevisionConflictError | PublisherError,
-  wee.Revision
+  EventPublisher
 > =>
-  pipe(
-    T.do,
-    T.bind("publisher", () => T.service(EventPublisher)),
-    T.bind("revision", ({ publisher }) =>
-      T.tryCatchPromise(
-        async () => {
-          return publisher.publish(aggregate, events, options);
-        },
-        (e) => new PublisherError(e)
-      )
-    ),
-    T.map(({ revision }) => revision)
-  );
+  Effect.gen(function* () {
+    const publisher = yield* EventPublisher;
+    const revision = yield* Effect.tryPromise({
+      try: async () => {
+        return publisher.publish(aggregate, events, options);
+      },
+      catch: (e) => new PublisherError(e)
+    });
+    return revision;
+  });

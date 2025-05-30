@@ -2,9 +2,7 @@ import * as wee from "@weegigs/events-core";
 
 import * as z from "zod";
 
-import * as T from "@effect-ts/core/Effect";
-import { pipe } from "@effect-ts/core/Function";
-import { Has } from "@effect-ts/core/Has";
+import * as Effect from "effect/Effect";
 
 import * as s from "../event-store";
 
@@ -37,15 +35,15 @@ export interface Service<R, E, S extends State> {
     path: string,
     target: wee.AggregateId,
     command: d.Command
-  ): T.Effect<
-    R & Has<s.EventLoader>,
+  ): Effect.Effect<
+    wee.Entity<S>,
     E | d.HandlerNotFound | l.EntityNotAvailableError | s.LoaderError | d.CommandValidationError,
-    wee.Entity<S>
+    R | s.EventLoader
   >;
 
   load(
     aggregate: wee.AggregateId
-  ): T.Effect<Has<s.EventLoader>, s.LoaderError | l.EntityNotAvailableError, wee.Entity<S>>;
+  ): Effect.Effect<wee.Entity<S>, s.LoaderError | l.EntityNotAvailableError, s.EventLoader>;
 }
 
 const $make = <R, E, S extends State>(
@@ -53,15 +51,12 @@ const $make = <R, E, S extends State>(
   loader: l.EntityLoader<S>
 ): Service<R, E, S> => {
   const execute = (path: string, target: wee.AggregateId, command: d.Command) => {
-    const run = pipe(
-      T.do,
-      T.bind("state", () => loader.load(target)),
-      T.bind("_", ({ state }) => dispatcher.dispatch(path, state, command)),
-      T.bind("result", () => loader.load(target)),
-      T.map(({ result }) => result)
-    );
-
-    return run;
+    return Effect.gen(function* () {
+      const state = yield* loader.load(target);
+      yield* dispatcher.dispatch(path, state, command);
+      const result = yield* loader.load(target);
+      return result;
+    });
   };
 
   return {

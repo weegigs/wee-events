@@ -1,12 +1,10 @@
-import * as T from "@effect-ts/core/Effect";
-import { Has } from "@effect-ts/core/Has";
+import * as Effect from "effect/Effect";
 
 import * as store from "../event-store";
 
 import * as wee from "@weegigs/events-core";
 
 import { z } from "zod";
-import { pipe } from "@effect-ts/core";
 import { DomainEvent, Payload } from "@weegigs/events-core";
 
 type State = wee.Payload;
@@ -52,7 +50,7 @@ interface InitializingLoader<A extends State> extends InitializedLoader<A> {
 export interface EntityLoader<A extends State> {
   load(
     id: wee.AggregateId
-  ): T.Effect<Has<store.EventLoader>, store.LoaderError | EntityNotAvailableError, wee.Entity<A>>;
+  ): Effect.Effect<wee.Entity<A>, store.LoaderError | EntityNotAvailableError, store.EventLoader>;
   events(): Record<string, z.Schema>;
 }
 
@@ -101,27 +99,21 @@ export namespace EntityLoader {
     };
 
     const load = (id: wee.AggregateId) =>
-      pipe(
-        T.do,
-        T.bind("events", () => store.load(id)),
-        T.bind("entity", ({ events }) =>
-          T.suspend(() => {
-            const [state, revision] = replay(events, typeof init == "function" ? init(id) : undefined);
-            if (state === undefined) {
-              return T.fail(new EntityNotAvailableError(id, type));
-            }
-            const entity: wee.Entity<A> = {
-              aggregate: id,
-              type,
-              state,
-              revision,
-            };
+      Effect.gen(function* () {
+        const events = yield* store.load(id);
+        const [state, revision] = replay(events, typeof init == "function" ? init(id) : undefined);
+        if (state === undefined) {
+          return yield* Effect.fail(new EntityNotAvailableError(id, type));
+        }
+        const entity: wee.Entity<A> = {
+          aggregate: id,
+          type,
+          state,
+          revision,
+        };
 
-            return T.succeed(entity);
-          })
-        ),
-        T.map(({ entity }) => entity)
-      );
+        return entity;
+      });
 
     return { load, events };
   };

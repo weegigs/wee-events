@@ -1,5 +1,5 @@
-import * as T from "@effect-ts/core/Effect";
-import * as L from "@effect-ts/core/Effect/Layer";
+import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
 import { Log } from "./effects";
 
 export type Sink = (level: string, message: string | Error, context?: Record<string, unknown>) => void;
@@ -46,4 +46,4 @@ export class TestLogger implements Log {
   }
 }
 
-export const test = L.fromEffect(Log)(T.succeed(new TestLogger()));
+export const test = Layer.effect(Log, Effect.succeed(new TestLogger()));

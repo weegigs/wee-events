@@ -1,11 +1,11 @@
-import * as T from "@effect-ts/core/Effect";
+import * as Effect from "effect/Effect";
 import { Entity, Payload } from "@weegigs/events-core";
 
 export interface RenderFailure {
   readonly description: string;
 }
 
-export type Renderer<R, P extends Payload, A extends Payload> = T.RIO<R, (entity: Entity<P>) => T.IO<RenderFailure, A>>;
+export type Renderer<R, P extends Payload, A extends Payload> = Effect.Effect<(entity: Entity<P>) => Effect.Effect<A, RenderFailure>, never, R>;
 export namespace Renderer {
   export type IO<P extends Payload, A extends Payload = Payload> = Renderer<unknown, P, A>;
 }

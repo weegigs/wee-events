@@ -2,8 +2,8 @@ import * as wee from "@weegigs/events-core";
 
 import * as z from "zod";
 
-import * as T from "@effect-ts/core/Effect";
-import { pipe } from "@effect-ts/core/Function";
+import * as Effect from "effect/Effect";
+import { pipe } from "effect";
 
 type Payload = wee.Payload;
 
@@ -12,7 +12,7 @@ export type Command = wee.Payload;
 export type Handler<R, E, S extends Payload, C extends Command> = (
   entity: wee.Entity<S>,
   command: C
-) => T.Effect<R, E, void>;
+) => Effect.Effect<void, E, R>;
 
 export type ValidationError = z.ZodError;
 
@@ -34,14 +34,14 @@ export class HandlerNotFound extends Error {
   }
 }
 
-const validate = <T>(schema: z.Schema<T>, value: T): T.IO<CommandValidationError, T> => {
-  return T.suspend(() => {
+const validate = <T>(schema: z.Schema<T>, value: T): Effect.Effect<T, CommandValidationError> => {
+  return Effect.suspend(() => {
     const result = schema.safeParse(value);
     if (!result.success) {
-      return T.fail(new CommandValidationError(result.error));
+      return Effect.fail(new CommandValidationError(result.error));
     }
 
-    return T.succeed(result.data);
+    return Effect.succeed(result.data);
   });
 };
 
@@ -51,10 +51,10 @@ function validated<R, E, S extends Payload, C extends Payload>(
 ): Handler<R, E | CommandValidationError, S, C> {
   return (entity: wee.Entity<S>, command: C) =>
     pipe(
-      T.do,
-      T.bind("command", () => validate(schema, command)),
-      T.bind("result", () => handler(entity, command)),
-      T.map(({ result }) => result)
+      Effect.Do,
+      Effect.bind("command", () => validate(schema, command)),
+      Effect.bind("result", () => handler(entity, command)),
+      Effect.map(({ result }) => result)
     );
 }
 
@@ -65,7 +65,7 @@ export interface Dispatcher<R, E, State extends Payload> {
     path: string,
     entity: Target<State>,
     command: Command
-  ): T.Effect<R, E | HandlerNotFound | CommandValidationError, void>;
+  ): Effect.Effect<void, E | HandlerNotFound | CommandValidationError, R>;
 
   handler: <R1, E1, C extends Command>(
     path: string,
@@ -87,10 +87,10 @@ export namespace Dispatcher {
       path: string,
       entity: wee.Entity<State>,
       command: Command
-    ): T.Effect<R, E | HandlerNotFound | CommandValidationError, void> => {
+    ): Effect.Effect<void, E | HandlerNotFound | CommandValidationError, R> => {
       const handler = handlers[path];
       if (undefined == handler) {
-        return T.fail(new HandlerNotFound(path));
+        return Effect.fail(new HandlerNotFound(path));
       }
 
       return handler.handler(entity, command);
