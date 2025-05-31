@@ -10,7 +10,7 @@ export interface Entity<T extends Payload = Payload> {
 }
 
 export namespace Entity {
-  export const schema = <Type extends string, Data extends z.Schema<any>>(type: Type, state: Data) =>
+  export const schema = <Type extends string, Data extends z.ZodTypeAny>(type: Type, state: Data) =>
     z.object({
       aggregate: AggregateId.schema(type),
       type: z.string().min(1),

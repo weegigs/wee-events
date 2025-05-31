@@ -1,5 +1,27 @@
 import { Effect, Data } from "effect";
 
+// AWS SDK error shape (what we expect from AWS SDK)
+interface AWSSDKRawError {
+  name?: string;
+  message?: string;
+  code?: string;
+  statusCode?: number;
+  retryable?: boolean;
+  requestId?: string;
+  retryAfter?: number;
+  field?: string;
+  resourceType?: string;
+  resourceId?: string;
+  action?: string;
+  resource?: string;
+  serviceName?: string;
+  $retryable?: boolean;
+  $metadata?: {
+    httpStatusCode?: number;
+    requestId?: string;
+  };
+}
+
 // Common AWS error types
 export class AWSError extends Data.TaggedError("AWSError")<{
   readonly name: string;
@@ -51,7 +73,7 @@ export type AWSSDKError =
   | ServiceUnavailableError;
 
 // Error classification helpers
-const isThrottlingError = (error: any): boolean => {
+const isThrottlingError = (error: AWSSDKRawError): boolean => {
   const throttlingCodes = [
     'Throttling',
     'ThrottlingException', 
@@ -59,20 +81,20 @@ const isThrottlingError = (error: any): boolean => {
     'RequestLimitExceeded',
     'TooManyRequestsException'
   ];
-  return throttlingCodes.includes(error.name) || throttlingCodes.includes(error.code);
+  return throttlingCodes.includes(error.name || '') || throttlingCodes.includes(error.code || '');
 };
 
-const isValidationError = (error: any): boolean => {
+const isValidationError = (error: AWSSDKRawError): boolean => {
   const validationCodes = [
     'ValidationException',
     'InvalidParameterValue',
     'InvalidParameterCombination',
     'MissingParameter'
   ];
-  return validationCodes.includes(error.name) || validationCodes.includes(error.code);
+  return validationCodes.includes(error.name || '') || validationCodes.includes(error.code || '');
 };
 
-const isResourceNotFoundError = (error: any): boolean => {
+const isResourceNotFoundError = (error: AWSSDKRawError): boolean => {
   const notFoundCodes = [
     'ResourceNotFoundException',
     'ResourceNotFound',
@@ -80,31 +102,31 @@ const isResourceNotFoundError = (error: any): boolean => {
     'NoSuchBucket',
     'TableNotFoundException'
   ];
-  return notFoundCodes.includes(error.name) || notFoundCodes.includes(error.code);
+  return notFoundCodes.includes(error.name || '') || notFoundCodes.includes(error.code || '');
 };
 
-const isAccessDeniedError = (error: any): boolean => {
+const isAccessDeniedError = (error: AWSSDKRawError): boolean => {
   const accessDeniedCodes = [
     'AccessDenied',
     'AccessDeniedException',
     'UnauthorizedOperation',
     'Forbidden'
   ];
-  return accessDeniedCodes.includes(error.name) || accessDeniedCodes.includes(error.code);
+  return accessDeniedCodes.includes(error.name || '') || accessDeniedCodes.includes(error.code || '');
 };
 
-const isServiceUnavailableError = (error: any): boolean => {
+const isServiceUnavailableError = (error: AWSSDKRawError): boolean => {
   const unavailableCodes = [
     'ServiceUnavailable',
     'ServiceUnavailableException',
     'InternalError',
     'InternalServerError'
   ];
-  return unavailableCodes.includes(error.name) || unavailableCodes.includes(error.code);
+  return unavailableCodes.includes(error.name || '') || unavailableCodes.includes(error.code || '');
 };
 
 // Error mapping function
-export const mapAWSError = (error: any): AWSSDKError => {
+export const mapAWSError = (error: AWSSDKRawError): AWSSDKError => {
   const baseError = {
     name: error.name || 'UnknownError',
     message: error.message || 'An unknown AWS error occurred'
@@ -113,46 +135,52 @@ export const mapAWSError = (error: any): AWSSDKError => {
   if (isThrottlingError(error)) {
     return new ThrottlingError({
       ...baseError,
-      retryAfter: error.retryAfter
+      ...(error.retryAfter && { retryAfter: error.retryAfter })
     });
   }
 
   if (isValidationError(error)) {
     return new ValidationError({
       ...baseError,
-      field: error.field
+      ...(error.field && { field: error.field })
     });
   }
 
   if (isResourceNotFoundError(error)) {
     return new ResourceNotFoundError({
       ...baseError,
-      resourceType: error.resourceType,
-      resourceId: error.resourceId
+      ...(error.resourceType && { resourceType: error.resourceType }),
+      ...(error.resourceId && { resourceId: error.resourceId })
     });
   }
 
   if (isAccessDeniedError(error)) {
     return new AccessDeniedError({
       ...baseError,
-      action: error.action,
-      resource: error.resource
+      ...(error.action && { action: error.action }),
+      ...(error.resource && { resource: error.resource })
     });
   }
 
   if (isServiceUnavailableError(error)) {
     return new ServiceUnavailableError({
       ...baseError,
-      serviceName: error.serviceName
+      ...(error.serviceName && { serviceName: error.serviceName })
     });
   }
 
   return new AWSError({
     ...baseError,
-    code: error.code || error.$metadata?.httpStatusCode?.toString(),
-    statusCode: error.$metadata?.httpStatusCode,
-    retryable: error.retryable || error.$retryable,
-    requestId: error.$metadata?.requestId
+    ...(error.code && { code: error.code }),
+    ...((error.$metadata?.httpStatusCode || error.statusCode) && { 
+      statusCode: error.$metadata?.httpStatusCode || error.statusCode 
+    }),
+    ...((error.retryable || error.$retryable) && { 
+      retryable: error.retryable || error.$retryable 
+    }),
+    ...((error.$metadata?.requestId || error.requestId) && { 
+      requestId: error.$metadata?.requestId || error.requestId 
+    })
   });
 };
 
@@ -160,7 +188,7 @@ export const mapAWSError = (error: any): AWSSDKError => {
 export const fromAWSPromise = <A>(promise: Promise<A>): Effect.Effect<A, AWSSDKError> =>
   Effect.tryPromise({
     try: () => promise,
-    catch: mapAWSError
+    catch: (error: unknown) => mapAWSError(error as AWSSDKRawError)
   });
 
 // Retry configuration for AWS operations

@@ -4,7 +4,6 @@ import { Log } from "./effects";
 
 export type Sink = (level: string, message: string | Error, context?: Record<string, unknown>) => void;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop: Sink = () => {};
 
 export class TestLogger implements Log {

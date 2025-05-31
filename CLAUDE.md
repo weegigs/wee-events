@@ -38,7 +38,7 @@ Each package supports these scripts:
 
 ## Architecture
 
-This is a **Lerna monorepo** using **pnpm workspaces** for dependency management and **Nx** for task caching.
+This is a **pnpm workspace monorepo** using **Turbo** for task caching and build orchestration.
 
 ### Package Structure
 - `packages/core` - Core event system and domain types
@@ -52,7 +52,8 @@ This is a **Lerna monorepo** using **pnpm workspaces** for dependency management
 ### Key Technologies
 - **TypeScript** with strict configuration
 - **Effect-TS** for functional programming patterns (mentioned in README as potential alternative)
-- **Lerna** for monorepo management
+- **Turbo** for monorepo task orchestration and caching
+- **pnpm workspaces** for dependency management
 - **Jest** for testing with ts-jest preset
 - **ESLint** with TypeScript and Prettier configurations
 - **DynamoDB** for event storage
@@ -61,9 +62,34 @@ This is a **Lerna monorepo** using **pnpm workspaces** for dependency management
 ### Build Dependencies
 - Packages have `^build` dependencies ensuring proper build order
 - Tests depend on `^compile` to ensure compilation before testing
-- Nx caches `compile`, `test`, and `lint` operations
+- Turbo caches `compile`, `test`, and `lint` operations
 
-### Testing
+## Testing
 - Tests use `.spec.ts` or `.test.ts` extensions
 - Jest configuration excludes `lib/`, `node_modules/`, and `tools/` from coverage
 - Some packages generate coverage reports in HTML format
+
+### Test Failure Analysis Protocol:
+- NEVER update snapshots without understanding WHY they changed
+- ALWAYS investigate the root cause when tests that should pass are failing
+- ALWAYS investigate the root cause when tests that should fail are passing
+- When validation tests show "expected X to fail" errors, this means validation logic is broken, not that snapshots need updating
+- Snapshot changes often indicate regressions or broken functionality, not valid updates
+- Ask yourself: "Should this test outcome be different?" before accepting any test changes
+
+### Quality Verification Standards:
+- Read and understand test assertions before declaring success
+- Verify that test failures make logical sense in context
+- Question any test that passes when it logically should fail
+- Don't declare builds "successful" based solely on exit codes - analyze the actual test results
+- When tests expect errors but get different errors, investigate the logic, don't update expectations
+
+### Build Success Criteria:
+- All tests passing AND behaving as logically expected
+- No test failures masked by snapshot updates
+- No broken validation logic accepted as "working"
+- Performance improvements that don't break functionality
+
+## Project Conventions
+- We use pnpm and never npm
+- Remember to use the native pnpm commands when updating and manipulating packages rather than editing the package file directly

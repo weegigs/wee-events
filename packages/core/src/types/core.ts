@@ -8,9 +8,7 @@ export type List = Primitive[] | Payload[] | List[];
 
 export namespace Payload {
   const primitive = z.union([z.string(), z.number(), z.boolean()]);
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const list: z.Schema<List> = z.lazy(() => z.union([z.array(primitive), z.array(payload), z.array(list)]));
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const value: z.Schema<Value> = z.lazy(() => z.union([primitive, list, payload]));
   const payload: z.Schema<Payload> = z.lazy(() => z.record(value));
 

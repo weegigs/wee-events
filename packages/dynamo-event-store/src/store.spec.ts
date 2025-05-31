@@ -58,11 +58,17 @@ describe("dynamo store", () => {
   let client: DynamoDBDocumentClient;
 
   beforeAll(async () => {
-    dbc = await new GenericContainer("amazon/dynamodb-local").withExposedPorts(8000).start();
+    dbc = await new GenericContainer("amazon/dynamodb-local")
+      .withExposedPorts(8000)
+      .withCommand(["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"])
+      .start();
     const dynamo = new DynamoDBClient({
       endpoint: `http://${dbc.getHost()}:${dbc.getMappedPort(8000)}`,
-      credentials: { accessKeyId: "fake-key", secretAccessKey: "fake-secret" },
-      region: "us-east-1",
+      credentials: { 
+        accessKeyId: "test", 
+        secretAccessKey: "test" 
+      },
+      region: "us-east-1"
     });
 
     const create = new CreateTableCommand({

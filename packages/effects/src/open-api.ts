@@ -12,6 +12,7 @@ import { ServiceDescription } from "./service/service";
 
 extendZodWithOpenApi(z);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const spec = <S extends Payload>(service: ServiceDescription<any, any, S>): string => {
   const {
     entity: { name },
@@ -23,7 +24,7 @@ export const spec = <S extends Payload>(service: ServiceDescription<any, any, S>
   const registry = new OpenAPIRegistry();
   const commands = service.commands();
 
-  z.intersection;
+  // z.intersection;
 
   const $resource = registry.register(
     "Resource",

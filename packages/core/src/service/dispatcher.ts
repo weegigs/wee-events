@@ -63,12 +63,16 @@ export interface DespatcherDescription<R extends Environment, S extends State> {
 
 export namespace DespatcherDescription {
   class Factory<R extends Environment, S extends State> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private handlers: Record<string, { schema: z.Schema<any>; handler: Handler<any, S, any> }> = {};
 
     constructor(
       path: string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       schema: z.Schema<any>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       handler: Handler<R, S, any>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       existing: Record<string, { schema: z.Schema<any>; handler: Handler<any, S, any> }> = {}
     ) {
       this.handlers = {

@@ -1,5 +1,5 @@
 import { Effect, Layer, Queue, Deferred, Runtime, Fiber } from "effect";
-import { pipe } from "effect/Function";
+import { pipe, identity } from "effect/Function";
 
 import middy from "@middy/core";
 import dontWait from "@middy/do-not-wait-for-empty-event-loop";
@@ -54,7 +54,7 @@ export const create = <R, E, I, O>(handler: EventHandler<R, E, I, O>) => {
     );
   });
 
-  const _handler = middy(run as any).use(dontWait()) as Handler<I, O>;
+  const _handler = middy(run as Handler<I, O>).use(dontWait()) as Handler<I, O>;
 
   return { handler: _handler, main: _main };
 };
@@ -85,7 +85,7 @@ export function run<R, E, I, O>(
       }
       return Effect.logError("Lambda handler error", cause);
     }),
-    options.timeout ? Effect.timeout(options.timeout) : (x: any) => x
+    options.timeout ? Effect.timeout(options.timeout) : identity
   );
 
   // Start the process engine with proper error handling

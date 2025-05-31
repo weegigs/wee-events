@@ -23,35 +23,35 @@ export function create<R extends Environment, S extends State>(
     const service = description.service(store, environment);
     const et = description.info().entity.type;
 
-    const get = (id: AggregateId) => {
+    const get = async (id: AggregateId) => {
       try {
-        return service.load(id);
+        return await service.load(id);
       } catch (e) {
         if (e instanceof EntityNotAvailableError) {
-          return new errors.NotFound(e.message);
+          throw new errors.NotFound(e.message);
         }
 
-        return errorMapper(e);
+        throw errorMapper(e);
       }
     };
 
-    const execute = (path: string, target: AggregateId, command: Command) => {
+    const execute = async (path: string, target: AggregateId, command: Command) => {
       try {
-        return service.execute(path, target, command);
+        return await service.execute(path, target, command);
       } catch (e) {
         if (e instanceof EntityNotAvailableError) {
-          return new errors.NotFound(e.message);
+          throw new errors.NotFound(e.message);
         }
 
         if (e instanceof CommandValidationError) {
-          return new errors.BadRequest(e.message);
+          throw new errors.BadRequest(e.message);
         }
 
         if (e instanceof HandlerNotFound) {
-          return new errors.InternalServerError(e.message);
+          throw new errors.InternalServerError(e.message);
         }
 
-        return errorMapper(e);
+        throw errorMapper(e);
       }
     };
     type Id = {
@@ -63,7 +63,7 @@ export function create<R extends Environment, S extends State>(
     app.get<{ Params: Id }>(`/${et}/:id`, async (req, _res) => {
       const id = { type: et, key: req.params.id as string };
 
-      return get(id);
+      return await get(id);
     });
 
     for (const [command, schema] of _.toPairs(description.commands())) {
@@ -71,9 +71,9 @@ export function create<R extends Environment, S extends State>(
         const id = { type: et, key: req.params.id as string };
         const payload = schema.safeParse(req.body);
         if (!payload.success) {
-          return new errors.BadRequest(payload.error.message);
+          throw new errors.BadRequest(payload.error.message);
         }
-        return execute(command, id, payload.data);
+        return await execute(command, id, payload.data);
       });
     }
 

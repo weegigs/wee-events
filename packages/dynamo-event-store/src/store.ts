@@ -24,6 +24,7 @@ import {
   AggregateId,
   ExpectedRevisionConflictError,
   RevisionConflictError,
+  Payload,
 } from "@weegigs/events-core";
 
 export namespace DynamoEventStore {
@@ -217,12 +218,12 @@ export class DynamoEventStore implements EventStore {
     const recorded: RecordedEvent[] = await Promise.all(
       events
         .map((event) => {
-          // Validate that the event has the basic DomainEvent structure
-          const genericDomainEventSchema = z.object({
-            type: z.string(),
-            data: z.record(z.any())
+          // Validate that the event has the proper DomainEvent structure
+          const domainEventSchema = z.object({
+            type: z.string().min(1),
+            data: Payload.schema
           });
-          return genericDomainEventSchema.parse(event);
+          return domainEventSchema.parse(event);
         })
         .map((event) =>
           this.$encoder(aggregate, event, _.pick(options, "correlationId", "causationId"), encrypt ?? false)

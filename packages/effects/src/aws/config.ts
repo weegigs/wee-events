@@ -1,4 +1,4 @@
-import { Layer, Context, Config, Effect, Option } from "effect";
+import { Layer, Context, Config, Effect, Option, ConfigError } from "effect";
 
 // Common AWS configuration interface
 export interface AWSCredentials {
@@ -28,7 +28,7 @@ export interface EventBridgeConfig extends AWSConfig, ServiceConfig {}
 export interface StepFunctionsConfig extends AWSConfig, ServiceConfig {}
 
 // Helper to create AWS config from environment
-const makeAWSConfig = (): Effect.Effect<AWSConfig, any> =>
+const makeAWSConfig = (): Effect.Effect<AWSConfig, ConfigError.ConfigError> =>
   Effect.gen(function* () {
     const region = yield* Config.option(Config.string("AWS_REGION"));
     const maxAttempts = yield* Config.option(Config.integer("AWS_MAX_ATTEMPTS"));
@@ -98,7 +98,7 @@ export const mergeConfig = <T extends ServiceConfig>(
 
 // Helper to create AWS client configuration from our config
 export const toClientConfig = (config: AWSConfig & ServiceConfig) => {
-  const clientConfig: Record<string, any> = {};
+  const clientConfig: Record<string, unknown> = {};
   
   if (config.region) clientConfig.region = config.region;
   if (config.endpoint) clientConfig.endpoint = config.endpoint;

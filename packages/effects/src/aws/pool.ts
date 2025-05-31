@@ -63,16 +63,16 @@ const makePool = <A>(
 };
 
 // Pool tags for dependency injection
-export interface CloudWatchPool extends Pool.Pool<CloudWatchClient> {}
+export type CloudWatchPool = Pool.Pool<CloudWatchClient>;
 export const CloudWatchPool = Context.GenericTag<CloudWatchPool>("CloudWatchPool");
 
-export interface DynamoDBPool extends Pool.Pool<DynamoDBClient> {}
+export type DynamoDBPool = Pool.Pool<DynamoDBClient>;
 export const DynamoDBPool = Context.GenericTag<DynamoDBPool>("DynamoDBPool");
 
-export interface EventBridgePool extends Pool.Pool<EventBridgeClient> {}
+export type EventBridgePool = Pool.Pool<EventBridgeClient>;
 export const EventBridgePool = Context.GenericTag<EventBridgePool>("EventBridgePool");
 
-export interface StepFunctionsPool extends Pool.Pool<SFNClient> {}
+export type StepFunctionsPool = Pool.Pool<SFNClient>;
 export const StepFunctionsPool = Context.GenericTag<StepFunctionsPool>("StepFunctionsPool");
 
 // Layer factories for pooled clients

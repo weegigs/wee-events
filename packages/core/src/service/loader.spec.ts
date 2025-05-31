@@ -51,7 +51,7 @@ describe("loaders", () => {
   const tid = { type: "test", key: "1" };
   const added = (amount: number): RecordedEvent<Added> => {
     const id = ulid();
-    const timestamp = DateTime.fromMillis(decodeTime(id)).toISO()!;
+    const timestamp = DateTime.fromMillis(decodeTime(id)).toISO() ?? new Date().toISOString();
 
     return {
       id,
@@ -65,7 +65,7 @@ describe("loaders", () => {
   };
   const subtracted = (amount: number): RecordedEvent<Subtracted> => {
     const id = ulid();
-    const timestamp = DateTime.fromMillis(decodeTime(id)).toISO()!;
+    const timestamp = DateTime.fromMillis(decodeTime(id)).toISO() ?? new Date().toISOString();
 
     return {
       id,

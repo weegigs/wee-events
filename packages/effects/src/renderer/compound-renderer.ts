@@ -14,7 +14,8 @@ export namespace CompoundRenderer {
       pipe(
         renderer(entity),
         Effect.flatMap((r) => r(entity))
-      ) as any
-    );
+      )
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ) as any;
   };
 }
