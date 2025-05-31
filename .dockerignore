@@ -1,0 +1,39 @@
+# Build artifacts
+**/lib/
+**/node_modules/
+**/.build/
+**/dist/
+**/coverage/
+
+# Cache files
+**/.eslintcache
+**/tsconfig.tsbuildinfo
+**/.turbo/
+**/.nx/
+
+# Development files
+**/*.spec.ts
+**/*.test.ts
+**/*.md
+!README.md
+
+# Git and IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Logs
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Temporary files
+**/tmp/
+**/temp/

@@ -15,17 +15,21 @@
     "clean": "pnpm exec rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
     "compile": "pnpm exec swc src --out-dir lib --extensions .ts --ignore '**/*.spec.ts' '**/*.test.ts' --strip-leading-paths -C module.type=commonjs && pnpm exec tsc --emitDeclarationOnly",
     "test": "pnpm exec jest --passWithNoTests",
-    "lint": "pnpm exec eslint \"src/**/*.ts\" --cache"
+    "test:docker": "pnpm exec jest src/sample/docker.spec.ts --testTimeout=600000 --no-coverage --testPathIgnorePatterns='nothing'",
+    "lint": "pnpm exec eslint \"src/**/*.ts\" --cache --ignore-pattern \"src/sample/docker.spec.ts\""
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.2",
     "@effect-ts/core": "^0.60.5",
-    "@fastify/sensible": "^5.2.0",
+    "@fastify/sensible": "^6.0.3",
+    "@scalar/fastify-api-reference": "^1.31.2",
     "@weegigs/events-core": "workspace:^",
-    "fastify": "^4.17.0",
+    "fastify": "^5.3.3",
     "http-errors": "^2.0.0",
     "lodash": "^4.17.21",
-    "ts-pattern": "^4.3.0",
-    "zod": "^3.25.41"
+    "openapi3-ts": "^4.1.2",
+    "ts-pattern": "^5.7.1",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@swc/jest": "^0.2.29",
@@ -34,6 +38,7 @@
     "@types/lodash": "^4.14.194",
     "@types/node": "^22.15.0",
     "jest": "^29.7.0",
+    "testcontainers": "^9.6.0",
     "typescript": "^5.8.3"
   },
   "publishConfig": {
@@ -57,10 +62,14 @@
       "**/*.spec.ts",
       "**/*.test.ts"
     ],
+    "testPathIgnorePatterns": [
+      "src/sample/docker.spec.ts"
+    ],
     "collectCoverage": true,
     "coverageReporters": [
       "html"
-    ]
+    ],
+    "testTimeout": 600000
   },
   "prettier": {
     "printWidth": 120,

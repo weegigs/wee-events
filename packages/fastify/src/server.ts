@@ -14,12 +14,24 @@ import {
   State,
 } from "@weegigs/events-core";
 
+import { createOpenAPIGenerator } from "./openapi";
+
+// Server options
+export interface ServerOptions {
+  openAPI?: boolean;           // Default: true
+  errorMapper?: (error: unknown) => errors.HttpError;   // Default: standard mapper
+}
+
 export function create<R extends Environment, S extends State>(
   description: ServiceDescription<R, S>,
-  errorMapper: (error: unknown) => errors.HttpError = (e) =>
-    new errors.InternalServerError(e instanceof Error ? e.message : `${e}`)
+  options?: ServerOptions
 ) {
-  return (store: EventStore, environment: Omit<R, "publish">): fast.FastifyInstance => {
+  const {
+    openAPI = true,
+    errorMapper = (e: unknown) => new errors.InternalServerError(e instanceof Error ? e.message : `${e}`)
+  } = options || {};
+
+  return async (store: EventStore, environment: Omit<R, "publish">): Promise<fast.FastifyInstance> => {
     const service = description.service(store, environment);
     const et = description.info().entity.type;
 
@@ -30,7 +42,6 @@ export function create<R extends Environment, S extends State>(
         if (e instanceof EntityNotAvailableError) {
           throw new errors.NotFound(e.message);
         }
-
         throw errorMapper(e);
       }
     };
@@ -42,27 +53,66 @@ export function create<R extends Environment, S extends State>(
         if (e instanceof EntityNotAvailableError) {
           throw new errors.NotFound(e.message);
         }
-
         if (e instanceof CommandValidationError) {
           throw new errors.BadRequest(e.message);
         }
-
         if (e instanceof HandlerNotFound) {
           throw new errors.InternalServerError(e.message);
         }
-
         throw errorMapper(e);
       }
     };
-    type Id = {
-      id: string;
-    };
 
+    type Id = { id: string; };
     const app = fast.fastify();
 
+    // Register OpenAPI documentation endpoints if enabled
+    if (openAPI) {
+      const openAPIGenerator = createOpenAPIGenerator(description);
+      const schema = openAPIGenerator.generateOpenAPISchema();
+
+      // Register OpenAPI JSON endpoint
+      app.get('/openapi/schema.json', async (_req, _res) => {
+        return schema;
+      });
+
+      // Register Scalar documentation UI
+      try {
+        const scalarPlugin = await import('@scalar/fastify-api-reference');
+        await app.register(scalarPlugin.default || scalarPlugin, {
+          routePrefix: '/openapi/documentation',
+          configuration: {
+            theme: 'purple',
+            spec: {
+              url: '/openapi/schema.json',
+            },
+            metaData: {
+              title: `${description.info().title || `${_.upperFirst(et)} Service`} API Documentation`,
+              description: description.info().description || `Event-sourced ${et} management service`
+            }
+          }
+        });
+      } catch {
+        // Fallback if Scalar plugin fails to load (e.g., in test environments)
+        app.get('/openapi/documentation', async (_req, res) => {
+          res.type('text/html');
+          return `
+            <!DOCTYPE html>
+            <html>
+              <head><title>API Documentation</title></head>
+              <body>
+                <h1>API Documentation</h1>
+                <p>OpenAPI schema available at <a href="/openapi/schema.json">/openapi/schema.json</a></p>
+              </body>
+            </html>
+          `;
+        });
+      }
+    }
+
+    // Register entity and command endpoints
     app.get<{ Params: Id }>(`/${et}/:id`, async (req, _res) => {
       const id = { type: et, key: req.params.id as string };
-
       return await get(id);
     });
 
@@ -80,3 +130,4 @@ export function create<R extends Environment, S extends State>(
     return app;
   };
 }
+

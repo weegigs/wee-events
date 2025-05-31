@@ -48,6 +48,7 @@ namespace Commands {
 describe("fastify server", () => {
   const id = { key: "test", type: "receipt" };
   const ms = new MemoryStore();
+  let server: FastifyInstance;
 
   const loader = LoaderDescription.fromInitFunction<Receipt>(
     { type: "receipt", schema: Receipt.schema },
@@ -67,8 +68,10 @@ describe("fastify server", () => {
     dispatcher
   );
 
-  const serverFactory = create(description);
-  const server: FastifyInstance = serverFactory(ms, {});
+  beforeAll(async () => {
+    const serverFactory = create(description, { openAPI: false });
+    server = await serverFactory(ms, {});
+  });
 
   beforeEach(() => ms.clear());
 
@@ -131,5 +134,107 @@ describe("fastify server", () => {
     });
 
     expect(response.statusCode).toEqual(500); // Server error due to insufficient funds
+  });
+});
+
+describe("Server with OpenAPI", () => {
+  let ms: MemoryStore;
+  let server: FastifyInstance;
+
+  // Reuse the same service description from the previous test
+  const loader = LoaderDescription.fromInitFunction<Receipt>(
+    { type: "receipt", schema: Receipt.schema },
+    () => ({ total: 0 })
+  )
+    .reducer("added", z.object({ amount: z.number() }), (state, event) => ({ ...state, total: state.total + event.data.amount }))
+    .reducer("deducted", z.object({ amount: z.number() }), (state, event) => ({ ...state, total: state.total - event.data.amount }))
+    .description();
+
+  const dispatcher = DespatcherDescription.handler("add", Commands.Add.schema, Commands.Add.handler)
+    .handler("deduct", Commands.Deduct.schema, Commands.Deduct.handler)
+    .description();
+
+  const serviceDescription = ServiceDescription.create(
+    { title: "receipt", description: "receipt service", version: "1.0.0" },
+    loader,
+    dispatcher
+  );
+
+  beforeEach(async () => {
+    ms = new MemoryStore();
+    // @ts-expect-error - Node16 module resolution requires .js extension for dynamic imports, but Jest resolves .ts correctly
+    const { create } = await import("./server");
+    const serverFactory = create(serviceDescription);
+    server = await serverFactory(ms, {});
+    await server.ready();
+  });
+
+  afterEach(async () => {
+    if (server) {
+      await server.close();
+    }
+  });
+
+  it("should serve OpenAPI schema", async () => {
+    const response = await server.inject({
+      method: "GET",
+      url: "/openapi/schema.json",
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.headers["content-type"]).toMatch(/application\/json/);
+    
+    const schema = JSON.parse(response.body);
+    expect(schema.openapi).toBe("3.1.0");
+    expect(schema.info).toBeDefined();
+    expect(schema.paths).toBeDefined();
+    expect(schema.components).toBeDefined();
+    
+    // Check that our receipt endpoints are documented
+    expect(schema.paths["/receipt/{id}"]).toBeDefined();
+    expect(schema.paths["/receipt/{id}/add"]).toBeDefined();
+    expect(schema.paths["/receipt/{id}/deduct"]).toBeDefined();
+  });
+
+  it("should serve documentation endpoint", async () => {
+    const response = await server.inject({
+      method: "GET",
+      url: "/openapi/documentation",
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(response.headers["content-type"]).toMatch(/text\/html/);
+  });
+
+  it("should work with OpenAPI disabled", async () => {
+    // @ts-expect-error - Node16 module resolution requires .js extension for dynamic imports, but Jest resolves .ts correctly
+    const { create } = await import("./server");
+    const serverFactory = create(serviceDescription, { openAPI: false });
+    const noAPIServer = await serverFactory(ms, {});
+    await noAPIServer.ready();
+
+    try {
+      // Should still serve normal endpoints
+      const entityResponse = await noAPIServer.inject({
+        method: "GET",
+        url: "/receipt/test",
+      });
+      expect(entityResponse.statusCode).toEqual(200);
+
+      // Should not serve OpenAPI endpoints
+      const apiResponse = await noAPIServer.inject({
+        method: "GET",
+        url: "/openapi/schema.json",
+      });
+      expect(apiResponse.statusCode).toEqual(404);
+
+      const docsResponse = await noAPIServer.inject({
+        method: "GET", 
+        url: "/openapi/documentation",
+      });
+      expect(docsResponse.statusCode).toEqual(404);
+    } finally {
+      await noAPIServer.close();
+    }
   });
 });
