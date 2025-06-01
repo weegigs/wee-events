@@ -93,3 +93,4 @@ This is a **pnpm workspace monorepo** using **Turbo** for task caching and build
 ## Project Conventions
 - We use pnpm and never npm
 - Remember to use the native pnpm commands when updating and manipulating packages rather than editing the package file directly
+- We control ALL dependency versions via the pnpm catalogue

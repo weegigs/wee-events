@@ -18,21 +18,21 @@
     "lint": "pnpm exec eslint \"src/**/*.ts\" --cache"
   },
   "peerDependencies": {
-    "@aws-sdk/lib-dynamodb": "^3.179.0",
+    "@aws-sdk/lib-dynamodb": "catalog:",
     "@weegigs/events-core": "workspace:^"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.329.0",
-    "@aws-sdk/lib-dynamodb": "^3.329.0",
+    "@aws-sdk/client-dynamodb": "catalog:",
+    "@aws-sdk/lib-dynamodb": "catalog:",
     "@aws-sdk/smithy-client": "^3.329.0",
-    "@aws-sdk/types": "^3.329.0",
-    "@swc/jest": "^0.2.29",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22.15.0",
+    "@aws-sdk/types": "catalog:",
+    "@swc/jest": "catalog:",
+    "@types/jest": "catalog:",
+    "@types/node": "catalog:",
     "@weegigs/events-core": "workspace:*",
-    "jest": "^29.7.0",
-    "testcontainers": "^9.6.0",
-    "typescript": "^5.8.3"
+    "jest": "catalog:",
+    "testcontainers": "catalog:",
+    "typescript": "catalog:"
   },
   "files": [
     "lib"

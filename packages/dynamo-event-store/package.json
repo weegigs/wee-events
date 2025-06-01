@@ -19,35 +19,35 @@
   },
   "dependencies": {
     "@aws-sdk/service-error-classification": "^3.374.0",
-    "lodash": "^4.17.21",
-    "luxon": "^3.3.0",
-    "ulid": "^2.3.0",
-    "zod": "^3.21.4"
+    "lodash": "catalog:",
+    "luxon": "catalog:",
+    "ulid": "catalog:",
+    "zod": "catalog:"
   },
   "peerDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.821.0",
-    "@aws-sdk/lib-dynamodb": "^3.821.0",
+    "@aws-sdk/client-dynamodb": "catalog:",
+    "@aws-sdk/lib-dynamodb": "catalog:",
     "@weegigs/events-common": "workspace:^",
     "@weegigs/events-core": "workspace:^",
     "@weegigs/events-cypher": "workspace:^"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.821.0",
-    "@aws-sdk/lib-dynamodb": "^3.821.0",
+    "@aws-sdk/client-dynamodb": "catalog:",
+    "@aws-sdk/lib-dynamodb": "catalog:",
     "@aws-sdk/smithy-client": "^3.374.0",
-    "@aws-sdk/types": "^3.821.0",
-    "@tsconfig/node22": "^22.0.0",
-    "@types/jest": "^29.5.14",
-    "@types/lodash": "^4.14.194",
-    "@types/luxon": "^3.3.0",
-    "@types/node": "^22.15.0",
+    "@aws-sdk/types": "catalog:",
+    "@tsconfig/node22": "catalog:",
+    "@types/jest": "catalog:",
+    "@types/lodash": "catalog:",
+    "@types/luxon": "catalog:",
+    "@types/node": "catalog:",
     "@weegigs/events-common": "workspace:*",
     "@weegigs/events-core": "workspace:*",
     "@weegigs/events-cypher": "workspace:*",
-    "jest": "^29.7.0",
-    "testcontainers": "^9.6.0",
-    "@swc/jest": "^0.2.29",
-    "typescript": "^5.8.3"
+    "jest": "catalog:",
+    "testcontainers": "catalog:",
+    "@swc/jest": "catalog:",
+    "typescript": "catalog:"
   },
   "files": [
     "lib"
