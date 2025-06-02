@@ -7,3 +7,13 @@ node = "22.15.1"
 "npm:learna" = "latest"
 "npm:pnpm" = "10.11.0"
 "npm:tsx" = "latest"
+
+[tasks.clean-rebuild]
+description = "Full clean and rebuild of the entire monorepo"
+run = [
+  "pnpm clean",
+  "rm -rf node_modules pnpm-lock.yaml",
+  "find packages tools -name node_modules -type d -exec rm -rf {} + 2>/dev/null || true",
+  "pnpm install",
+  "pnpm build"
+]
