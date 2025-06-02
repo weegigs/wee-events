@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/dynamo-event-store",
-  "version": "0.18.3",
+  "version": "0.18.4",
   "description": "DynamoDB event storage for Wee Events",
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
   "license": "MIT",
@@ -52,7 +52,9 @@
   ],
   "jest": {
     "transform": {
-      "^.+\\.ts$": ["@swc/jest"]
+      "^.+\\.ts$": [
+        "@swc/jest"
+      ]
     },
     "testEnvironment": "node",
     "collectCoverageFrom": [

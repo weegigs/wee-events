@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-core",
-  "version": "0.18.3",
+  "version": "0.18.4",
   "description": "Core Event System",
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
   "license": "MIT",
@@ -39,7 +39,9 @@
   ],
   "jest": {
     "transform": {
-      "^.+\\.ts$": ["@swc/jest"]
+      "^.+\\.ts$": [
+        "@swc/jest"
+      ]
     },
     "testEnvironment": "node",
     "collectCoverageFrom": [
