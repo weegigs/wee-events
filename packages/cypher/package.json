@@ -24,7 +24,6 @@
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "catalog:",
     "@aws-sdk/lib-dynamodb": "catalog:",
-    "@aws-sdk/smithy-client": "^3.329.0",
     "@aws-sdk/types": "catalog:",
     "@swc/jest": "catalog:",
     "@types/jest": "catalog:",

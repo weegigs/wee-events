@@ -6,12 +6,11 @@ import { DynamoDBDocumentClient, QueryCommand, TransactWriteCommand, QueryComman
 
 import { ChangeSet } from "./changeset";
 
-import {
-  isClockSkewError,
-  isRetryableByTrait,
-  isThrottlingError,
-  isTransientError,
-} from "@aws-sdk/service-error-classification";
+// Simple error classification functions to replace deprecated @aws-sdk/service-error-classification
+const isRetryableByTrait = (error: any) => error?.retryable === true;
+const isClockSkewError = (error: any) => error?.name === "ClockSkew";
+const isThrottlingError = (error: any) => error?.name === "ThrottlingException" || error?.name === "ProvisionedThroughputExceededException";
+const isTransientError = (error: any) => error?.name === "ServiceUnavailable" || error?.name === "InternalServerError";
 
 import { retry } from "@weegigs/events-common";
 import { Cypher, Tokenizer, no } from "@weegigs/events-cypher";

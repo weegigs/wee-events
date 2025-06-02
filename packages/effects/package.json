@@ -49,7 +49,6 @@
     "@aws-sdk/client-eventbridge": "catalog:",
     "@aws-sdk/client-sfn": "catalog:",
     "@aws-sdk/lib-dynamodb": "catalog:",
-    "@aws-sdk/smithy-client": "^3.374.0",
     "@aws-sdk/types": "catalog:",
     "effect": "catalog:",
     "@effect/platform": "catalog:",
