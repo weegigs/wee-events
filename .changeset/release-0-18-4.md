@@ -1,14 +1,14 @@
 ---
-"@weegigs/events-common": minor
-"@weegigs/events-core": minor
-"@weegigs/events-cypher": minor
-"@weegigs/dynamo-event-store": minor
-"@weegigs/events-effects": minor
-"@weegigs/events-fastify": minor
-"@weegigs/events-tools": minor
+"@weegigs/events-common": patch
+"@weegigs/events-core": patch
+"@weegigs/events-cypher": patch
+"@weegigs/dynamo-event-store": patch
+"@weegigs/events-effects": patch
+"@weegigs/events-fastify": patch
+"@weegigs/events-tools": patch
 ---
 
-Release v0.19.0: Complete dependency modernization and code quality improvements
+Release v0.18.4: Complete dependency modernization and code quality improvements
 
 This release completes a comprehensive dependency modernization effort across all packages:
 
