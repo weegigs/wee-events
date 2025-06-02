@@ -6,11 +6,33 @@ import { DynamoDBDocumentClient, QueryCommand, TransactWriteCommand, QueryComman
 
 import { ChangeSet } from "./changeset";
 
+// AWS error type definitions
+interface AWSError extends Error {
+  name: string;
+  retryable?: boolean;
+  CancellationReasons?: Array<{ Code?: string }>;
+}
+
 // Simple error classification functions to replace deprecated @aws-sdk/service-error-classification
-const isRetryableByTrait = (error: any) => error?.retryable === true;
-const isClockSkewError = (error: any) => error?.name === "ClockSkew";
-const isThrottlingError = (error: any) => error?.name === "ThrottlingException" || error?.name === "ProvisionedThroughputExceededException";
-const isTransientError = (error: any) => error?.name === "ServiceUnavailable" || error?.name === "InternalServerError";
+const isRetryableByTrait = (error: unknown): error is AWSError => {
+  const awsError = error as AWSError;
+  return awsError?.retryable === true;
+};
+
+const isClockSkewError = (error: unknown): error is AWSError => {
+  const awsError = error as AWSError;
+  return awsError?.name === "ClockSkew";
+};
+
+const isThrottlingError = (error: unknown): error is AWSError => {
+  const awsError = error as AWSError;
+  return awsError?.name === "ThrottlingException" || awsError?.name === "ProvisionedThroughputExceededException";
+};
+
+const isTransientError = (error: unknown): error is AWSError => {
+  const awsError = error as AWSError;
+  return awsError?.name === "ServiceUnavailable" || awsError?.name === "InternalServerError";
+};
 
 import { retry } from "@weegigs/events-common";
 import { Cypher, Tokenizer, no } from "@weegigs/events-cypher";
@@ -84,13 +106,15 @@ function latestCondition(changeset: ChangeSet, expectedVersion?: string) {
   };
 }
 
-const isRetryableError = (error: unknown) => {
-  return isRetryableByTrait(error as any) || isClockSkewError(error as any) || isThrottlingError(error as any) || isTransientError(error as any);
+const isRetryableError = (error: unknown): boolean => {
+  return isRetryableByTrait(error) || isClockSkewError(error) || isThrottlingError(error) || isTransientError(error);
 };
 
-const isConditionCheckFailed = (error: unknown) =>
-  (error as any)?.name === "TransactionCanceledException" &&
-  (error as any).CancellationReasons?.[0]?.Code === "ConditionalCheckFailed";
+const isConditionCheckFailed = (error: unknown): error is AWSError => {
+  const awsError = error as AWSError;
+  return awsError?.name === "TransactionCanceledException" &&
+    awsError.CancellationReasons?.[0]?.Code === "ConditionalCheckFailed";
+};
 
 export class DynamoEventStore implements EventStore {
   private readonly $client: DynamoDBDocumentClient;
@@ -111,8 +135,8 @@ export class DynamoEventStore implements EventStore {
     key: string,
     decrypt: boolean,
     _after?: Revision,
-    cursor: any = undefined
-  ): Promise<{ events: RecordedEvent[]; next: any }> => {
+    cursor?: Record<string, unknown>
+  ): Promise<{ events: RecordedEvent[]; next?: Record<string, unknown> }> => {
     const query = new QueryCommand({
       TableName: this.$table,
       ScanIndexForward: true,
@@ -138,11 +162,19 @@ export class DynamoEventStore implements EventStore {
 
     const events: RecordedEvent[][] = await Promise.all(
       (Items ?? [])
-        .map((item: any) => ChangeSet.schema.parse(item))
+        .map((item: Record<string, unknown>) => ChangeSet.schema.parse(item))
         .map((changeSet) => this.$decoder(changeSet, decrypt))
     );
 
-    return { events: events.flat(), next: LastEvaluatedKey };
+    const result: { events: RecordedEvent[]; next?: Record<string, unknown> } = {
+      events: events.flat()
+    };
+    
+    if (LastEvaluatedKey) {
+      result.next = LastEvaluatedKey as Record<string, unknown>;
+    }
+    
+    return result;
   };
 
   load = async (aggregate: AggregateId, options: EventStore.LoadOptions = {}): Promise<RecordedEvent[]> => {
@@ -150,7 +182,7 @@ export class DynamoEventStore implements EventStore {
     const { decrypt, afterRevision: after } = { decrypt: false, ...options };
 
     let events: RecordedEvent[] = [];
-    let cursor: any | undefined = undefined;
+    let cursor: Record<string, unknown> | undefined = undefined;
     do {
       const { events: page, next } = await retry(
         () => this.$read(key, decrypt, after, cursor),
@@ -183,10 +215,7 @@ export class DynamoEventStore implements EventStore {
           if (!_.isError(e)) {
             return false;
           }
-          if (
-            e.name === "TransactionCanceledException" &&
-            (e as any).CancellationReasons?.[0]?.Code === "ConditionalCheckFailed"
-          ) {
+          if (isConditionCheckFailed(e)) {
             return expectedRevision === undefined;
           }
 
