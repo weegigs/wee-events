@@ -7,8 +7,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This project uses **mise** for tool version management. The `.mise.toml` file defines:
 - **Node.js**: v22.15.1 (automatically activated when entering project directory)
 - **pnpm**: Latest version for package management
-- **Claude Code**: Latest version for AI assistance
-- **Lerna**: Latest version for monorepo management
 
 ### mise Commands
 - `mise install` - Install all tools defined in .mise.toml
@@ -90,7 +88,40 @@ This is a **pnpm workspace monorepo** using **Turbo** for task caching and build
 - No broken validation logic accepted as "working"
 - Performance improvements that don't break functionality
 
+## Task Completion Standards
+
+### NEVER Declare Completion When:
+- **Compilation Errors Exist**: Any TypeScript errors must be resolved before claiming success
+- **Tests Are Failing**: All tests must pass before declaring a task complete
+- **Linting Errors Present**: ESLint errors must be fixed before completion
+- **Build Processes Fail**: `pnpm build`, `pnpm test`, `pnpm lint` must all succeed
+
+### Verification Process:
+1. **Always run compilation**: Use `pnpm build` or `tsc --noEmit` to verify no TypeScript errors
+2. **Always run tests**: Use `pnpm test` to ensure all tests pass
+3. **Always run linting**: Use `pnpm lint` to verify code quality standards
+4. **Analyze error output**: Don't just check exit codes - read and understand error messages
+5. **Fix root causes**: Think deeply and address underlying issues, don't mask symptoms
+
+### Before Claiming Success:
+- [ ] No TypeScript compilation errors
+- [ ] All tests passing with logical results
+- [ ] No ESLint warnings or errors
+- [ ] Build process completes successfully
+- [ ] Code changes implement the intended functionality
+
+### Red Flags That Indicate Incomplete Work:
+- "Command failed with exit code 2" or similar compilation failures
+- Test failures or "FAIL" messages in test output
+- ESLint errors or warnings
+- Missing imports or exports
+- Type errors or `any` type usage
+- Incomplete function implementations
+
+**Remember**: A task is only complete when the code compiles, tests pass, and meets quality standards.
+
 ## Project Conventions
 - We use pnpm and never npm
 - Remember to use the native pnpm commands when updating and manipulating packages rather than editing the package file directly
 - We control ALL dependency versions via the pnpm catalogue
+- Always use the versions for the pnpm catalogue
