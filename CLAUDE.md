@@ -125,3 +125,4 @@ This is a **pnpm workspace monorepo** using **Turbo** for task caching and build
 - Remember to use the native pnpm commands when updating and manipulating packages rather than editing the package file directly
 - We control ALL dependency versions via the pnpm catalogue
 - Always use the versions for the pnpm catalogue
+- Always add a newline at the end of files
