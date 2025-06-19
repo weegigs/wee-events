@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { description, receiptErrorMapper } from "./receipts";
 import { MemoryStore } from "@weegigs/events-core/lib";
 import { create } from "../index";
@@ -8,7 +9,9 @@ describe("receipts sample", () => {
   it("should create a valid service description", () => {
     const info = description.info();
     expect(info.title).toBe("Receipt Service");
-    expect(info.description).toBe("A sample receipt management service demonstrating event sourcing patterns with modular architecture");
+    expect(info.description).toBe(
+      "A sample receipt management service demonstrating event sourcing patterns with modular architecture"
+    );
     expect(info.version).toBe("1.0.0");
   });
 
@@ -32,7 +35,7 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       expect(server).toBeDefined();
       expect(typeof server.listen).toBe("function");
@@ -45,13 +48,13 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       const response = await server.inject({
         method: "GET",
-        url: "/receipt/test-receipt"
+        url: "/receipt/test-receipt",
       });
-      
+
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.state.status).toBe("open");
@@ -67,14 +70,14 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       const response = await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/add-item",
-        payload: { name: "Coffee", price: 5.99, quantity: 2 }
+        payload: { name: "Coffee", price: 5.99, quantity: 2 },
       });
-      
+
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.state.total).toBe(11.98);
@@ -89,22 +92,22 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       // Add an item first
       await server.inject({
-        method: "POST", 
+        method: "POST",
         url: "/receipt/test-receipt/add-item",
-        payload: { name: "Coffee", price: 5.99, quantity: 1 }
+        payload: { name: "Coffee", price: 5.99, quantity: 1 },
       });
-      
+
       // Then finalize
       const response = await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/finalize",
-        payload: {}
+        payload: {},
       });
-      
+
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.state.status).toBe("closed");
@@ -117,22 +120,22 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       // Add an item first
       await server.inject({
         method: "POST",
-        url: "/receipt/test-receipt/add-item", 
-        payload: { name: "Coffee", price: 5.99, quantity: 1 }
+        url: "/receipt/test-receipt/add-item",
+        payload: { name: "Coffee", price: 5.99, quantity: 1 },
       });
-      
+
       // Then void the receipt
       const response = await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/void-receipt",
-        payload: { reason: "Customer changed mind" }
+        payload: { reason: "Customer changed mind" },
       });
-      
+
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.state.status).toBe("voided");
@@ -145,28 +148,28 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       // Add item and finalize receipt
       await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/add-item",
-        payload: { name: "Coffee", price: 5.99, quantity: 1 }
+        payload: { name: "Coffee", price: 5.99, quantity: 1 },
       });
-      
+
       await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/finalize",
-        payload: {}
+        payload: {},
       });
-      
+
       // Try to add another item to closed receipt
       const response = await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/add-item",
-        payload: { name: "Tea", price: 3.99, quantity: 1 }
+        payload: { name: "Tea", price: 3.99, quantity: 1 },
       });
-      
+
       expect(response.statusCode).toBe(400);
     } finally {
       await server.close();
@@ -177,28 +180,28 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       // Add item and void receipt
       await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/add-item",
-        payload: { name: "Coffee", price: 5.99, quantity: 1 }
+        payload: { name: "Coffee", price: 5.99, quantity: 1 },
       });
-      
+
       await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/void-receipt",
-        payload: { reason: "Test void" }
+        payload: { reason: "Test void" },
       });
-      
+
       // Try to add another item to voided receipt
       const response = await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/add-item",
-        payload: { name: "Tea", price: 3.99, quantity: 1 }
+        payload: { name: "Tea", price: 3.99, quantity: 1 },
       });
-      
+
       expect(response.statusCode).toBe(400);
     } finally {
       await server.close();
@@ -209,15 +212,15 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       // Try to remove an item that doesn't exist
       const response = await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/remove-item",
-        payload: { name: "NonExistentItem" }
+        payload: { name: "NonExistentItem" },
       });
-      
+
       expect(response.statusCode).toBe(400);
     } finally {
       await server.close();
@@ -228,15 +231,15 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       // Try to finalize an empty receipt
       const response = await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/finalize",
-        payload: {}
+        payload: {},
       });
-      
+
       expect(response.statusCode).toBe(400);
     } finally {
       await server.close();
@@ -247,28 +250,28 @@ describe("receipts sample", () => {
     const store = new MemoryStore();
     const serverFactory = create(description, { openAPI: false, errorMapper: receiptErrorMapper });
     const server = await serverFactory(store, {});
-    
+
     try {
       // Add item and void receipt
       await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/add-item",
-        payload: { name: "Coffee", price: 5.99, quantity: 1 }
+        payload: { name: "Coffee", price: 5.99, quantity: 1 },
       });
-      
+
       await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/void-receipt",
-        payload: { reason: "First void" }
+        payload: { reason: "First void" },
       });
-      
+
       // Try to void the already voided receipt
       const response = await server.inject({
         method: "POST",
         url: "/receipt/test-receipt/void-receipt",
-        payload: { reason: "Second void attempt" }
+        payload: { reason: "Second void attempt" },
       });
-      
+
       expect(response.statusCode).toBe(400);
     } finally {
       await server.close();

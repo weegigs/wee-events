@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`dynamo store encryption should tokenize the content of encrypted events 1`] = `
+exports[`dynamo store > encryption > should tokenize the content of encrypted events 1`] = `
 {
   "array": [
     "array.0:one",
@@ -15,7 +15,7 @@ exports[`dynamo store encryption should tokenize the content of encrypted events
 }
 `;
 
-exports[`dynamo store event publishing rejects events with invalid data 1`] = `
+exports[`dynamo store > event publishing > rejects events with invalid data 1`] = `
 [ZodError: [
   {
     "code": "invalid_union",
@@ -165,7 +165,7 @@ exports[`dynamo store event publishing rejects events with invalid data 1`] = `
 ]]
 `;
 
-exports[`dynamo store event publishing rejects events with invalid type 1`] = `
+exports[`dynamo store > event publishing > rejects events with invalid type 1`] = `
 [ZodError: [
   {
     "code": "too_small",

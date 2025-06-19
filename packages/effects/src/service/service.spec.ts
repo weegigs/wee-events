@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from "vitest";
 import _ from "lodash";
 
 import { Effect, Exit, Layer, pipe, Cause } from "effect";
@@ -66,15 +67,10 @@ describe("describe receipt service", () => {
 
     const program = pipe(
       update,
-      Effect.provide(
-        Layer.mergeAll(
-          Layer.succeed(store.EventLoader, ms),
-          Layer.succeed(store.EventPublisher, ms)
-        )
-      )
+      Effect.provide(Layer.mergeAll(Layer.succeed(store.EventLoader, ms), Layer.succeed(store.EventPublisher, ms)))
     );
     const exit = await Effect.runPromiseExit(program);
-    
+
     expect(Exit.isFailure(exit)).toBe(true);
     if (Exit.isFailure(exit)) {
       const failure = Cause.failureOption(exit.cause);
@@ -91,15 +87,10 @@ describe("describe receipt service", () => {
 
     const program = pipe(
       update,
-      Effect.provide(
-        Layer.mergeAll(
-          Layer.succeed(store.EventLoader, ms),
-          Layer.succeed(store.EventPublisher, ms)
-        )
-      )
+      Effect.provide(Layer.mergeAll(Layer.succeed(store.EventLoader, ms), Layer.succeed(store.EventPublisher, ms)))
     );
     const exit = await Effect.runPromiseExit(program);
-    
+
     expect(Exit.isFailure(exit)).toBe(true);
     if (Exit.isFailure(exit)) {
       const failure = Cause.failureOption(exit.cause);
@@ -116,12 +107,7 @@ describe("describe receipt service", () => {
 
     const program = pipe(
       update,
-      Effect.provide(
-        Layer.mergeAll(
-          Layer.succeed(store.EventLoader, ms),
-          Layer.succeed(store.EventPublisher, ms)
-        )
-      )
+      Effect.provide(Layer.mergeAll(Layer.succeed(store.EventLoader, ms), Layer.succeed(store.EventPublisher, ms)))
     );
     const result = await Effect.runPromise(program);
 
@@ -135,12 +121,7 @@ describe("describe receipt service", () => {
 
     const program = pipe(
       update,
-      Effect.provide(
-        Layer.mergeAll(
-          Layer.succeed(store.EventLoader, ms),
-          Layer.succeed(store.EventPublisher, ms)
-        )
-      )
+      Effect.provide(Layer.mergeAll(Layer.succeed(store.EventLoader, ms), Layer.succeed(store.EventPublisher, ms)))
     );
     const result = await Effect.runPromise(program);
 
@@ -155,16 +136,11 @@ describe("describe receipt service", () => {
     const update = receipts.service.execute("deduct", id, { amount: 15 });
     const program = pipe(
       update,
-      Effect.provide(
-        Layer.mergeAll(
-          Layer.succeed(store.EventLoader, ms),
-          Layer.succeed(store.EventPublisher, ms)
-        )
-      )
+      Effect.provide(Layer.mergeAll(Layer.succeed(store.EventLoader, ms), Layer.succeed(store.EventPublisher, ms)))
     );
 
     const exit = await Effect.runPromiseExit(program);
-    
+
     expect(Exit.isFailure(exit)).toBe(true);
     if (Exit.isFailure(exit)) {
       const failure = Cause.failureOption(exit.cause);

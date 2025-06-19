@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import _ from "lodash";
 
 import { range } from "@weegigs/events-common";
@@ -6,12 +7,9 @@ import { Cypher, Tokenizer } from "@weegigs/events-cypher";
 import { CreateTableCommand, DynamoDBClient, DescribeTableCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { DomainEvent, Payload, Revision, AggregateId, Errors } from "@weegigs/events-core";
-import { GenericContainer, StartedTestContainer } from "testcontainers";
+import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
 
 import { DynamoEventStore } from "./store";
-
-// it takes time to spin the containers up
-jest.setTimeout(100000);
 
 const sampleEvent: DomainEvent = {
   type: "test:test-event",
@@ -61,14 +59,20 @@ describe("dynamo store", () => {
     dbc = await new GenericContainer("amazon/dynamodb-local")
       .withExposedPorts(8000)
       .withCommand(["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"])
+      .withWaitStrategy(Wait.forListeningPorts())
+      .withStartupTimeout(15000)
       .start();
+
+    // Add small delay for DynamoDB to fully initialize
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const dynamo = new DynamoDBClient({
       endpoint: `http://${dbc.getHost()}:${dbc.getMappedPort(8000)}`,
-      credentials: { 
-        accessKeyId: "test", 
-        secretAccessKey: "test" 
+      credentials: {
+        accessKeyId: "test",
+        secretAccessKey: "test",
       },
-      region: "us-east-1"
+      region: "us-east-1",
     });
 
     const create = new CreateTableCommand({
@@ -102,7 +106,7 @@ describe("dynamo store", () => {
         removeUndefinedValues: true,
       },
     });
-  });
+  }, 45000); // it takes time to spin the containers up
 
   afterAll(async () => {
     await dbc.stop();
@@ -146,7 +150,9 @@ describe("dynamo store", () => {
         });
         throw new Error("expected publish to fail");
       } catch (e: unknown) {
-        expect((e as Error).message).toEqual("revision did not match the expected revision of 00000000000000000000000000");
+        expect((e as Error).message).toEqual(
+          "revision did not match the expected revision of 00000000000000000000000000"
+        );
         expect((e as Error & { name: string }).name).toEqual("expected-revision-conflict");
         expect(Errors.isExpectedRevisionConflict(e)).toBeTruthy();
       }

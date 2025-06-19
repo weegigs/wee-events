@@ -1,12 +1,10 @@
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { CreateTableCommand, DescribeTableCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { GenericContainer, StartedTestContainer } from "testcontainers";
-//import { startDb, stopDb, createTables, deleteTables } from "jest-dynalite";
+import { GenericContainer, type StartedTestContainer } from "testcontainers";
 
 import { RSACypher } from "../cypher";
 import { DynamoKeySource } from "./dynamodb";
-
-jest.setTimeout(10000000);
 
 const TableName = "test-table";
 
@@ -21,11 +19,11 @@ describe("dynamo key source", () => {
       .start();
     const dynamo = new DynamoDBClient({
       endpoint: `http://${dbc.getHost()}:${dbc.getMappedPort(8000)}`,
-      credentials: { 
-        accessKeyId: "test", 
-        secretAccessKey: "test" 
+      credentials: {
+        accessKeyId: "test",
+        secretAccessKey: "test",
       },
-      region: "us-east-1"
+      region: "us-east-1",
     });
 
     const create = new CreateTableCommand({
@@ -59,7 +57,7 @@ describe("dynamo key source", () => {
         removeUndefinedValues: true,
       },
     });
-  });
+  }, 100000); // Set a generous timeout for this hook
 
   afterAll(async () => {
     await dbc.stop();

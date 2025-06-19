@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`dispatcher should allow a dispatcher to be created with a single handler 1`] = `
+exports[`dispatcher > should allow a dispatcher to be created with a single handler 1`] = `
 {
   "counter.1": [
     {
@@ -13,7 +13,7 @@ exports[`dispatcher should allow a dispatcher to be created with a single handle
 }
 `;
 
-exports[`dispatcher should allow a dispatcher to be created with multiple handlers 1`] = `
+exports[`dispatcher > should allow a dispatcher to be created with multiple handlers 1`] = `
 {
   "counter.1": [
     {

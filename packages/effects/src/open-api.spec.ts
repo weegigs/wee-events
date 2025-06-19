@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import * as api from "./open-api";
 import * as receipts from "./service/sample/receipts";
 

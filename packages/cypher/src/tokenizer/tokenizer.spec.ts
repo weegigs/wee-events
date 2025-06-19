@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { Payload } from "@weegigs/events-core";
 
 import { TokenizeFunction, Tokenizer } from "./types";

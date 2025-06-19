@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`tokenizer should tokenize a payload with nested lists 1`] = `
+exports[`tokenizer > should tokenize a payload with nested lists 1`] = `
 {
   "nested": [
     {
@@ -17,7 +17,7 @@ exports[`tokenizer should tokenize a payload with nested lists 1`] = `
 }
 `;
 
-exports[`tokenizer should tokenize a payload with nested payloads 1`] = `
+exports[`tokenizer > should tokenize a payload with nested payloads 1`] = `
 {
   "nested": {
     "boolean": true,
@@ -27,7 +27,7 @@ exports[`tokenizer should tokenize a payload with nested payloads 1`] = `
 }
 `;
 
-exports[`tokenizer should tokenize a payload with simple values 1`] = `
+exports[`tokenizer > should tokenize a payload with simple values 1`] = `
 {
   "boolean": false,
   "number": 1649953809,

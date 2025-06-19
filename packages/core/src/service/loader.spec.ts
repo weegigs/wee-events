@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from "vitest";
 import { DateTime } from "luxon";
 import { decodeTime, monotonicFactory } from "ulid";
 import { z } from "zod";
@@ -41,10 +42,10 @@ namespace Subtracted {
 }
 
 describe("loaders", () => {
-  const load = jest.fn();
+  const load = vi.fn();
 
   const store: EventStore = {
-    publish: jest.fn(),
+    publish: vi.fn(),
     load,
   };
 

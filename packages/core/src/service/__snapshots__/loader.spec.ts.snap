@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`loaders with init function should return an initialized entity if no events are available 1`] = `
+exports[`loaders > with init function > should return an initialized entity if no events are available 1`] = `
 {
   "aggregate": {
     "key": "1",

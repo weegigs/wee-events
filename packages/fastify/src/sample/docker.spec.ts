@@ -1,4 +1,5 @@
-import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { GenericContainer, type StartedTestContainer, Wait } from "testcontainers";
 import path from "path";
 
 describe("Docker Container Integration", () => {
@@ -6,17 +7,21 @@ describe("Docker Container Integration", () => {
   let baseUrl: string;
 
   beforeAll(async () => {
-    // Build context should be the repo root for monorepo build
-    const buildContext = path.resolve(__dirname, "../../../../..");
-    const dockerfilePath = path.resolve(buildContext, "Dockerfile");
+    // The build context is the root of the monorepo, where `pnpm test` is executed.
+    const buildContext = path.resolve(process.cwd());
 
-    console.log("Building Docker image from monorepo root...");
+    // The Dockerfile is located at the root of the build context.
+    const dockerfilePath = "Dockerfile"; // Relative path from context
+
+    console.log(`[Fastify Docker Test] Build context: ${buildContext}`);
+    console.log(`[Fastify Docker Test] Dockerfile path: ${path.join(buildContext, dockerfilePath)}`);
+
     // Build the image targeting the fastify-sample stage
     const image = await GenericContainer.fromDockerfile(buildContext, dockerfilePath)
       .withTarget("fastify-sample")
       .build();
-    
-    console.log("Starting container...");
+
+    console.log("[Fastify Docker Test] Starting container...");
     // Then create container from the built image
     container = await new GenericContainer(image)
       .withExposedPorts(3000)
@@ -28,7 +33,7 @@ describe("Docker Container Integration", () => {
     const port = container.getMappedPort(3000);
     baseUrl = `http://${host}:${port}`;
 
-    console.log(`Container started at ${baseUrl}`);
+    console.log(`[Fastify Docker Test] Container started at ${baseUrl}`);
   }, 600000); // 10 minutes timeout for container startup
 
   afterAll(async () => {
@@ -40,14 +45,14 @@ describe("Docker Container Integration", () => {
   it("should respond to health check", async () => {
     const response = await fetch(`${baseUrl}/healthz`);
     expect(response.status).toBe(200);
-    
-    const body = await response.json() as { status: string; timestamp: string };
+
+    const body = (await response.json()) as { status: string; timestamp: string };
     expect(body.status).toBe("healthy");
     expect(body.timestamp).toBeDefined();
   });
 
   it("should serve OpenAPI documentation", async () => {
-    const response = await fetch(`${baseUrl}/openapi/documentation`);
+    const response = await fetch(`${baseUrl}/openapi`);
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toMatch(/text\/html/);
   });
@@ -56,8 +61,8 @@ describe("Docker Container Integration", () => {
     const response = await fetch(`${baseUrl}/openapi/schema.json`);
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toMatch(/application\/json/);
-    
-    const schema = await response.json() as {
+
+    const schema = (await response.json()) as {
       openapi: string;
       info: unknown;
       paths: Record<string, unknown>;
@@ -65,7 +70,7 @@ describe("Docker Container Integration", () => {
     expect(schema.openapi).toBe("3.1.0");
     expect(schema.info).toBeDefined();
     expect(schema.paths).toBeDefined();
-    
+
     // Check that receipt endpoints are documented
     expect(schema.paths["/receipt/{id}"]).toBeDefined();
     expect(schema.paths["/receipt/{id}/add-item"]).toBeDefined();
@@ -80,8 +85,8 @@ describe("Docker Container Integration", () => {
     // Get initial state (should create empty receipt)
     const getResponse = await fetch(`${baseUrl}/receipt/${receiptId}`);
     expect(getResponse.status).toBe(200);
-    
-    const initialState = await getResponse.json() as {
+
+    const initialState = (await getResponse.json()) as {
       state: { status: string; total: number; items: unknown[] };
     };
     expect(initialState.state.status).toBe("open");
@@ -95,14 +100,14 @@ describe("Docker Container Integration", () => {
       body: JSON.stringify({
         name: "Test Coffee",
         price: 4.99,
-        quantity: 2
-      })
+        quantity: 2,
+      }),
     });
-    
+
     expect(addResponse.status).toBe(200);
-    const addedState = await addResponse.json() as {
-      state: { 
-        total: number; 
+    const addedState = (await addResponse.json()) as {
+      state: {
+        total: number;
         items: Array<{ name: string; price: number; quantity: number }>;
       };
     };
@@ -114,11 +119,11 @@ describe("Docker Container Integration", () => {
     const finalizeResponse = await fetch(`${baseUrl}/receipt/${receiptId}/finalize`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({})
+      body: JSON.stringify({}),
     });
-    
+
     expect(finalizeResponse.status).toBe(200);
-    const finalizedState = await finalizeResponse.json() as {
+    const finalizedState = (await finalizeResponse.json()) as {
       state: { status: string };
     };
     expect(finalizedState.state.status).toBe("closed");
@@ -131,9 +136,9 @@ describe("Docker Container Integration", () => {
     const response = await fetch(`${baseUrl}/receipt/${receiptId}/finalize`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({})
+      body: JSON.stringify({}),
     });
-    
+
     expect(response.status).toBe(400);
   });
 
@@ -145,11 +150,11 @@ describe("Docker Container Integration", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: "Test Item"
+        name: "Test Item",
         // Missing required fields: price, quantity
-      })
+      }),
     });
-    
+
     expect(response.status).toBe(400);
   });
 });
