@@ -11,12 +11,11 @@
     "url": "https://github.com/weegigs/wee-events.git"
   },
   "scripts": {
-    "build": "pnpm clean && pnpm lint && pnpm compile && pnpm test",
-    "clean": "pnpm exec rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
-    "compile": "pnpm exec swc src --out-dir lib --extensions .ts --ignore '**/*.spec.ts' '**/*.test.ts' --strip-leading-paths -C module.type=commonjs && pnpm exec tsc --emitDeclarationOnly",
-    "test": "pnpm exec jest --passWithNoTests",
-    "test:docker": "pnpm exec jest src/sample/docker.spec.ts --testTimeout=600000 --no-coverage --testPathIgnorePatterns='nothing'",
-    "lint": "pnpm exec eslint \"src/**/*.ts\" --cache --ignore-pattern \"src/sample/docker.spec.ts\""
+    "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
+    "compile": "tsc --build",
+    "test": "vitest run --passWithNoTests",
+    "test:docker": "vitest run src/sample/docker.spec.ts",
+    "lint": "eslint \"src/**/*.ts\" --cache --ignore-pattern \"src/sample/docker.spec.ts\""
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "catalog:",
@@ -24,6 +23,7 @@
     "@fastify/sensible": "catalog:",
     "@scalar/fastify-api-reference": "catalog:",
     "@weegigs/events-core": "workspace:^",
+    "ajv": "catalog:",
     "fastify": "catalog:",
     "http-errors": "catalog:",
     "lodash": "catalog:",
@@ -32,14 +32,14 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@swc/jest": "catalog:",
+    "@tsconfig/node24": "catalog:",
     "@types/http-errors": "catalog:",
-    "@types/jest": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
-    "jest": "catalog:",
+    "rimraf": "catalog:",
     "testcontainers": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "publishConfig": {
     "access": "public"
@@ -47,30 +47,6 @@
   "files": [
     "lib"
   ],
-  "jest": {
-    "transform": {
-      "^.+\\.ts$": [
-        "@swc/jest"
-      ]
-    },
-    "testEnvironment": "node",
-    "collectCoverageFrom": [
-      "**/*.{ts,tsx}",
-      "!**/node_modules/**"
-    ],
-    "testMatch": [
-      "**/*.spec.ts",
-      "**/*.test.ts"
-    ],
-    "testPathIgnorePatterns": [
-      "src/sample/docker.spec.ts"
-    ],
-    "collectCoverage": true,
-    "coverageReporters": [
-      "html"
-    ],
-    "testTimeout": 600000
-  },
   "prettier": {
     "printWidth": 120,
     "trailingComma": "es5"

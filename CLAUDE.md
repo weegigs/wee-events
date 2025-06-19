@@ -5,38 +5,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Tool Management
 
 This project uses **mise** for tool version management. The `.mise.toml` file defines:
-- **Node.js**: v22.15.1 (automatically activated when entering project directory)
-- **pnpm**: Latest version for package management
+- **Node.js**: v24.2.0 (automatically activated when entering project directory)
+- **pnpm**: latest for package management and script execution
 
 ### mise Commands
 - `mise install` - Install all tools defined in .mise.toml
 - `mise current` - Show currently activated tool versions
-- `mise use node@22.15.1` - Update Node.js version
-- `mise use npm:pnpm@latest` - Update pnpm version
+- `mise use node@24.2.0` - Update Node.js version
+- `mise use pnpm@latest` - Update pnpm version
 
 ## Development Commands
 
 ### Build and Test
-- `pnpm install` - Install dependencies (uses frozen lockfile)
-- `pnpm build` - Build all packages using Lerna
-- `pnpm test` - Compile and run Jest tests with coverage
-- `pnpm lint` - Run ESLint across all packages
-- `pnpm compile` - Compile TypeScript without running tests
+- `pnpm install --frozen-lockfile` - Install dependencies (uses frozen lockfile)
+- `pnpm run build` - Build all packages
+- `pnpm run test` - Compile and run Jest tests with coverage
+- `pnpm run lint` - Run ESLint across all packages
+- `pnpm run compile` - Compile TypeScript without running tests
 
 ### Cleaning and Maintenance
-- `pnpm clean` - Clean all packages recursively
-- `pnpm fix:typescript-references` - Fix TypeScript project references
-- `pnpm prepublish` - Clean and build (runs before publish)
+- `pnpm run clean` - Clean all packages recursively
+- `pnpm run fix:typescript-references` - Fix TypeScript project references
+- `pnpm run prepublish` - Clean and build (runs before publish)
 
 ### Individual Package Commands
 Each package supports these scripts:
-- `pnpm exec --filter <package-name> build` - Build specific package
-- `pnpm exec --filter <package-name> test` - Test specific package
-- `pnpm exec --filter <package-name> lint` - Lint specific package
+- `pnpm run --filter <package-name> build` - Build specific package
+- `pnpm run --filter <package-name> test` - Test specific package
+- `pnpm run --filter <package-name> lint` - Lint specific package
 
 ## Architecture
 
-This is a **pnpm workspace monorepo** using **Turbo** for task caching and build orchestration.
+This is a **pnpm workspace monorepo** using **pnpm** for package management and script execution.
 
 ### Package Structure
 - `packages/core` - Core event system and domain types
@@ -64,6 +64,8 @@ This is a **pnpm workspace monorepo** using **Turbo** for task caching and build
 
 ## Testing
 - Tests use `.spec.ts` or `.test.ts` extensions
+- **Tests are co-located with source files** in the same directory structure (not in separate `tests/` directories)
+- **Prefer testcontainers over mocks** - Use real dependencies (databases, message brokers, etc.) in Docker containers rather than mocks to avoid testing assumptions
 - Jest configuration excludes `lib/`, `node_modules/`, and `tools/` from coverage
 - Some packages generate coverage reports in HTML format
 
@@ -94,12 +96,12 @@ This is a **pnpm workspace monorepo** using **Turbo** for task caching and build
 - **Compilation Errors Exist**: Any TypeScript errors must be resolved before claiming success
 - **Tests Are Failing**: All tests must pass before declaring a task complete
 - **Linting Errors Present**: ESLint errors must be fixed before completion
-- **Build Processes Fail**: `pnpm build`, `pnpm test`, `pnpm lint` must all succeed
+- **Build Processes Fail**: `pnpm run build`, `pnpm run test`, `pnpm run lint` must all succeed
 
 ### Verification Process:
-1. **Always run compilation**: Use `pnpm build` or `tsc --noEmit` to verify no TypeScript errors
-2. **Always run tests**: Use `pnpm test` to ensure all tests pass
-3. **Always run linting**: Use `pnpm lint` to verify code quality standards
+1. **Always run compilation**: Use `pnpm run build` or `tsc --noEmit` to verify no TypeScript errors
+2. **Always run tests**: Use `pnpm run test` to ensure all tests pass
+3. **Always run linting**: Use `pnpm run lint` to verify code quality standards
 4. **Analyze error output**: Don't just check exit codes - read and understand error messages
 5. **Fix root causes**: Think deeply and address underlying issues, don't mask symptoms
 
@@ -121,8 +123,8 @@ This is a **pnpm workspace monorepo** using **Turbo** for task caching and build
 **Remember**: A task is only complete when the code compiles, tests pass, and meets quality standards.
 
 ## Project Conventions
-- We use pnpm and never npm
+- We use pnpm and never npm or bun
 - Remember to use the native pnpm commands when updating and manipulating packages rather than editing the package file directly
-- We control ALL dependency versions via the pnpm catalogue
-- Always use the versions for the pnpm catalogue
+- We control ALL dependency versions via the pnpm workspace catalogue
+- Always use the versions from the workspace catalogue
 - Always add a newline at the end of files

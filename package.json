@@ -5,7 +5,7 @@
   "type": "module",
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
   "private": true,
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@9.7.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/weegigs/wee-events.git"
@@ -13,76 +13,46 @@
   "scripts": {
     "bootstrap": "pnpm install --frozen-lockfile",
     "clean": "turbo run clean",
-    "lint": "turbo run lint",
-    "build": "turbo run build",
-    "compile": "turbo run compile",
-    "test": "turbo run test",
-    "fix": "pnpm fix:typescript-references",
+    "lint": "turbo lint",
+    "build": "turbo build --concurrency=1",
+    "compile": "turbo compile",
+    "test": "turbo test --concurrency=1",
+    "fix": "pnpm run fix:typescript-references",
     "fix:typescript-references": "pnpm dlx @monorepo-utils/workspaces-to-typescript-project-references workspaces-to-typescript-project-references --root --includesRoot",
-    "prepublish": "turbo run clean && turbo run build",
+    "prepublish": "turbo clean && turbo build",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish",
-    "deps:check": "tsx scripts/update-deps.ts check",
-    "deps:verify": "tsx scripts/update-deps.ts verify", 
-    "deps:sync": "tsx scripts/update-deps.ts sync",
+    "release": "turbo build && changeset publish",
+    "deps:check": "pnpm exec ts-node scripts/update-deps.ts check",
+    "deps:verify": "pnpm exec ts-node scripts/update-deps.ts verify",
+    "deps:sync": "pnpm exec ts-node scripts/update-deps.ts sync",
     "deps:outdated": "pnpm outdated",
-    "deps:update": "pnpm update --latest && pnpm install"
+    "deps:update": "pnpm update -r"
   },
   "engines": {
-    "node": ">=22.15.0"
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
   },
-  "pnpm": {},
   "devDependencies": {
     "@changesets/cli": "catalog:",
     "@eslint/js": "catalog:",
-    "@swc/cli": "catalog:",
-    "@swc/core": "catalog:",
-    "@tsconfig/node22": "catalog:",
-    "@types/jest": "catalog:",
+    "@tsconfig/node24": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "jest": "catalog:",
     "lodash": "catalog:",
     "prettier": "catalog:",
     "rimraf": "catalog:",
-    "tsx": "catalog:",
+    "ts-node": "catalog:",
     "turbo": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "prettier": {
     "printWidth": 120,
     "trailingComma": "es5"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "collectCoverage": false,
-    "collectCoverageFrom": [
-      "**/*.{ts,tsx}",
-      "!**/lib/**",
-      "!**/node_modules/**",
-      "!tools/**"
-    ],
-    "testMatch": [
-      "**/*.spec.ts",
-      "**/*.test.ts"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      ".<rootDir>/.build",
-      ".<rootDir>/cdk.out",
-      "<rootDir>/package.json",
-      "<rootDir>tools/"
-    ],
-    "verbose": true
-  },
-  "workspaces": [
-    "packages/*",
-    "tools/*"
-  ]
+  }
 }

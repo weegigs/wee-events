@@ -2,9 +2,22 @@ import _ from "lodash";
 import * as z from "zod";
 
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand, TransactWriteCommand, QueryCommandOutput } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand, TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
+import { retry, handleWhen, ExponentialBackoff } from "cockatiel";
 
 import { ChangeSet } from "./changeset";
+import { Cypher, Tokenizer, no } from "@weegigs/events-cypher";
+
+import {
+  DomainEvent,
+  EventStore,
+  RecordedEvent,
+  Revision,
+  AggregateId,
+  ExpectedRevisionConflictError,
+  RevisionConflictError,
+  Payload,
+} from "@weegigs/events-core";
 
 // AWS error type definitions
 interface AWSError extends Error {
@@ -13,7 +26,7 @@ interface AWSError extends Error {
   CancellationReasons?: Array<{ Code?: string }>;
 }
 
-// Simple error classification functions to replace deprecated @aws-sdk/service-error-classification
+// Simple error classification functions
 const isRetryableByTrait = (error: unknown): error is AWSError => {
   const awsError = error as AWSError;
   return awsError?.retryable === true;
@@ -34,19 +47,49 @@ const isTransientError = (error: unknown): error is AWSError => {
   return awsError?.name === "ServiceUnavailable" || awsError?.name === "InternalServerError";
 };
 
-import { retry } from "@weegigs/events-common";
-import { Cypher, Tokenizer, no } from "@weegigs/events-cypher";
+const isRetryableError = (error: unknown): boolean => {
+  return (
+    _.isError(error) &&
+    (isRetryableByTrait(error) || isClockSkewError(error) || isThrottlingError(error) || isTransientError(error))
+  );
+};
 
-import {
-  DomainEvent,
-  EventStore,
-  RecordedEvent,
-  Revision,
-  AggregateId,
-  ExpectedRevisionConflictError,
-  RevisionConflictError,
-  Payload,
-} from "@weegigs/events-core";
+const isConditionCheckFailed = (error: unknown): error is AWSError => {
+  const awsError = error as AWSError;
+  return (
+    awsError?.name === "TransactionCanceledException" &&
+    awsError.CancellationReasons?.[0]?.Code === "ConditionalCheckFailed"
+  );
+};
+
+// --- Retry Policies ---
+
+const readRetryPolicy = retry(handleWhen(isRetryableError), {
+  maxAttempts: 5,
+  backoff: new ExponentialBackoff({ initialDelay: 50, maxDelay: 1000 }),
+});
+
+const createPublishRetryPolicy = (expectedRevision?: string) =>
+  retry(
+    handleWhen((e: unknown) => {
+      if (!_.isError(e)) {
+        return false;
+      }
+      // If the condition check failed, we only want to retry if we weren't expecting a specific revision.
+      // This handles the "put if not exists" scenario where a concurrent write might have just created the record.
+      if (isConditionCheckFailed(e)) {
+        return expectedRevision === undefined;
+      }
+      // For all other errors, use the standard retryable logic.
+      return isRetryableError(e);
+    }),
+    {
+      maxAttempts: 5,
+      backoff: new ExponentialBackoff({ initialDelay: 50, maxDelay: 1000 }),
+    }
+  );
+
+// --- DynamoEventStore Implementation ---
 
 export namespace DynamoEventStore {
   export interface Options {
@@ -106,16 +149,6 @@ function latestCondition(changeset: ChangeSet, expectedVersion?: string) {
   };
 }
 
-const isRetryableError = (error: unknown): boolean => {
-  return isRetryableByTrait(error) || isClockSkewError(error) || isThrottlingError(error) || isTransientError(error);
-};
-
-const isConditionCheckFailed = (error: unknown): error is AWSError => {
-  const awsError = error as AWSError;
-  return awsError?.name === "TransactionCanceledException" &&
-    awsError.CancellationReasons?.[0]?.Code === "ConditionalCheckFailed";
-};
-
 export class DynamoEventStore implements EventStore {
   private readonly $client: DynamoDBDocumentClient;
   private readonly $table: string;
@@ -152,28 +185,22 @@ export class DynamoEventStore implements EventStore {
       },
     });
 
-    const { Items, LastEvaluatedKey } = await retry(
-      async () => this.$client.send(query),
-      (e: Error | QueryCommandOutput) => {
-        return _.isError(e) ? isRetryableError(e) : false;
-      },
-      { limit: 5, delay: 37 }
-    );
+    const { Items, LastEvaluatedKey } = await readRetryPolicy.execute(() => this.$client.send(query));
 
     const events: RecordedEvent[][] = await Promise.all(
       (Items ?? [])
         .map((item: Record<string, unknown>) => ChangeSet.schema.parse(item))
-        .map((changeSet) => this.$decoder(changeSet, decrypt))
+        .map((changeSet: ChangeSet) => this.$decoder(changeSet, decrypt))
     );
 
     const result: { events: RecordedEvent[]; next?: Record<string, unknown> } = {
-      events: events.flat()
+      events: events.flat(),
     };
-    
+
     if (LastEvaluatedKey) {
       result.next = LastEvaluatedKey as Record<string, unknown>;
     }
-    
+
     return result;
   };
 
@@ -184,10 +211,8 @@ export class DynamoEventStore implements EventStore {
     let events: RecordedEvent[] = [];
     let cursor: Record<string, unknown> | undefined = undefined;
     do {
-      const { events: page, next } = await retry(
-        () => this.$read(key, decrypt, after, cursor),
-        (result) => _.isError(result) && isRetryableError(result)
-      );
+      // The retry policy is now inside the $read method, so we don't need to wrap the call here.
+      const { events: page, next } = await this.$read(key, decrypt, after, cursor);
 
       events = events.concat(page);
       cursor = next;
@@ -207,22 +232,10 @@ export class DynamoEventStore implements EventStore {
     }
 
     const { expectedRevision } = options;
+    const publishRetryPolicy = createPublishRetryPolicy(expectedRevision);
 
     try {
-      return await retry(
-        async (): Promise<Revision> => this.$publish(aggregate, _events, options),
-        (e: Error | Revision) => {
-          if (!_.isError(e)) {
-            return false;
-          }
-          if (isConditionCheckFailed(e)) {
-            return expectedRevision === undefined;
-          }
-
-          return isRetryableError(e);
-        },
-        { limit: 5, delay: 37 }
-      );
+      return await publishRetryPolicy.execute(() => this.$publish(aggregate, _events, options));
     } catch (e: unknown) {
       if (_.isError(e) && isConditionCheckFailed(e)) {
         if (expectedRevision !== undefined) {
@@ -249,7 +262,7 @@ export class DynamoEventStore implements EventStore {
           // Validate that the event has the proper DomainEvent structure
           const domainEventSchema = z.object({
             type: z.string().min(1),
-            data: Payload.schema
+            data: Payload.schema,
           });
           return domainEventSchema.parse(event);
         })

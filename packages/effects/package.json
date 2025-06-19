@@ -9,11 +9,10 @@
     "url": "https://github.com/weegigs/wee-events.git"
   },
   "scripts": {
-    "build": "pnpm clean && pnpm lint && pnpm compile && pnpm test",
-    "clean": "pnpm exec rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
-    "compile": "pnpm exec swc src --out-dir lib --extensions .ts --ignore '**/*.spec.ts' '**/*.test.ts' --strip-leading-paths -C module.type=commonjs && pnpm exec tsc --emitDeclarationOnly",
-    "test": "pnpm exec jest --passWithNoTests",
-    "lint": "pnpm exec eslint \"src/**/*.ts\" --cache"
+    "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
+    "compile": "tsc --build",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint \"src/**/*.ts\" --cache"
   },
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
   "license": "MIT",
@@ -53,17 +52,15 @@
     "effect": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-node": "catalog:",
-    "@tsconfig/node22": "catalog:",
+    "@tsconfig/node24": "catalog:",
     "@types/aws-lambda": "catalog:",
-    "@types/jest": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
     "@weegigs/dynamo-event-store": "workspace:*",
     "@weegigs/events-core": "workspace:*",
-    "jest": "catalog:",
-    "@swc/jest": "catalog:",
-    "ts-node": "catalog:",
-    "typescript": "catalog:"
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "publishConfig": {
     "access": "public"
@@ -71,26 +68,6 @@
   "files": [
     "lib"
   ],
-  "jest": {
-    "transform": {
-      "^.+\\.ts$": [
-        "@swc/jest"
-      ]
-    },
-    "testEnvironment": "node",
-    "collectCoverageFrom": [
-      "**/*.{ts,tsx}",
-      "!**/node_modules/**"
-    ],
-    "testMatch": [
-      "**/*.spec.ts",
-      "**/*.test.ts"
-    ],
-    "collectCoverage": false,
-    "coverageReporters": [
-      "html"
-    ]
-  },
   "prettier": {
     "printWidth": 120,
     "trailingComma": "es5"

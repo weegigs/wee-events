@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
+  "extends": "@tsconfig/node24/tsconfig.json",
   "compilerOptions": {
     "composite": true,
     "isolatedModules": true,
@@ -20,14 +20,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": [
-    "scripts/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules/**/*",
-    ".build/**/*",
-    ".vscode/**/*"
-  ],
+  "include": ["scripts/**/*.ts"],
+  "exclude": ["node_modules/**/*", ".build/**/*", ".vscode/**/*"],
   "references": [
     {
       "path": "packages/common"
@@ -46,6 +40,9 @@
     },
     {
       "path": "packages/fastify"
+    },
+    {
+      "path": "packages/nats"
     },
     {
       "path": "tools/events"

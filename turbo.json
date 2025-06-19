@@ -7,21 +7,16 @@
     },
     "compile": {
       "dependsOn": ["^compile"],
-      "outputs": ["lib/**", "tsconfig.tsbuildinfo"]
+      "outputs": ["lib/**"]
     },
     "test": {
-      "dependsOn": ["compile"],
-      "outputs": ["coverage/**"]
+      "dependsOn": ["^compile"]
     },
     "lint": {
-      "outputs": [".eslintcache"]
+      "cache": true
     },
     "clean": {
       "cache": false
     }
-  },
-  "globalDependencies": [
-    "tsconfig.json",
-    "jest.config.js"
-  ]
+  }
 }

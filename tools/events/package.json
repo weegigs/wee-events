@@ -11,11 +11,10 @@
     "url": "https://github.com/weegigs/wee-events.git"
   },
   "scripts": {
-    "build": "pnpm clean && pnpm lint && pnpm compile && pnpm test",
-    "clean": "pnpm exec rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
-    "compile": "pnpm exec swc src --out-dir lib --extensions .ts --ignore '**/*.spec.ts' '**/*.test.ts' --strip-leading-paths -C module.type=commonjs && pnpm exec tsc --emitDeclarationOnly",
-    "test": "pnpm exec jest --passWithNoTests",
-    "lint": "pnpm exec eslint \"src/**/*.ts\" --cache"
+    "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
+    "compile": "tsc --build",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint \"src/**/*.ts\" --cache"
   },
   "dependencies": {
     "@effect-ts/core": "catalog:",
@@ -25,36 +24,16 @@
     "lodash": "catalog:"
   },
   "devDependencies": {
-    "@swc/jest": "catalog:",
-    "@types/jest": "catalog:",
+    "@tsconfig/node24": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
-    "jest": "catalog:",
-    "typescript": "catalog:"
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "files": [
     "lib"
   ],
-  "jest": {
-    "transform": {
-      "^.+\\.ts$": [
-        "@swc/jest"
-      ]
-    },
-    "testEnvironment": "node",
-    "collectCoverageFrom": [
-      "**/*.{ts,tsx}",
-      "!**/node_modules/**"
-    ],
-    "testMatch": [
-      "**/*.spec.ts",
-      "**/*.test.ts"
-    ],
-    "collectCoverage": true,
-    "coverageReporters": [
-      "html"
-    ]
-  },
   "prettier": {
     "printWidth": 120,
     "trailingComma": "es5"
