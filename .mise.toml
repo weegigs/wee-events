@@ -3,13 +3,13 @@ _.file = ".env"
 
 [tools]
 pnpm = "latest"
-node = "24.2.0"
+node = "22.15.1"
 
 [tasks.clean-rebuild]
 description = "Full clean and rebuild of the entire monorepo"
 run = [
     "pnpm run clean",
-    "rm -rf node_modules pnpm-lock.yaml",
+    "rm -rf node_modules",
     "find packages tools -name node_modules -type d -exec rm -rf {} + 2>/dev/null || true",
     "pnpm install",
     "pnpm run build",

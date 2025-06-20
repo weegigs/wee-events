@@ -14,7 +14,7 @@
     "bootstrap": "pnpm install --frozen-lockfile",
     "clean": "turbo run clean",
     "lint": "turbo lint",
-    "build": "turbo build --concurrency=1",
+    "build": "turbo build",
     "compile": "turbo compile",
     "test": "turbo test --concurrency=1",
     "fix": "pnpm run fix:typescript-references",
@@ -23,9 +23,6 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo build && changeset publish",
-    "deps:check": "pnpm exec ts-node scripts/update-deps.ts check",
-    "deps:verify": "pnpm exec ts-node scripts/update-deps.ts verify",
-    "deps:sync": "pnpm exec ts-node scripts/update-deps.ts sync",
     "deps:outdated": "pnpm outdated",
     "deps:update": "pnpm update -r"
   },
@@ -36,7 +33,7 @@
   "devDependencies": {
     "@changesets/cli": "catalog:",
     "@eslint/js": "catalog:",
-    "@tsconfig/node24": "catalog:",
+    "@tsconfig/node22": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
     "@typescript-eslint/eslint-plugin": "catalog:",

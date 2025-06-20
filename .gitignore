@@ -12,6 +12,7 @@ cdk.out
 .build
 *.js
 !.eslintrc.js
+!eslint.config.js
 *.js.map
 *.d.ts
 tsconfig.tsbuildinfo

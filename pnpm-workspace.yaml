@@ -22,7 +22,7 @@ catalog:
   "@opentelemetry/instrumentation": "0.202.0"
   "@opentelemetry/sdk-node": "0.202.0"
   "@scalar/fastify-api-reference": "1.31.14"
-  "@tsconfig/node24": "24.0.1"
+  "@tsconfig/node22": "22.0.2"
   "@types/aws-lambda": "8.10.150"
   "@types/http-errors": "2.0.5"
   "@types/lodash": "4.17.18"

@@ -12,6 +12,7 @@
   },
   "scripts": {
     "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
+    "build": "pnpm run lint && pnpm run compile && pnpm run test",
     "compile": "tsc --build",
     "test": "vitest run --passWithNoTests",
     "lint": "eslint \"src/**/*.ts\" --cache"
@@ -21,6 +22,7 @@
     "lodash": "catalog:"
   },
   "devDependencies": {
+    "@tsconfig/node22": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
     "rimraf": "catalog:",

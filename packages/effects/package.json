@@ -10,6 +10,7 @@
   },
   "scripts": {
     "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
+    "build": "pnpm run lint && pnpm run compile && pnpm run test",
     "compile": "tsc --build",
     "test": "vitest run --passWithNoTests",
     "lint": "eslint \"src/**/*.ts\" --cache"
@@ -43,6 +44,7 @@
     "@weegigs/events-core": "workspace:^"
   },
   "devDependencies": {
+    "@tsconfig/node22": "catalog:",
     "@aws-sdk/client-cloudwatch": "catalog:",
     "@aws-sdk/client-dynamodb": "catalog:",
     "@aws-sdk/client-eventbridge": "catalog:",
@@ -52,7 +54,6 @@
     "effect": "catalog:",
     "@effect/platform": "catalog:",
     "@effect/platform-node": "catalog:",
-    "@tsconfig/node24": "catalog:",
     "@types/aws-lambda": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",

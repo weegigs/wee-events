@@ -13,9 +13,10 @@
   "scripts": {
     "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
     "compile": "tsc --build",
+    "build": "pnpm run lint && pnpm run compile && pnpm run test",
     "test": "vitest run --passWithNoTests",
     "test:docker": "vitest run src/sample/docker.spec.ts",
-    "lint": "eslint \"src/**/*.ts\" --cache --ignore-pattern \"src/sample/docker.spec.ts\""
+    "lint": "eslint \"src/**/*.ts\" --cache"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "catalog:",
@@ -32,10 +33,11 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@tsconfig/node24": "catalog:",
+    "@tsconfig/node22": "catalog:",
     "@types/http-errors": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
+    "globals": "^16.2.0",
     "rimraf": "catalog:",
     "testcontainers": "catalog:",
     "typescript": "catalog:",
