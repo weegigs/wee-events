@@ -3,14 +3,14 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["lib/**"]
+      "cache": false
     },
     "compile": {
       "dependsOn": ["^compile"],
       "outputs": ["lib/**"]
     },
     "test": {
-      "dependsOn": ["^compile"]
+      "dependsOn": ["compile"]
     },
     "lint": {
       "cache": true
