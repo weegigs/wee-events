@@ -24,10 +24,11 @@ COPY packages/cypher/package.json ./packages/cypher/
 COPY packages/dynamo-event-store/package.json ./packages/dynamo-event-store/
 COPY packages/effects/package.json ./packages/effects/
 COPY packages/fastify/package.json ./packages/fastify/
+COPY packages/nats/package.json ./packages/nats/
 COPY tools/events/package.json ./tools/events/
 
 # Install all dependencies
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Copy all source code
 COPY packages/ ./packages/
@@ -62,10 +63,11 @@ COPY packages/cypher/package.json ./packages/cypher/
 COPY packages/dynamo-event-store/package.json ./packages/dynamo-event-store/
 COPY packages/effects/package.json ./packages/effects/
 COPY packages/fastify/package.json ./packages/fastify/
+COPY packages/nats/package.json ./packages/nats/
 COPY tools/events/package.json ./tools/events/
 
 # Install production dependencies only
-RUN pnpm install --no-frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod
 
 # Copy built artifacts from builder stage
 COPY --from=builder /app/packages/core/lib/ ./packages/core/lib/
