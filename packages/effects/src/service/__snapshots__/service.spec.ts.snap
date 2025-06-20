@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`describe receipt service should create an entity 1`] = `
+exports[`describe receipt service > should create an entity 1`] = `
 {
   "aggregate": {
     "key": "test",
@@ -14,7 +14,7 @@ exports[`describe receipt service should create an entity 1`] = `
 }
 `;
 
-exports[`describe receipt service should load an empty entity 1`] = `
+exports[`describe receipt service > should load an empty entity 1`] = `
 {
   "aggregate": {
     "key": "test",
@@ -29,7 +29,7 @@ exports[`describe receipt service should load an empty entity 1`] = `
 }
 `;
 
-exports[`describe receipt service should load an empty entity if the aggregate only contains unknown events 1`] = `
+exports[`describe receipt service > should load an empty entity if the aggregate only contains unknown events 1`] = `
 {
   "aggregate": {
     "key": "test",
@@ -44,7 +44,7 @@ exports[`describe receipt service should load an empty entity if the aggregate o
 }
 `;
 
-exports[`describe receipt service should load an entity with existing events 1`] = `
+exports[`describe receipt service > should load an entity with existing events 1`] = `
 {
   "aggregate": {
     "key": "test",
@@ -58,7 +58,7 @@ exports[`describe receipt service should load an entity with existing events 1`]
 }
 `;
 
-exports[`describe receipt service should skip unknown event types 1`] = `
+exports[`describe receipt service > should skip unknown event types 1`] = `
 {
   "aggregate": {
     "key": "test",
@@ -72,7 +72,7 @@ exports[`describe receipt service should skip unknown event types 1`] = `
 }
 `;
 
-exports[`describe receipt service should update an entity 1`] = `
+exports[`describe receipt service > should update an entity 1`] = `
 {
   "aggregate": {
     "key": "test",
@@ -85,3 +85,5 @@ exports[`describe receipt service should update an entity 1`] = `
   "type": "receipt",
 }
 `;
+
+

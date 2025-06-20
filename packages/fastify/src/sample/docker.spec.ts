@@ -7,23 +7,20 @@ describe("Docker Container Integration", () => {
   let baseUrl: string;
 
   beforeAll(async () => {
-    // The build context is the root of the monorepo, where `pnpm test` is executed.
-    const buildContext = path.resolve(process.cwd());
+    // The build context is the root of the monorepo
+    // Navigate up from the current package to the repository root
+    const buildContext = path.resolve(__dirname, "../../../../");
 
     // The Dockerfile is located at the root of the build context.
     const dockerfilePath = "Dockerfile"; // Relative path from context
 
-    console.log(`[Fastify Docker Test] Build context: ${buildContext}`);
-    console.log(`[Fastify Docker Test] Dockerfile path: ${path.join(buildContext, dockerfilePath)}`);
-
     // Build the image targeting the fastify-sample stage
-    const image = await GenericContainer.fromDockerfile(buildContext, dockerfilePath)
+    const builtImage = await GenericContainer.fromDockerfile(buildContext, dockerfilePath)
       .withTarget("fastify-sample")
       .build();
 
-    console.log("[Fastify Docker Test] Starting container...");
     // Then create container from the built image
-    container = await new GenericContainer(image)
+    container = await builtImage
       .withExposedPorts(3000)
       .withWaitStrategy(Wait.forHttp("/healthz", 3000))
       .withStartupTimeout(300000) // 5 minutes for startup
@@ -32,8 +29,6 @@ describe("Docker Container Integration", () => {
     const host = container.getHost();
     const port = container.getMappedPort(3000);
     baseUrl = `http://${host}:${port}`;
-
-    console.log(`[Fastify Docker Test] Container started at ${baseUrl}`);
   }, 600000); // 10 minutes timeout for container startup
 
   afterAll(async () => {

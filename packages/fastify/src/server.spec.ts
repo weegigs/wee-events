@@ -209,11 +209,21 @@ describe("Server with OpenAPI", () => {
   it("should serve documentation endpoint", async () => {
     const response = await server.inject({
       method: "GET",
-      url: "/openapi",
+      url: "/openapi/documentation/",
     });
 
     expect(response.statusCode).toEqual(200);
     expect(response.headers["content-type"]).toMatch(/text\/html/);
+  });
+
+  it("should redirect /openapi to /openapi/documentation", async () => {
+    const response = await server.inject({
+      method: "GET",
+      url: "/openapi",
+    });
+
+    expect(response.statusCode).toEqual(302);
+    expect(response.headers.location).toEqual("/openapi/documentation");
   });
 
   it("should work with OpenAPI disabled", async () => {

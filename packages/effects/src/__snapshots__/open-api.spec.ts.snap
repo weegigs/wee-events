@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`describe service specification should describe valid service specification 1`] = `
+exports[`describe service specification > should describe valid service specification 1`] = `
 "openapi: 3.0.3
 info:
   title: A Sample Receipt Service
@@ -209,3 +209,5 @@ paths:
                 $ref: "#/components/schemas/RateLimit"
 "
 `;
+
+

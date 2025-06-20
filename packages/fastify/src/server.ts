@@ -1,6 +1,7 @@
 import * as fast from "fastify";
 import errors from "http-errors";
 import _ from "lodash";
+import scalarFastifyApiReference from "@scalar/fastify-api-reference";
 
 import {
   AggregateId,
@@ -18,8 +19,8 @@ import { createOpenAPIGenerator } from "./openapi";
 
 // Server options
 export interface ServerOptions {
-  openAPI?: boolean;           // Default: true
-  errorMapper?: (error: unknown) => errors.HttpError;   // Default: standard mapper
+  openAPI?: boolean; // Default: true
+  errorMapper?: (error: unknown) => errors.HttpError; // Default: standard mapper
 }
 
 export function create<R extends Environment, S extends State>(
@@ -28,7 +29,7 @@ export function create<R extends Environment, S extends State>(
 ) {
   const {
     openAPI = true,
-    errorMapper = (e: unknown) => new errors.InternalServerError(e instanceof Error ? e.message : `${e}`)
+    errorMapper = (e: unknown) => new errors.InternalServerError(e instanceof Error ? e.message : `${e}`),
   } = options || {};
 
   return async (store: EventStore, environment: Omit<R, "publish">): Promise<fast.FastifyInstance> => {
@@ -63,7 +64,7 @@ export function create<R extends Environment, S extends State>(
       }
     };
 
-    type Id = { id: string; };
+    type Id = { id: string };
     const app = fast.fastify();
 
     // Register OpenAPI documentation endpoints if enabled
@@ -72,42 +73,27 @@ export function create<R extends Environment, S extends State>(
       const schema = openAPIGenerator.generateOpenAPISchema();
 
       // Register OpenAPI JSON endpoint
-      app.get('/openapi/schema.json', async (_req, _res) => {
+      app.get("/openapi/schema.json", async (_req, _res) => {
         return schema;
       });
 
       // Register Scalar documentation UI
-      try {
-        const scalarPlugin = await import('@scalar/fastify-api-reference');
-        await app.register(scalarPlugin.default || scalarPlugin, {
-          routePrefix: '/openapi/documentation',
-          configuration: {
-            theme: 'purple',
-            spec: {
-              url: '/openapi/schema.json',
-            },
-            metaData: {
-              title: `${description.info().title || `${_.upperFirst(et)} Service`} API Documentation`,
-              description: description.info().description || `Event-sourced ${et} management service`
-            }
-          }
-        });
-      } catch {
-        // Fallback if Scalar plugin fails to load (e.g., in test environments)
-        app.get('/openapi/documentation', async (_req, res) => {
-          res.type('text/html');
-          return `
-            <!DOCTYPE html>
-            <html>
-              <head><title>API Documentation</title></head>
-              <body>
-                <h1>API Documentation</h1>
-                <p>OpenAPI schema available at <a href="/openapi/schema.json">/openapi/schema.json</a></p>
-              </body>
-            </html>
-          `;
-        });
-      }
+      await app.register(scalarFastifyApiReference, {
+        routePrefix: "/openapi/documentation",
+        configuration: {
+          url: "/openapi/schema.json",
+          theme: "purple",
+          metaData: {
+            title: `${description.info().title || `${_.upperFirst(et)} Service`} API Documentation`,
+            description: description.info().description || `Event-sourced ${et} management service`,
+          },
+        },
+      });
+
+      // Add convenience redirect from /openapi to /openapi/documentation
+      app.get("/openapi", async (_req, res) => {
+        res.redirect("/openapi/documentation");
+      });
     }
 
     // Register entity and command endpoints
@@ -130,4 +116,3 @@ export function create<R extends Environment, S extends State>(
     return app;
   };
 }
-
