@@ -31,5 +31,33 @@ export default defineConfig({
      * confusing errors when the source and compiled code are out of sync.
      */
     exclude: ["**/node_modules/**", "**/lib/**", "**/dist/**", "**/build/**"],
+
+    /**
+     * Code coverage configuration
+     */
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "json-summary", "lcov"],
+      reportsDirectory: "./coverage",
+      exclude: [
+        "**/node_modules/**",
+        "**/lib/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/*.spec.ts",
+        "**/*.test.ts",
+        "**/sample/**",
+        "**/types/**",
+        "**/*.d.ts",
+      ],
+      thresholds: {
+        statements: 60,
+        branches: 60,
+        functions: 60,
+        lines: 60,
+      },
+      all: true,
+      skipFull: false,
+    },
   },
 });
