@@ -13,8 +13,10 @@
   "scripts": {
     "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
     "compile": "tsc --build",
-    "build": "pnpm run lint && pnpm run compile && pnpm run test",
+    "build": "pnpm run lint && pnpm run compile && pnpm run test:coverage",
     "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "test:coverage:ui": "vitest --ui --coverage",
     "lint": "eslint \"src/**/*.ts\" --cache"
   },
   "dependencies": {
@@ -32,13 +34,15 @@
     "@weegigs/events-cypher": "workspace:^"
   },
   "devDependencies": {
-    "@tsconfig/node22": "catalog:",
     "@aws-sdk/client-dynamodb": "catalog:",
     "@aws-sdk/lib-dynamodb": "catalog:",
     "@aws-sdk/types": "catalog:",
+    "@tsconfig/node22": "catalog:",
     "@types/lodash": "catalog:",
     "@types/luxon": "catalog:",
     "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "@weegigs/events-common": "workspace:*",
     "@weegigs/events-core": "workspace:*",
     "@weegigs/events-cypher": "workspace:*",

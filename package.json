@@ -5,7 +5,7 @@
   "type": "module",
   "author": "Kevin O'Neill <kevin@oneill.id.au>",
   "private": true,
-  "packageManager": "pnpm@9.7.0",
+  "packageManager": "pnpm@10.2.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/weegigs/wee-events.git"
@@ -19,16 +19,16 @@
     "test": "turbo test --concurrency=1",
     "fix": "pnpm run fix:typescript-references",
     "fix:typescript-references": "pnpm dlx @monorepo-utils/workspaces-to-typescript-project-references workspaces-to-typescript-project-references --root --includesRoot",
-    "prepublish": "turbo clean && turbo build",
+    "prepublish": "turbo build --force",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo build && changeset publish",
-    "deps:outdated": "pnpm outdated",
+    "release": "turbo build --force && changeset publish",
+    "deps:outdated": "pnpm outdated --recursive",
     "deps:update": "pnpm update -r"
   },
   "engines": {
     "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "pnpm": ">=10.2.1"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",

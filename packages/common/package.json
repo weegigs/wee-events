@@ -12,9 +12,11 @@
   },
   "scripts": {
     "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
-    "build": "pnpm run lint && pnpm run compile && pnpm run test",
+    "build": "pnpm run lint && pnpm run compile && pnpm run test:coverage",
     "compile": "tsc --build",
     "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "test:coverage:ui": "vitest --ui --coverage",
     "lint": "eslint \"src/**/*.ts\" --cache"
   },
   "dependencies": {
@@ -25,6 +27,8 @@
     "@tsconfig/node22": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

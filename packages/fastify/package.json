@@ -13,8 +13,10 @@
   "scripts": {
     "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
     "compile": "tsc --build",
-    "build": "pnpm run lint && pnpm run compile && pnpm run test",
+    "build": "pnpm run lint && pnpm run compile && pnpm run test:coverage",
     "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "test:coverage:ui": "vitest --ui --coverage",
     "test:docker": "vitest run src/sample/docker.spec.ts",
     "lint": "eslint \"src/**/*.ts\" --cache"
   },
@@ -37,6 +39,8 @@
     "@types/http-errors": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "globals": "^16.2.0",
     "rimraf": "catalog:",
     "testcontainers": "catalog:",
