@@ -2,6 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ REQUIRED: Read Coding Practices First
+
+**Before beginning any work, all agents MUST:**
+
+1. **Read** the coding practices document: `/docs/coding-practices.md`
+2. **Acknowledge** to the user that you have read and understood the practices
+3. **Apply** these practices throughout your work
+
+**Example acknowledgment:**
+> "I have read and understood the coding practices in `/docs/coding-practices.md`. I will apply these principles including: starting minimal, using domain-specific errors, pre-computing in constructors, validating early, and ensuring strict TypeScript compliance."
+
 ## Tool Management
 
 This project uses **mise** for tool version management. The `.mise.toml` file defines:
