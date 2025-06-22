@@ -1,0 +1,129 @@
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from "vitest";
+import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
+import { connect, NatsConnection } from "@nats-io/transport-node";
+import { MemoryStore } from "@weegigs/events-core";
+import { NatsService } from "./nats-service";
+import { description, Receipt } from "@weegigs/events-fastify/src/sample/receipts";
+
+interface ServiceDiscoveryResponse {
+  name: string;
+  type: string;
+  version?: string;
+  endpoints?: Array<{ subject: string }>;
+  started?: string;
+}
+
+/**
+ * Test to verify NATS microservices subject naming conventions and service discovery
+ */
+describe("NATS Service Discovery", () => {
+  let natsContainer: StartedTestContainer;
+  let natsUrl: string;
+  let connection: NatsConnection;
+  let service: NatsService<Receipt>;
+
+  beforeAll(async () => {
+    // Start NATS server in Docker
+    natsContainer = await new GenericContainer("nats:latest")
+      .withExposedPorts(4222)
+      .withCommand(["-js", "-m", "8222"])
+      .withWaitStrategy(Wait.forLogMessage("Server is ready"))
+      .withStartupTimeout(120000)
+      .start();
+
+    natsUrl = `nats://localhost:${natsContainer.getMappedPort(4222)}`;
+
+    // Add small delay for NATS to fully initialize
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }, 120000);
+
+  afterAll(async () => {
+    if (natsContainer !== undefined) {
+      await natsContainer.stop();
+    }
+  });
+
+  beforeEach(async () => {
+    // Create NATS connection
+    connection = await connect({
+      servers: natsUrl,
+      timeout: 5000,
+      maxReconnectAttempts: 10,
+      reconnectTimeWait: 2000,
+    });
+
+    // Create and start service
+    const store = new MemoryStore();
+    service = await NatsService.create(description).connect(connection, store, {});
+    await service.start();
+
+    // Add delay for service to register
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }, 10000); // 10 second timeout for beforeEach
+
+  afterEach(async () => {
+    if (service !== undefined) {
+      await service.shutdown();
+    }
+    if (connection !== undefined) {
+      await connection.close();
+    }
+  }, 10000); // 10 second timeout for afterEach
+
+  it("should respond to $SRV.PING", async () => {
+    const pingResponse = await connection.request("$SRV.PING", "", { timeout: 1000 });
+    const pingData = pingResponse.json() as ServiceDiscoveryResponse;
+    
+    expect(pingData.name).toBe("receipt");
+    expect(pingData.type).toBe("io.nats.micro.v1.ping_response");
+  });
+
+  it("should respond to $SRV.INFO with service metadata", async () => {
+    const infoResponse = await connection.request("$SRV.INFO", "", { timeout: 1000 });
+    const infoData = infoResponse.json() as ServiceDiscoveryResponse;
+    
+    expect(infoData.name).toBe("receipt");
+    expect(infoData.version).toBe("1.0.0");
+    expect(infoData.endpoints).toHaveLength(5); // 4 commands + 1 fetch
+    
+    // Verify expected endpoints are present with service prefix
+    expect(infoData.endpoints).toBeDefined();
+    const endpointSubjects = infoData.endpoints?.map((ep: { subject: string }) => ep.subject) ?? [];
+    expect(endpointSubjects).toContain("receipt.commands.add-item");
+    expect(endpointSubjects).toContain("receipt.commands.remove-item");
+    expect(endpointSubjects).toContain("receipt.commands.finalize");
+    expect(endpointSubjects).toContain("receipt.commands.void-receipt");
+    expect(endpointSubjects).toContain("receipt.fetch");
+  });
+
+  it("should respond to $SRV.STATS with service statistics", async () => {
+    const statsResponse = await connection.request("$SRV.STATS", "", { timeout: 1000 });
+    const statsData = statsResponse.json() as ServiceDiscoveryResponse;
+    
+    expect(statsData.name).toBe("receipt");
+    expect(statsData.type).toBe("io.nats.micro.v1.stats_response");
+    expect(typeof statsData.started).toBe("string");
+  });
+
+  it("should respond to targeted $SRV.PING.receipt", async () => {
+    const targetedPingResponse = await connection.request("$SRV.PING.receipt", "", { timeout: 1000 });
+    const targetedPingData = targetedPingResponse.json() as ServiceDiscoveryResponse;
+    
+    expect(targetedPingData.name).toBe("receipt");
+  });
+
+  it("should use service-prefixed subject naming pattern", async () => {
+    const infoResponse = await connection.request("$SRV.INFO", "", { timeout: 1000 });
+    const infoData = infoResponse.json() as ServiceDiscoveryResponse;
+    expect(infoData.endpoints).toBeDefined();
+    const endpointSubjects = infoData.endpoints?.map((ep: { subject: string }) => ep.subject) ?? [];
+    
+    // Verify expected endpoints are present with service prefix
+    expect(endpointSubjects).toContain("receipt.commands.add-item");
+    expect(endpointSubjects).toContain("receipt.fetch");
+    
+    // Verify direct endpoints (without service prefix) are NOT present
+    expect(endpointSubjects).not.toContain("commands.add-item");
+    expect(endpointSubjects).not.toContain("fetch");
+  });
+});

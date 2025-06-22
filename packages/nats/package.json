@@ -1,0 +1,64 @@
+{
+  "name": "@weegigs/events-nats",
+  "version": "0.18.4",
+  "author": "Kevin O'Neill <kevin@weegigs.com.au>",
+  "license": "MIT",
+  "description": "NATS service infrastructure based on wee-events",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/weegigs/wee-events.git"
+  },
+  "scripts": {
+    "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
+    "compile": "tsc --build",
+    "build": "pnpm run lint && pnpm run compile && pnpm run test:coverage",
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "test:coverage:ui": "vitest --ui --coverage",
+    "test:docker": "vitest run src/sample/docker.spec.ts",
+    "lint": "cd ../.. && eslint \"packages/nats/src/**/*.ts\" --cache --ignore-pattern \"packages/nats/src/sample/docker.spec.ts\"",
+    "sample:server": "ts-node src/sample/server.ts",
+    "sample:client": "ts-node src/sample/client.ts"
+  },
+  "dependencies": {
+    "@nats-io/nats-core": "catalog:",
+    "@nats-io/services": "catalog:",
+    "@nats-io/transport-node": "catalog:",
+    "@opentelemetry/api": "catalog:",
+    "@opentelemetry/api-logs": "catalog:",
+    "@opentelemetry/exporter-logs-otlp-http": "catalog:",
+    "@opentelemetry/instrumentation": "catalog:",
+    "@opentelemetry/sdk-logs": "catalog:",
+    "@opentelemetry/sdk-node": "catalog:",
+    "@weegigs/events-core": "workspace:^",
+    "cockatiel": "catalog:",
+    "lodash": "catalog:",
+    "ulid": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "catalog:",
+    "@types/lodash": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "@weegigs/events-fastify": "workspace:^",
+    "rimraf": "catalog:",
+    "testcontainers": "catalog:",
+    "ts-node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib"
+  ],
+  "prettier": {
+    "printWidth": 120,
+    "trailingComma": "es5"
+  }
+}
