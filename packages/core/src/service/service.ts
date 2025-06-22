@@ -14,7 +14,8 @@ export type ServiceInfo<S extends Payload> = {
 };
 
 export type Service<S extends State> = {
-  execute: (path: string, target: AggregateId, command: Command) => Promise<Entity<S>>;
+  // TODO: KAO - execute needs to be enhanced with a context for cross cutting concerns like authorization.
+  execute: (name: string, target: AggregateId, command: Command) => Promise<Entity<S>>;
   load: (aggregate: AggregateId) => Promise<Entity<S>>;
 };
 
@@ -30,7 +31,10 @@ export namespace ServiceDescription {
   class TrackingPublisher {
     triggered = false;
 
-    constructor(private store: EventStore, private command: string) {}
+    constructor(
+      private store: EventStore,
+      private command: string
+    ) {}
 
     publish: EventStore.Publisher = async (
       aggregate: AggregateId,

@@ -2,12 +2,12 @@ import * as z from "zod";
 
 import { AggregateId, Payload, Revision } from "./core";
 
-export interface Entity<T extends Payload = Payload> {
+export type Entity<T extends Payload = Payload> = {
   aggregate: AggregateId;
   type: string;
   revision: Revision;
   state: T;
-}
+};
 
 export namespace Entity {
   export const schema = <Type extends string, Data extends z.ZodTypeAny>(type: Type, state: Data) =>

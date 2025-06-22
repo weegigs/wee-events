@@ -18,10 +18,10 @@ import {
 import { createOpenAPIGenerator } from "./openapi";
 
 // Server options
-export interface ServerOptions {
+export type ServerOptions = {
   openAPI?: boolean; // Default: true
   errorMapper?: (error: unknown) => errors.HttpError; // Default: standard mapper
-}
+};
 
 export function create<R extends Environment, S extends State>(
   description: ServiceDescription<R, S>,

@@ -85,5 +85,3 @@ exports[`describe receipt service > should update an entity 1`] = `
   "type": "receipt",
 }
 `;
-
-

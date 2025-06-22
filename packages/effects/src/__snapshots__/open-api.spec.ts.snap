@@ -209,5 +209,3 @@ paths:
                 $ref: "#/components/schemas/RateLimit"
 "
 `;
-
-
