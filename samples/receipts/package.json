@@ -6,8 +6,9 @@
   "scripts": {
     "clean": "rimraf lib tsconfig.tsbuildinfo .eslintcache coverage",
     "compile": "tsc --build",
-    "build": "pnpm run compile",
+    "build": "pnpm run compile && pnpm run test",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:docker": "vitest run **/docker.spec.ts",
     "http:server": "node lib/http/server.js",
     "nats:server": "node lib/nats/server.js",
@@ -18,7 +19,9 @@
     "@weegigs/events-fastify": "workspace:^",
     "@weegigs/events-nats": "workspace:^",
     "http-errors": "catalog:",
-    "@nats-io/transport-node": "catalog:"
+    "@nats-io/transport-node": "catalog:",
+    "zod": "catalog:",
+    "@asteasolutions/zod-to-openapi": "catalog:"
   },
   "devDependencies": {
     "@types/http-errors": "catalog:",
