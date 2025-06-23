@@ -1,6 +1,6 @@
-import { NatsConnection } from "@nats-io/nats-core";
+import { NatsConnection, RequestOptions } from "@nats-io/nats-core";
 import { connect } from "@nats-io/transport-node";
-import { AggregateId, Entity, ServiceDescription, Environment, State, Payload } from "@weegigs/events-core";
+import { AggregateId, Entity, ServiceDescription, Environment, State, Command } from "@weegigs/events-core";
 import { ulid } from "ulid";
 
 import { ExecuteRequest, ExecuteResponse, FetchRequest, FetchResponse } from "../messages";
@@ -39,7 +39,12 @@ export class NatsClient<S extends State = State> {
   /**
    * Execute a command on an aggregate
    */
-  async execute(command: string, aggregateId: AggregateId, payload: Payload): Promise<Entity<S>> {
+  async execute(
+    command: string,
+    aggregateId: AggregateId,
+    payload: Command,
+    options: Pick<RequestOptions, "timeout" | "headers"> = { timeout: 5000 }
+  ): Promise<Entity<S>> {
     // Validate command exists
     if (!(command in this.commands)) {
       throw new UnknownCommandError(command, Object.keys(this.commands));
@@ -68,9 +73,7 @@ export class NatsClient<S extends State = State> {
     };
 
     try {
-      const response = await this.connection.request(subject, JSON.stringify(request), {
-        timeout: 5000,
-      });
+      const response = await this.connection.request(subject, JSON.stringify(request), options);
 
       // Parse response - NATS services automatically throws for error responses
       const data = JSON.parse(new TextDecoder().decode(response.data));
@@ -94,7 +97,10 @@ export class NatsClient<S extends State = State> {
   /**
    * Fetch an entity by aggregate ID
    */
-  async fetch(aggregateId: AggregateId): Promise<Entity<S>> {
+  async fetch(
+    aggregateId: AggregateId,
+    options: Pick<RequestOptions, "timeout" | "headers"> = { timeout: 5000 }
+  ): Promise<Entity<S>> {
     const subject = `${this.type}.fetch`;
 
     const request: FetchRequest.Type = {
@@ -102,9 +108,7 @@ export class NatsClient<S extends State = State> {
     };
 
     try {
-      const response = await this.connection.request(subject, JSON.stringify(request), {
-        timeout: 5000,
-      });
+      const response = await this.connection.request(subject, JSON.stringify(request), options);
 
       // Parse response - NATS services automatically throws for error responses
       const data = JSON.parse(new TextDecoder().decode(response.data));
