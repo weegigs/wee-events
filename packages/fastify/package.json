@@ -17,7 +17,6 @@
     "test": "vitest run --passWithNoTests",
     "test:coverage": "vitest run --coverage --passWithNoTests",
     "test:coverage:ui": "vitest --ui --coverage",
-    "test:docker": "vitest run src/sample/docker.spec.ts",
     "lint": "eslint \"src/**/*.ts\" --cache"
   },
   "dependencies": {

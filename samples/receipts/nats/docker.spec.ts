@@ -2,9 +2,8 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from
 import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
 import { MemoryStore, AggregateId } from "@weegigs/events-core";
 import { connect, NatsConnection } from "@nats-io/transport-node";
-import { NatsClient } from "../client";
-import { NatsService } from "../server";
-import { description, Receipt } from "@weegigs/events-fastify/src/sample/receipts";
+import { NatsClient, NatsService } from "@weegigs/events-nats";
+import { description, Receipt } from "../core/receipts";
 
 describe("Receipt Service NATS Integration Tests", () => {
   let natsContainer: StartedTestContainer;

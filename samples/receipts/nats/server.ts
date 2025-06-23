@@ -1,7 +1,7 @@
 import { MemoryStore } from "@weegigs/events-core";
 import { connect } from "@nats-io/transport-node";
-import { NatsService } from "../server";
-import { description } from "@weegigs/events-fastify/src/sample/receipts";
+import { NatsService } from "@weegigs/events-nats";
+import { description } from "../core/receipts";
 
 async function startServer() {
   const natsUrl = process.env.NATS_URL || "nats://localhost:4222";

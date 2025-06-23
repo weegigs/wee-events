@@ -1,6 +1,7 @@
 packages:
   - "packages/*"
   - "tools/*"
+  - "samples/*"
 
 catalog:
   "@asteasolutions/zod-to-openapi": "7.3.4"

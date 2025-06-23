@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # NATS message broker
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"    # NATS client connections
+      - "8222:8222"    # NATS monitoring
+    command: ["-js", "-m", "8222"]
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8222/varz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Receipt HTTP service (Fastify)
+  receipt-http:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: receipt-http-sample
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Receipt NATS service
+  receipt-nats:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: receipt-nats-sample
+    depends_on:
+      nats:
+        condition: service_healthy
+    environment:
+      - NATS_URL=nats://nats:4222
+    restart: unless-stopped
+
+networks:
+  default:
+    name: receipt-sample-network

@@ -2,7 +2,7 @@ import {
   DespatcherDescription, 
   LoaderDescription, 
   ServiceDescription
-} from "@weegigs/events-core/lib";
+} from "@weegigs/events-core";
 import errors from "http-errors";
 
 // Import types

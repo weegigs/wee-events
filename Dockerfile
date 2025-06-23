@@ -26,6 +26,7 @@ COPY packages/effects/package.json ./packages/effects/
 COPY packages/fastify/package.json ./packages/fastify/
 COPY packages/nats/package.json ./packages/nats/
 COPY tools/events/package.json ./tools/events/
+COPY samples/receipts/package.json ./samples/receipts/
 
 # Install all dependencies
 RUN pnpm install --frozen-lockfile
@@ -33,6 +34,7 @@ RUN pnpm install --frozen-lockfile
 # Copy all source code
 COPY packages/ ./packages/
 COPY tools/ ./tools/
+COPY samples/ ./samples/
 
 # Build stage - compiles everything
 FROM base AS builder
@@ -40,8 +42,8 @@ FROM base AS builder
 # Just compile without linting for Docker build
 RUN pnpm exec turbo compile
 
-# Fastify sample runtime stage
-FROM node:22-alpine AS fastify-sample
+# Receipt HTTP sample runtime stage
+FROM node:22-alpine AS receipt-http-sample
 
 # Install curl for health checks
 RUN apk add --no-cache curl
@@ -65,6 +67,7 @@ COPY packages/effects/package.json ./packages/effects/
 COPY packages/fastify/package.json ./packages/fastify/
 COPY packages/nats/package.json ./packages/nats/
 COPY tools/events/package.json ./tools/events/
+COPY samples/receipts/package.json ./samples/receipts/
 
 # Install production dependencies only
 RUN pnpm install --frozen-lockfile --prod
@@ -74,6 +77,7 @@ COPY --from=builder /app/packages/core/lib/ ./packages/core/lib/
 COPY --from=builder /app/packages/common/lib/ ./packages/common/lib/
 COPY --from=builder /app/packages/effects/lib/ ./packages/effects/lib/
 COPY --from=builder /app/packages/fastify/lib/ ./packages/fastify/lib/
+COPY --from=builder /app/samples/receipts/lib/ ./samples/receipts/lib/
 
 # Expose port
 EXPOSE 3000
@@ -82,11 +86,11 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/healthz || exit 1
 
-# Start the fastify sample server
-CMD ["node", "packages/fastify/lib/sample/server.js"]
+# Start the receipt HTTP server
+CMD ["node", "samples/receipts/lib/http/server.js"]
 
-# NATS sample runtime stage
-FROM node:22-alpine AS nats-sample
+# Receipt NATS sample runtime stage
+FROM node:22-alpine AS receipt-nats-sample
 
 # Install curl for health checks
 RUN apk add --no-cache curl
@@ -110,6 +114,7 @@ COPY packages/effects/package.json ./packages/effects/
 COPY packages/fastify/package.json ./packages/fastify/
 COPY packages/nats/package.json ./packages/nats/
 COPY tools/events/package.json ./tools/events/
+COPY samples/receipts/package.json ./samples/receipts/
 
 # Install production dependencies only
 RUN pnpm install --frozen-lockfile --prod
@@ -120,9 +125,10 @@ COPY --from=builder /app/packages/common/lib/ ./packages/common/lib/
 COPY --from=builder /app/packages/effects/lib/ ./packages/effects/lib/
 COPY --from=builder /app/packages/fastify/lib/ ./packages/fastify/lib/
 COPY --from=builder /app/packages/nats/lib/ ./packages/nats/lib/
+COPY --from=builder /app/samples/receipts/lib/ ./samples/receipts/lib/
 
 # Expose port for NATS communication (if needed)
 EXPOSE 4222
 
-# Start the NATS sample server
-CMD ["node", "packages/nats/lib/sample/server.js"]
+# Start the receipt NATS server
+CMD ["node", "samples/receipts/lib/nats/server.js"]

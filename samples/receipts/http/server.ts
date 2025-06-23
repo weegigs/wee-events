@@ -1,6 +1,6 @@
 import { MemoryStore } from "@weegigs/events-core";
-import { create } from "../index";
-import { description, receiptErrorMapper } from "./receipts";
+import { create } from "@weegigs/events-fastify";
+import { description, receiptErrorMapper } from "../core/receipts";
 
 async function startServer() {
   const store = new MemoryStore();

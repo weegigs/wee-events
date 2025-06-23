@@ -9,14 +9,14 @@ describe("Docker Container Integration", () => {
   beforeAll(async () => {
     // The build context is the root of the monorepo
     // Navigate up from the current package to the repository root
-    const buildContext = path.resolve(__dirname, "../../../../");
+    const buildContext = path.resolve(__dirname, "../../../");
 
     // The Dockerfile is located at the root of the build context.
     const dockerfilePath = "Dockerfile"; // Relative path from context
 
-    // Build the image targeting the fastify-sample stage
+    // Build the image targeting the receipt-http-sample stage
     const builtImage = await GenericContainer.fromDockerfile(buildContext, dockerfilePath)
-      .withTarget("fastify-sample")
+      .withTarget("receipt-http-sample")
       .build();
 
     // Then create container from the built image

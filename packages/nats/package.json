@@ -17,10 +17,7 @@
     "test": "vitest run --passWithNoTests",
     "test:coverage": "vitest run --coverage --passWithNoTests",
     "test:coverage:ui": "vitest --ui --coverage",
-    "test:docker": "vitest run src/sample/docker.spec.ts",
-    "lint": "cd ../.. && eslint \"packages/nats/src/**/*.ts\" --cache --ignore-pattern \"packages/nats/src/sample/docker.spec.ts\"",
-    "sample:server": "ts-node src/sample/server.ts",
-    "sample:client": "ts-node src/sample/client.ts"
+    "lint": "cd ../.. && eslint \"packages/nats/src/**/*.ts\" --cache"
   },
   "dependencies": {
     "@nats-io/nats-core": "catalog:",

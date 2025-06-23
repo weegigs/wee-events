@@ -681,6 +681,46 @@ importers:
         specifier: 'catalog:'
         version: 3.2.4(@types/node@24.0.3)(@vitest/ui@3.2.4)
 
+  samples/receipts:
+    dependencies:
+      '@nats-io/transport-node':
+        specifier: 'catalog:'
+        version: 3.0.2
+      '@weegigs/events-core':
+        specifier: workspace:^
+        version: link:../../packages/core
+      '@weegigs/events-fastify':
+        specifier: workspace:^
+        version: link:../../packages/fastify
+      '@weegigs/events-nats':
+        specifier: workspace:^
+        version: link:../../packages/nats
+      http-errors:
+        specifier: 'catalog:'
+        version: 2.0.0
+    devDependencies:
+      '@types/http-errors':
+        specifier: 'catalog:'
+        version: 2.0.5
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.0.3
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 3.2.4(vitest@3.2.4)
+      rimraf:
+        specifier: 'catalog:'
+        version: 6.0.1
+      testcontainers:
+        specifier: 'catalog:'
+        version: 11.0.3
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@24.0.3)(@vitest/ui@3.2.4)
+
   tools/events:
     dependencies:
       '@effect-ts/core':

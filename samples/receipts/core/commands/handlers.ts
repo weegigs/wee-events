@@ -1,4 +1,4 @@
-import { Entity, Publisher } from "@weegigs/events-core/lib";
+import { Entity, Publisher } from "@weegigs/events-core";
 import { Receipt } from "../types";
 import { AddItem, RemoveItem, Finalize, VoidReceipt } from "./types";
 import { ItemAdded, ItemRemoved, ReceiptFinalized, ReceiptVoided } from "../events/types";

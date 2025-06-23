@@ -1,5 +1,5 @@
-import { NatsClient } from "../client";
-import { description } from "@weegigs/events-fastify/src/sample/receipts";
+import { NatsClient } from "@weegigs/events-nats";
+import { description } from "../core/receipts";
 
 async function runClient() {
   const natsUrl = process.env.NATS_URL || "nats://localhost:4222";

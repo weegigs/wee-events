@@ -1,0 +1,28 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "./",
+    "outDir": "./lib",
+    "composite": true
+  },
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "lib",
+    "node_modules",
+    "**/*.spec.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/core"
+    },
+    {
+      "path": "../../packages/fastify"
+    },
+    {
+      "path": "../../packages/nats"
+    }
+  ]
+}

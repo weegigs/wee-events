@@ -1,4 +1,4 @@
-import { DomainEvent } from "@weegigs/events-core/lib";
+import { DomainEvent } from "@weegigs/events-core";
 import { Receipt } from "../types";
 import { ItemAdded, ItemRemoved, ReceiptFinalized, ReceiptVoided } from "./types";
 
