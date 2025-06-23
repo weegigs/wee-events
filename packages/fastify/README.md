@@ -95,7 +95,7 @@ import { create } from "@weegigs/events-fastify";
 import { 
   ServiceDescription, 
   LoaderDescription, 
-  DespatcherDescription,
+  DispatcherDescription,
   MemoryStore 
 } from "@weegigs/events-core";
 
@@ -117,7 +117,7 @@ const description = ServiceDescription.create(
     { type: "item", schema: ItemSchema },
     () => ({ name: "", quantity: 0, price: 0 })
   ).description(),
-  DespatcherDescription.handler(
+  DispatcherDescription.handler(
     "update", 
     ItemSchema, 
     async (env, entity, command) => {

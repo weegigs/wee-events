@@ -1,5 +1,5 @@
 import { 
-  DespatcherDescription, 
+  DispatcherDescription,
   LoaderDescription, 
   ServiceDescription
 } from "@weegigs/events-core";
@@ -29,7 +29,7 @@ const loader = LoaderDescription.fromInitFunction<Receipt>(
   .description();
 
 // Command dispatcher configuration
-const dispatcher = DespatcherDescription.handler(AddItem.name, AddItem.schema, addItemHandler)
+const dispatcher = DispatcherDescription.handler(AddItem.name, AddItem.schema, addItemHandler)
   .handler(RemoveItem.name, RemoveItem.schema, removeItemHandler)
   .handler(Finalize.name, Finalize.schema, finalizeHandler)
   .handler(VoidReceipt.name, VoidReceipt.schema, voidReceiptHandler)

@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 
 import { EventStore } from "../store";
 import { AggregateId, DomainEvent, Entity, Payload } from "../types";
-import { Command, DespatcherDescription as DispatcherDescription, Environment } from "./dispatcher";
+import { Command, DispatcherDescription, Environment } from "./dispatcher";
 import { EntityDescription, LoaderDescription } from "./loader";
 import { State } from "./state";
 

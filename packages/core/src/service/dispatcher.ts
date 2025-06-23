@@ -56,12 +56,12 @@ export namespace Dispatcher {
   }
 }
 
-export interface DespatcherDescription<R extends Environment, S extends State> {
+export interface DispatcherDescription<R extends Environment, S extends State> {
   commands(): Record<string, z.Schema<Payload>>;
   dispatcher(environment: R): Dispatcher<S>;
 }
 
-export namespace DespatcherDescription {
+export namespace DispatcherDescription {
   class Factory<R extends Environment, S extends State> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private handlers: Record<string, { schema: z.Schema<any>; handler: Handler<any, S, any> }> = {};
@@ -93,7 +93,7 @@ export namespace DespatcherDescription {
       return new Factory<R & R1, S>(path, schema, handler, this.handlers);
     };
 
-    description: () => DespatcherDescription<R, S> = () => {
+    description: () => DispatcherDescription<R, S> = () => {
       return {
         dispatcher: (environment: R) => ({
           dispatch: async (path: string, entity: Entity<S>, command: Payload) => {

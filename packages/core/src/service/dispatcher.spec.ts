@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { EventStore } from "../store";
 import { AggregateId, DomainEvent, Entity, Revision } from "../types";
-import { CommandValidationError, DespatcherDescription, HandlerNotFound, Publisher } from "./dispatcher";
+import { CommandValidationError, DispatcherDescription, HandlerNotFound, Publisher } from "./dispatcher";
 
 const withLogger = <R extends Publisher>(environment: R): R & { logger: (message: string) => void } => {
   const logger = (message: string) => {
@@ -88,7 +88,7 @@ describe("dispatcher", () => {
   const target = Entity.create(AggregateId.create("counter", "1"), "counter", Revision.Initial, { current: 0 });
 
   it("should allow a dispatcher to be created with a single handler", async () => {
-    const dispatcher = DespatcherDescription.handler("add", Add.schema, add).description().dispatcher(environment);
+    const dispatcher = DispatcherDescription.handler("add", Add.schema, add).description().dispatcher(environment);
 
     await dispatcher.dispatch("add", target, { amount: 1 });
 
@@ -97,7 +97,7 @@ describe("dispatcher", () => {
   });
 
   it("should allow a dispatcher to be created with multiple handlers", async () => {
-    const dispatcher = DespatcherDescription.handler("add", Add.schema, add)
+    const dispatcher = DispatcherDescription.handler("add", Add.schema, add)
       .handler("subtract", Subtract.schema, subtract)
       .handler("clear", Clear.schema, clear)
       .description()
@@ -111,19 +111,19 @@ describe("dispatcher", () => {
   });
 
   it("should fail with a handler not found error if a command is sent to an unknown path", async () => {
-    const dispatcher = DespatcherDescription.handler("add", Add.schema, add).description().dispatcher(environment);
+    const dispatcher = DispatcherDescription.handler("add", Add.schema, add).description().dispatcher(environment);
 
     await expect(dispatcher.dispatch("multiply", target, { amount: 1 })).rejects.toThrowError(HandlerNotFound);
   });
 
   it("should fail with a validation error if a command payload is incorrect", async () => {
-    const dispatcher = DespatcherDescription.handler("add", Add.schema, add).description().dispatcher(environment);
+    const dispatcher = DispatcherDescription.handler("add", Add.schema, add).description().dispatcher(environment);
 
     await expect(dispatcher.dispatch("add", target, { quantity: 1 })).rejects.toThrowError(CommandValidationError);
   });
 
   it("should allow describe the paths and commands available", async () => {
-    const description = DespatcherDescription.handler("add", Add.schema, add)
+    const description = DispatcherDescription.handler("add", Add.schema, add)
       .handler("subtract", Subtract.schema, subtract)
       .handler("clear", Clear.schema, clear)
       .description();

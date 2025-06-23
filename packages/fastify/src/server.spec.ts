@@ -5,7 +5,7 @@ import { z } from "zod";
 import {
   MemoryStore,
   Entity,
-  DespatcherDescription,
+  DispatcherDescription,
   LoaderDescription,
   ServiceDescription,
   Publisher,
@@ -64,7 +64,7 @@ describe("fastify server", () => {
     }))
     .description();
 
-  const dispatcher = DespatcherDescription.handler("add", Commands.Add.schema, Commands.Add.handler)
+  const dispatcher = DispatcherDescription.handler("add", Commands.Add.schema, Commands.Add.handler)
     .handler("deduct", Commands.Deduct.schema, Commands.Deduct.handler)
     .description();
 
@@ -162,7 +162,7 @@ describe("Server with OpenAPI", () => {
     }))
     .description();
 
-  const dispatcher = DespatcherDescription.handler("add", Commands.Add.schema, Commands.Add.handler)
+  const dispatcher = DispatcherDescription.handler("add", Commands.Add.schema, Commands.Add.handler)
     .handler("deduct", Commands.Deduct.schema, Commands.Deduct.handler)
     .description();
 

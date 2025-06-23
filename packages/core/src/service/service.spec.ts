@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { MemoryStore } from "../store";
 import { DomainEvent, Entity } from "../types";
-import { DespatcherDescription, Publisher } from "./dispatcher";
+import { DispatcherDescription, Publisher } from "./dispatcher";
 import { LoaderDescription, Reducer } from "./loader";
 import { ServiceDescription } from "./service";
 
@@ -110,7 +110,7 @@ describe("entity service", () => {
     .reducer("cleared", Events.Cleared.schema.shape.data, Events.Cleared.reducer)
     .description();
 
-  const dispatcher = DespatcherDescription.handler("add", Commands.Add.schema, Commands.Add.handler)
+  const dispatcher = DispatcherDescription.handler("add", Commands.Add.schema, Commands.Add.handler)
     .handler("subtract", Commands.Subtract.schema, Commands.Subtract.handler)
     .handler("clear", Commands.Clear.schema, Commands.Clear.handler)
     .description();
