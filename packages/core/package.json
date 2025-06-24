@@ -39,7 +39,9 @@
     "vitest": "catalog:"
   },
   "files": [
-    "lib"
+    "lib",
+    "src",
+    "tsconfig.full.json"
   ],
   "prettier": {
     "printWidth": 120,
