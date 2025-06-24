@@ -18,7 +18,7 @@
     "test:coverage": "vitest run --coverage --passWithNoTests",
     "test:coverage:ui": "vitest --ui --coverage",
     "lint": "eslint \"src/**/*.ts\" --cache",
-    "postinstall": "pnpm run compile --force"
+    "postinstall": "tsc --build -p tsconfig.full.json"
   },
   "dependencies": {
     "lodash": "catalog:",

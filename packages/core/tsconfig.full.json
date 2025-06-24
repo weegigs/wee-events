@@ -1,0 +1,38 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "declaration": true,
+    "declarationMap": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmit": false,
+    "rootDir": "./src",
+    "outDir": "./lib"
+  },
+  "include": ["scripts/**/*.ts"],
+  "exclude": ["node_modules/**/*", ".build/**/*", ".vscode/**/*"],
+  "include": [
+    "src/**/*.ts",
+    "../effects/entity-loader.ts"
+  ],
+  "exclude": [
+    "./node_modules/**/*",
+    "./lib/**/*",
+    "./.vscode/**/*"
+  ],
+  "references": []
+}
+
