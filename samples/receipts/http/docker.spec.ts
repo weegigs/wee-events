@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { GenericContainer, type StartedTestContainer, Wait } from "testcontainers";
 import path from "path";
 
-describe.skip("Docker Container Integration", () => {
+describe("Docker Container Integration", () => {
   let container: StartedTestContainer;
   let baseUrl: string;
 
