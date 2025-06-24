@@ -19,7 +19,7 @@
     "test": "turbo test --concurrency=1",
     "fix": "pnpm run fix:typescript-references",
     "fix:typescript-references": "pnpm dlx @monorepo-utils/workspaces-to-typescript-project-references workspaces-to-typescript-project-references --root --includesRoot",
-    "prepublish": "turbo build --force",
+    "prepublish": "turbo compile --force",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo build --force && changeset publish",
