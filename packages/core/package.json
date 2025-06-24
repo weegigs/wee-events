@@ -17,7 +17,8 @@
     "test": "vitest run --passWithNoTests",
     "test:coverage": "vitest run --coverage --passWithNoTests",
     "test:coverage:ui": "vitest --ui --coverage",
-    "lint": "eslint \"src/**/*.ts\" --cache"
+    "lint": "eslint \"src/**/*.ts\" --cache",
+    "prepublish": "pnpm run compile --force"
   },
   "dependencies": {
     "lodash": "catalog:",
