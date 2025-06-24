@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": ["TESTCONTAINERS_*"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
