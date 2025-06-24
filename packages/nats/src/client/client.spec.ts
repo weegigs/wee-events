@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from "vitest";
 import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
 import { connect, NatsConnection } from "@nats-io/transport-node";
-import { MemoryStore, DespatcherDescription, LoaderDescription, ServiceDescription, AggregateId, Entity, Publisher } from "@weegigs/events-core";
+import { MemoryStore, DispatcherDescription, LoaderDescription, ServiceDescription, AggregateId, Entity, Publisher } from "@weegigs/events-core";
 import { z } from "zod";
 import { NatsService } from "../server/nats-service";
 import { NatsClient } from "./client";
@@ -77,7 +77,7 @@ const testDescription = ServiceDescription.create(
   )
     .reducer(ValueSet.name, ValueSet.schema, valueSetReducer)
     .description(),
-  DespatcherDescription.handler(SetValue.name, SetValue.schema, setValueHandler)
+  DispatcherDescription.handler(SetValue.name, SetValue.schema, setValueHandler)
     .handler(SetStatus.name, SetStatus.schema, setStatusHandler)
     .description()
 );

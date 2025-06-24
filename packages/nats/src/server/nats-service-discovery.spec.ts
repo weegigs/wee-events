@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from "vitest";
 import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
 import { connect, NatsConnection } from "@nats-io/transport-node";
-import { MemoryStore, DespatcherDescription, LoaderDescription, ServiceDescription } from "@weegigs/events-core";
+import { MemoryStore, DispatcherDescription, LoaderDescription, ServiceDescription } from "@weegigs/events-core";
 import { NatsService } from "./nats-service";
 import { z } from "zod";
 
@@ -36,7 +36,7 @@ const description = ServiceDescription.create(
     { type: "receipt", schema: Receipt.schema },
     Receipt.create
   ).description(),
-  DespatcherDescription.handler("test", z.object({}), async () => {}).description()
+  DispatcherDescription.handler("test", z.object({}), async () => {}).description()
 );
 
 interface ServiceDiscoveryResponse {
