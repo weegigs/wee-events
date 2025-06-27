@@ -20,24 +20,25 @@ export namespace ExecuteRequest {
 }
 
 export namespace ExecuteResponse {
-  export const schema = z
-    .object({
-      entity: z.object({
-        aggregate: z
-          .object({
-            type: z.string(),
-            key: z.string(),
-          })
-          .strict(),
-        type: z.string().min(1),
-        revision: Revision.schema,
-        state: z.any(),
-      }),
-      metadata: z.record(z.unknown()).default({}),
-    })
-    .strict();
+  export const schema = <S extends z.ZodTypeAny>(stateSchema: S) =>
+    z
+      .object({
+        entity: z.object({
+          aggregate: z
+            .object({
+              type: z.string(),
+              key: z.string(),
+            })
+            .strict(),
+          type: z.string().min(1),
+          revision: Revision.schema,
+          state: stateSchema,
+        }),
+        metadata: z.record(z.unknown()).default({}),
+      })
+      .strict();
 
-  export type Type = z.infer<typeof schema>;
+  export type Type<S extends z.ZodTypeAny> = z.infer<ReturnType<typeof schema<S>>>;
 }
 
 export namespace FetchRequest {
@@ -56,21 +57,22 @@ export namespace FetchRequest {
 }
 
 export namespace FetchResponse {
-  export const schema = z
-    .object({
-      entity: z.object({
-        aggregate: z
-          .object({
-            type: z.string(),
-            key: z.string(),
-          })
-          .strict(),
-        type: z.string().min(1),
-        revision: Revision.schema,
-        state: z.any(),
-      }),
-    })
-    .strict();
+  export const schema = <S extends z.ZodTypeAny>(stateSchema: S) =>
+    z
+      .object({
+        entity: z.object({
+          aggregate: z
+            .object({
+              type: z.string(),
+              key: z.string(),
+            })
+            .strict(),
+          type: z.string().min(1),
+          revision: Revision.schema,
+          state: stateSchema,
+        }),
+      })
+      .strict();
 
-  export type Type = z.infer<typeof schema>;
+  export type Type<S extends z.ZodTypeAny> = z.infer<ReturnType<typeof schema<S>>>;
 }

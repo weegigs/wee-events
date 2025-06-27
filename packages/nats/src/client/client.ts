@@ -27,6 +27,7 @@ export class NatsClient<S extends State = State> {
 
   private readonly type: string;
   private readonly commands: ReturnType<ServiceDescription<Environment, S>["commands"]>;
+  private readonly description: ServiceDescription<Environment, S>;
 
   constructor(
     private readonly connection: NatsConnection,
@@ -34,6 +35,7 @@ export class NatsClient<S extends State = State> {
   ) {
     this.type = description.info().entity.type;
     this.commands = description.commands();
+    this.description = description;
   }
 
   /**
@@ -79,9 +81,14 @@ export class NatsClient<S extends State = State> {
       const data = JSON.parse(new TextDecoder().decode(response.data));
 
       // Validate successful response
-      const parsed = ExecuteResponse.schema.safeParse(data);
+      const responseSchema = ExecuteResponse.schema(this.description.info().entity.schema);
+      const parsed = responseSchema.safeParse(data);
       if (!parsed.success) {
         throw new InvalidResponseFormatError("execute", parsed.error.message);
+      }
+
+      if (!parsed.data.entity) {
+        throw new InvalidResponseFormatError("execute", "missing entity in response");
       }
 
       return parsed.data.entity as Entity<S>;
@@ -114,9 +121,14 @@ export class NatsClient<S extends State = State> {
       const data = JSON.parse(new TextDecoder().decode(response.data));
 
       // Validate successful response
-      const parsed = FetchResponse.schema.safeParse(data);
+      const responseSchema = FetchResponse.schema(this.description.info().entity.schema);
+      const parsed = responseSchema.safeParse(data);
       if (!parsed.success) {
         throw new InvalidResponseFormatError("fetch", parsed.error.message);
+      }
+
+      if (!parsed.data.entity) {
+        throw new InvalidResponseFormatError("fetch", "missing entity in response");
       }
 
       return parsed.data.entity as Entity<S>;

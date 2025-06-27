@@ -1,5 +1,2 @@
-// Re-export client implementation
-export { NatsClient } from "./client";
-
-// Re-export error types
-export * from "./errors";
+export * from "./client";
+export * from "./error-registry";

@@ -1,26 +1,11 @@
 import { NatsConnection, QueuedIterator, syncIterator } from "@nats-io/nats-core";
 import { Svcm, Service, ServiceMsg, ServiceGroup } from "@nats-io/services";
 import * as events from "@weegigs/events-core";
-import { WorkerPool } from "./worker-pool";
+import { Signal } from "@weegigs/events-common";
+import { WorkerPool, WorkerPoolShutdownError, WorkerPoolTimeoutError } from "./worker-pool";
 import { ExecuteRequest, FetchRequest, FetchResponse } from "../messages";
-
-type Deferred<T> = {
-  promise: Promise<T>;
-  resolve: (value: T) => void;
-  reject: (reason?: unknown) => void;
-};
-
-namespace Deferred {
-  export function create<T>(): Deferred<T> {
-    let resolve!: (value: T) => void;
-    let reject!: (reason?: unknown) => void;
-    const promise = new Promise<T>((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
-    return { promise, resolve, reject };
-  }
-}
+import { NatsServiceErrorCodes, NatsServiceErrorPayload, NatsServiceErrorCode } from "../errors";
+import { z } from "zod";
 
 // Service wrapper
 export class NatsService<S extends events.State> {
@@ -47,7 +32,7 @@ export class NatsService<S extends events.State> {
   private readonly service: events.Service<S>;
   private readonly pool: WorkerPool<events.Entity<S>>;
   private readonly iteratorProcessors = new Set<Promise<void>>();
-  private readonly shutdownSignal = Deferred.create<null>();
+  private readonly shutdownSignal = new Signal<null>();
 
   constructor(
     description: events.ServiceDescription<events.Environment, S>,
@@ -83,28 +68,25 @@ export class NatsService<S extends events.State> {
         const parsed = FetchRequest.schema.safeParse(request);
 
         if (!parsed.success) {
-          msg.respondError(400, `Invalid request: ${parsed.error.message}`);
+          const payload: NatsServiceErrorPayload = {
+            error: {
+              name: "InvalidRequest",
+              code: NatsServiceErrorCodes.InvalidRequest,
+              message: `Invalid request: ${parsed.error.message}`,
+            },
+          };
+          msg.respond(JSON.stringify(payload));
           return;
         }
 
         // Load entity using core service
-        const aggregateId = {
-          type: parsed.data.aggregateId.type,
-          key: parsed.data.aggregateId.key,
-        } as events.AggregateId;
-        const entity = await this.service.load(aggregateId);
+        const entity = await this.service.load(parsed.data.aggregateId);
 
         // Send successful response
-        const response: FetchResponse.Type = { entity };
+        const response: FetchResponse.Type<z.ZodType<S>> = { entity };
         msg.respond(JSON.stringify(response));
       } catch (error) {
-        // Map domain errors to appropriate responses
-        if (error instanceof events.EntityNotAvailableError) {
-          msg.respondError(404, error.message);
-        } else {
-          // Generic error for unexpected failures
-          msg.respondError(500, error instanceof Error ? error.message : String(error));
-        }
+        this.handleError(msg, error);
       }
     });
   }
@@ -149,33 +131,29 @@ export class NatsService<S extends events.State> {
     const parsed = ExecuteRequest.schema.safeParse(message.json());
 
     if (!parsed.success) {
-      message.respondError(400, "Invalid command");
+      const payload: NatsServiceErrorPayload = {
+        error: {
+          name: "InvalidCommand",
+          code: NatsServiceErrorCodes.InvalidRequest,
+          message: "Invalid command",
+        },
+      };
+      message.respond(JSON.stringify(payload));
       return;
     }
 
     try {
       // Process command through pool with capacity management
-      const result = await this.pool.withCapacity(async (signal: AbortSignal) => {
+      const entity = await this.pool.execute(async (signal: AbortSignal) => {
         if (signal.aborted) {
           throw new Error("Operation cancelled");
         }
-        const target = { type: parsed.data.target.type, key: parsed.data.target.key } as events.AggregateId;
-        return await this.service.execute(parsed.data.command, target, parsed.data.payload);
+        return await this.service.execute(parsed.data.command, parsed.data.target, parsed.data.payload);
       });
-
-      if (result === "shutting-down") {
-        // Service is shutting down - don't respond, let message stay in queue
-        return;
-      }
-
-      if (result === "timeout") {
-        message.respondError(503, "service overloaded - timeout");
-        return;
-      }
 
       // Send successful response
       const response = {
-        entity: result,
+        entity,
         metadata: parsed.data.metadata,
       };
 
@@ -183,17 +161,62 @@ export class NatsService<S extends events.State> {
         console.error("Failed to send response to NATS message");
       }
     } catch (error) {
-      // Map domain errors to appropriate responses
-      if (error instanceof events.EntityNotAvailableError) {
-        message.respondError(404, `Not Found: ${error.message}`);
-      } else if (error instanceof events.CommandValidationError) {
-        message.respondError(400, `Bad Request: ${error.message}`);
-      } else if (error instanceof events.HandlerNotFound) {
-        message.respondError(500, `Handler Not Found: ${error.message}`);
-      } else {
-        message.respondError(500, error instanceof Error ? error.message : String(error));
-      }
+      this.handleError(message, error);
     }
+  }
+
+  private handleError(msg: ServiceMsg, error: unknown): void {
+    if (error instanceof WorkerPoolShutdownError) {
+      // Service is shutting down - don't respond, let message stay in queue
+      return;
+    }
+
+    if (error instanceof WorkerPoolTimeoutError) {
+      const payload: NatsServiceErrorPayload = {
+        error: {
+          name: error.name,
+          code: NatsServiceErrorCodes.ServiceOverloaded,
+          message: error.message,
+        },
+      };
+      msg.respond(JSON.stringify(payload));
+      return;
+    }
+
+    if (error instanceof Error && 'toJSON' in error && typeof (error as { toJSON: () => Record<string, unknown> }).toJSON === 'function') {
+      const payload: NatsServiceErrorPayload = {
+        error: {
+          name: error.name,
+          code: this.getErrorCode(error),
+          message: error.message,
+          details: (error as events.ISerializableError).toJSON(),
+        },
+      };
+      msg.respond(JSON.stringify(payload));
+      return;
+    }
+
+    const payload: NatsServiceErrorPayload = {
+      error: {
+        name: "UnknownError",
+        code: NatsServiceErrorCodes.Unknown,
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+    msg.respond(JSON.stringify(payload));
+  }
+
+  private getErrorCode(error: Error): NatsServiceErrorCode {
+    if (error instanceof events.EntityNotAvailableError) {
+      return NatsServiceErrorCodes.EntityNotFound;
+    }
+    if (error instanceof events.CommandValidationError) {
+      return NatsServiceErrorCodes.CommandValidation;
+    }
+    if (error instanceof events.HandlerNotFound) {
+      return NatsServiceErrorCodes.HandlerNotFound;
+    }
+    return NatsServiceErrorCodes.Unknown;
   }
 
   // Start the service (if needed - NATS services may auto-start)
@@ -205,7 +228,7 @@ export class NatsService<S extends events.State> {
   // Graceful cleanup method
   async shutdown(): Promise<void> {
     // Signal all iterators to exit immediately
-    this.shutdownSignal.resolve(null);
+    this.shutdownSignal.trigger(null);
     
     // Stop accepting new messages
     await this.nats.stop();
