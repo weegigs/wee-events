@@ -2,30 +2,69 @@
 
 This document captures the coding practices and design principles for this project. All contributors must read and acknowledge these practices before beginning work.
 
-## Core Design Philosophy
+## Core Philosophy
 
 ### Start Minimal, Grow Deliberately
-- **Begin with the simplest solution that works** - Avoid anticipating future requirements
-- **Add complexity only when explicitly needed** - Don't build "just in case" features  
-- **Question every assumption** - "Does this really need logging? Telemetry? Complex lifecycle?"
-- **Prefer obvious over clever** - Simple code that clearly expresses intent
-- **Most programming problems are simpler than we make them** - Start minimal, let real requirements drive complexity
+- **Begin with the simplest solution that works.** Avoid over-engineering or anticipating future requirements.
+- **Add complexity only when explicitly needed.** Don't build "just in case" features.
+- **Prefer obvious over clever.** Write simple code that clearly expresses its intent.
 
 ### Dependency Discipline
-- **Challenge every import** - Can this be solved without this dependency?
-- **Research before adding** - Use Context7 or documentation to understand correct packages
-- **Use workspace catalogues** - All dependency versions controlled via pnpm workspace catalogue
-- **Import specifically, not broadly** - Avoid importing entire modules for one function
-- **Minimize surface area** - Fewer dependencies = fewer failure modes
+- **Challenge every import.** Can this be solved without a new dependency?
+- **Use workspace catalogues.** All dependency versions are controlled via the pnpm workspace catalogue.
+- **Import specifically, not broadly.** Avoid importing entire modules for a single function.
 
-## Error Handling Patterns
+## Core Design Principles
 
-### Always Use Domain-Specific Errors
+### Separation of Concerns
+Each class and function should have one clear purpose. Keep infrastructure and business logic separate.
+
+**Example: Separating Infrastructure from Business Logic**
+
+- **Infrastructure Layer**: Handles protocol-specific concerns like connection management, timeouts, and serialization. It should not contain business rules.
+- **Application Layer**: Implements business logic, such as retries or circuit breakers, by composing calls to the infrastructure layer.
+
+```typescript
+// ✅ Infrastructure Layer: Protocol concerns only
+class TransportClient {
+  withTimeout(ms: number): TransportClient { /* ... */ }
+  withHeader(key: string, value: string): TransportClient { /* ... */ }
+
+  async execute(operation: string, data: unknown): Promise<Result> {
+    // Pure transport logic: send a request using configured options.
+    const options = this.modifiers.reduce((opts, modifier) => modifier(opts), defaults);
+    return this.connection.send(operation, data, options);
+  }
+}
+
+// ✅ Application Layer: Business concerns are composed externally
+import { Policy } from 'external-resilience-library';
+
+const businessPolicy = Policy
+  .handle(Error)
+  .retry().attempts(3);
+
+// Compose layers externally
+const result = await businessPolicy.execute(() =>
+  transportClient
+    .withTimeout(5000)     // Infrastructure concern
+    .withHeader("trace", id) // Infrastructure concern
+    .execute(operation, data)
+);
+```
+
+### Error Handling: Use Domain-Specific Errors
+Always throw custom, domain-specific errors that capture structured data. This enables callers to handle specific failure modes programmatically.
+
+- **Capture structured data as fields**, not in error messages.
+- **Keep messages clean and focused.**
+- **End class names with `Error`** (e.g., `ValidationError`).
+
 ```typescript
 // ❌ Never do this
-throw new Error(`Unknown command: ${command}. Available: ${commands.join(', ')}`);
+throw new Error(`Unknown command: ${command}.`);
 
-// ✅ Always do this  
+// ✅ Always do this
 export class UnknownCommandError extends Error {
   constructor(
     public readonly command: string,
@@ -37,37 +76,43 @@ export class UnknownCommandError extends Error {
 }
 ```
 
-### Error Design Principles
-- **Capture structured data as fields** - Not in error messages
-- **Keep messages clean and focused** - Details go in separate fields
-- **Make errors programmatically useful** - Enable specific error handling
-- **Use consistent naming** - End with "Error" (e.g., `ValidationError`, `TimeoutError`)
-- **Include relevant context** - What failed, why it failed, what was expected
+### Type Safety: Use Strict TypeScript
+- **Never use `any`.** Always find or create proper types.
+- **Use `interface` for services, `type` for data.** An interface defines a contract for behavior (what a service *does*), while a type defines a shape for data (what data *is*). Never use an interface for data structures.
+- **Prefer unions over optional fields.** Instead of making fields optional (`field?: T`), model different states explicitly with a discriminated union. This makes it impossible to represent an invalid state.
+- **Leverage existing types** with TypeScript's utility types like `ReturnType<T>`.
+- **Map types explicitly** when converting between domains.
 
-## Constructor and Class Design
+### Validation: Validate Early and Often
+- **Validate on the client-side** to catch errors before network calls.
+- **Use existing schemas** and validation logic where possible.
+- **Fail fast** and provide clear, actionable error messages.
 
-### Pre-compute in Constructors
+### Class Design: Pre-compute in Constructors
+Perform expensive operations or computations once in the constructor, not on every method call. This makes objects more efficient and ready to use immediately after instantiation.
+
 ```typescript
 // ❌ Avoid repeated computation
 class Client {
   constructor(private description: ServiceDescription) {}
-  
+
   execute(command: string) {
-    const commands = this.description.commands(); // Called every time!
-    if (!(command in commands)) { ... }
+    // This is called every time!
+    const commands = this.description.commands();
+    if (!(command in commands)) { /* ... */ }
   }
 }
 
 // ✅ Extract what you need once
 class Client {
   private readonly commands: Record<string, { schema: ZodSchema }>;
-  
+
   constructor(description: ServiceDescription) {
-    // Extract only what we need, when we need it
+    // Extract and compute command definitions just once.
     const commandDefs = description.commands();
     this.commands = Object.fromEntries(
       Object.entries(commandDefs).map(([name, def]) => [
-        name, 
+        name,
         { schema: def.schema }
       ])
     );
@@ -75,142 +120,88 @@ class Client {
 }
 ```
 
-### Constructor Principles
-- **Extract only needed fields** - Don't store entire objects when you need specific fields
-- **Use proper TypeScript types** - Never use `any`, leverage existing type definitions
-- **Pre-compute expensive operations** - Do work once in constructor, not on every method call
-- **Make objects ready to use** - Avoid complex initialization after construction
+## Key Pattern: Composable Fluent APIs
+To avoid a combinatorial explosion of classes for configurable behaviors (e.g., `TimeoutClient`, `RetriesClient`, `TimeoutRetriesClient`), use function composition with a fluent, immutable API.
 
-## Validation Strategy
-
-### Validate Early and Often
-- **Client-side validation** - Catch errors before network calls
-- **Use existing schemas** - Leverage service descriptions and existing validation logic
-- **Provide immediate feedback** - Clear, actionable error messages
-- **Fail fast** - Don't continue with invalid data
+### The Pattern: Function Composition
+Instead of creating a new class for every combination of features, define features as functions (`OptionsModifier`) and apply them in a sequence.
 
 ```typescript
-// ✅ Validate before sending
-async execute(command: string, payload: Payload) {
-  // Validate command exists
-  if (!(command in this.commands)) {
-    throw new UnknownCommandError(command, Object.keys(this.commands));
+// ✅ Linear growth with composition
+type OptionsModifier<T> = (options: T) => T;
+
+class Client<T> {
+  constructor(
+    private readonly implementation: Implementation,
+    private readonly modifiers: OptionsModifier<T>[] = []
+  ) {}
+
+  // Each `with...` method returns a *new* immutable instance.
+  withTimeout(ms: number): Client<T> {
+    return this.withModifier(options => ({ ...options, timeout: ms }));
   }
-  
-  // Validate payload
-  const validation = this.commands[command].schema.safeParse(payload);
-  if (!validation.success) {
-    throw new InvalidCommandPayloadError(command, validation.error.message);
+
+  private withModifier(modifier: OptionsModifier<T>): Client<T> {
+    return new Client(this.implementation, [...this.modifiers, modifier]);
   }
-  
-  // Now send with confidence
-  return this.sendRequest(command, validation.data);
-}
-```
 
-## Interface Design
-
-### Design for the Common Case
-- **Start with calling code** - How would you want to use this API?
-- **Make wrong usage hard** - Guide users toward correct patterns
-- **Match actual capabilities** - Align with server implementation, not idealized APIs
-- **Prefer composition over configuration** - Pass behavior, not complex option objects
-
-### Factory Patterns
-```typescript
-// ✅ Static factory methods can be cleaner
-class NatsClient {
-  static create(description: ServiceDescription) {
-    return {
-      async connect(url: string): Promise<NatsClient> {
-        const connection = await connect(url);
-        return new NatsClient(connection, description);
-      }
-    };
+  execute(operation: string): Promise<Result> {
+    // Apply all modifiers to the default options
+    const options = this.modifiers.reduce((opts, modify) => modify(opts), defaults);
+    return this.implementation.execute(operation, options);
   }
 }
-
-// Usage: const client = await NatsClient.create(desc).connect(url);
 ```
 
-## Type Safety Practices
-
-### Strict TypeScript Usage
-- **Never use `any`** - Always find or create proper types
-- **Leverage existing types** - Use `ReturnType<T>`, service description types, etc.
-- **Map types explicitly** - When converting between domains, be explicit about type mapping
-- **Use strict compilation** - Fix all TypeScript errors immediately
-
-```typescript
-// ✅ Use proper types from existing definitions
-private readonly commands: ReturnType<ServiceDescription<Environment, S>["commands"]>;
-
-// ✅ Map types explicitly when needed
-const aggregateId = { 
-  type: parsed.data.target.type, 
-  key: parsed.data.target.key 
-} as AggregateId;
-```
-
-## Separation of Concerns
-
-### Single Responsibility
-- **Each class/function has one clear purpose** - If you can't explain it in one sentence, split it
-- **Infrastructure separate from business logic** - Don't mix plumbing with domain concepts
-- **Avoid god objects** - Classes that know too much or do too much
-- **Use appropriate abstractions** - Different domains have different patterns
-
-### Import Organization
-- **Import what you need where you need it** - Don't create unnecessary layers
-- **Group related imports** - External, internal, relative imports in separate groups
-- **No circular dependencies** - Design clear dependency hierarchies
+### Fluent API Design Principles
+- **Immutable Transformations**: Methods like `withTimeout` return a new `Client` instance instead of mutating the existing one.
+- **Return Types**:
+    - **Concrete Types for Chaining**: Fluent configuration methods (`with...`) should return the concrete class (`Client`) to enable method chaining.
+    - **Interface Types for Operations**: Core operational methods (`execute`) should return a generic interface type (`Promise<Result>`) to enable composition and testing.
+- **Factory Patterns**: Use static factory methods to provide a clean entry point for creating and connecting a client.
+  ```typescript
+  // ✅ Static factory methods can be cleaner
+  class NatsClient {
+    static create(description: ServiceDescription) {
+      return {
+        async connect(url: string): Promise<NatsClient> {
+          const connection = await connect(url);
+          return new NatsClient(connection, description);
+        }
+      };
+    }
+  }
+  ```
 
 ## Build and Quality Standards
 
-### Compilation Requirements
-- **Zero TypeScript errors** - All code must compile cleanly
-- **Fix issues immediately** - Don't accumulate technical debt
-- **Exclude problematic files** - Use tsconfig exclude for sample/test files if needed
-- **Verify builds succeed** - Run `pnpm run build` before claiming completion
+### Compilation and Linting
+- **Zero Errors**: Code must compile with zero TypeScript errors and pass all linting checks.
+- **Fix Immediately**: Do not accumulate technical debt. Fix all build and lint errors as they appear.
+- **Verify Locally**: Run `pnpm run build` and `pnpm run lint` before claiming a task is complete.
 
-### Testing Practices
-- **Tests co-located with source** - In same directory structure, not separate `tests/` folders
-- **Prefer testcontainers over mocks** - Use real dependencies in Docker containers
-- **Understand test failures** - Never update snapshots without understanding why they changed
-- **Verify logical correctness** - Tests should pass AND make logical sense
+### Testing
+- **Co-location**: Tests are located in the same directory as the source files they cover.
+- **Prefer Testcontainers**: Use real dependencies (like databases or message brokers) in Docker containers instead of mocks to avoid testing incorrect assumptions.
+- **Understand Failures**: Never update snapshots without understanding the root cause of the change. A failing test often indicates a regression, not an invalid test.
 
 ## Project Conventions
 
 ### Package Management
-- **Use pnpm exclusively** - Never npm or bun
-- **Use workspace catalogues** - All dependency versions controlled centrally
-- **Add dependencies via catalogue** - Research versions first, add to catalogue, then use `catalog:`
-- **Use mise for tool management** - Node.js and tool versions managed via `.mise.toml`
+- **Use pnpm exclusively.**
+- **Use workspace catalogues** for all dependency versions.
+- **Use mise** for Node.js and other tool version management.
 
 ### Code Style
-- **Always add newlines at end of files** - Consistent file formatting
-- **Use project prettier/eslint config** - Don't override formatting rules
-- **Follow existing patterns** - Match the style and structure of existing code
+- **Add newlines at the end of files.**
+- **Follow project's Prettier/ESLint configuration.**
+- **Match the style and structure of existing code.**
 
 ## Implementation Workflow
 
-### Before Starting Work
-1. **Read and acknowledge these practices** - Confirm understanding
-2. **Understand the existing codebase** - Read related code, understand patterns
-3. **Research dependencies** - Use Context7 for unfamiliar libraries
-4. **Plan the minimal solution** - Start simple, add complexity only when needed
-
-### During Development
-1. **Start with tests/interfaces** - Define the API you want before implementing
-2. **Implement incrementally** - Small, working steps
-3. **Validate continuously** - Compile, test, lint frequently
-4. **Fix errors immediately** - Don't accumulate compilation or test failures
-
-### Before Completion
-1. **Run full build pipeline** - `pnpm run build`, `pnpm run test`, `pnpm run lint`
-2. **Verify logical correctness** - Tests pass AND make sense
-3. **Check error handling** - All error paths use domain-specific errors
-4. **Review type safety** - No `any` types, proper TypeScript usage
+1.  **Before Starting**: Read and acknowledge these practices. Understand the existing codebase and plan the minimal viable solution.
+2.  **During Development**: Start with tests, types and interfaces. Implement incrementally and validate your work continuously (compile, test, lint).
+3.  **Before Completion**: Run the full quality pipeline (`pnpm run build`, `pnpm run test`, `pnpm run lint`) and verify that all checks pass and the results are logically correct.
 
 ---
 
