@@ -114,6 +114,9 @@ catalogs:
     ajv:
       specifier: 8.17.1
       version: 8.17.1
+    async-mutex:
+      specifier: 0.5.0
+      version: 0.5.0
     aws-lambda:
       specifier: 1.0.7
       version: 1.0.7
@@ -637,9 +640,15 @@ importers:
       '@opentelemetry/sdk-node':
         specifier: 'catalog:'
         version: 0.202.0(@opentelemetry/api@1.9.0)
+      '@weegigs/events-common':
+        specifier: workspace:^
+        version: link:../common
       '@weegigs/events-core':
         specifier: workspace:^
         version: link:../core
+      async-mutex:
+        specifier: 'catalog:'
+        version: 0.5.0
       cockatiel:
         specifier: 'catalog:'
         version: 3.2.1
@@ -2292,6 +2301,9 @@ packages:
 
   async-lock@1.4.1:
     resolution: {integrity: sha512-Az2ZTpuytrtqENulXwO3GGv1Bztugx6TT37NIo7imr/Qo0gsYiGtSdBa2B6fsXhTpVZDNfu1Qn3pk531e3q+nQ==}
+
+  async-mutex@0.5.0:
+    resolution: {integrity: sha512-1A94B18jkJ3DYq284ohPxoXbfTA5HsQ7/Mf4DEhcyLx3Bz27Rh59iScbB6EPiP+B+joue6YCxcMXSbFC1tZKwA==}
 
   async@3.2.6:
     resolution: {integrity: sha512-htCUDlxyyCLMgaM3xXg0C0LW2xqfuQ6p05pCEIsXuyQ+a1koYKTuBMzRNwmybfLgvJDMd0r1LTn4+E0Ti6C2AA==}
@@ -6141,6 +6153,10 @@ snapshots:
       js-tokens: 9.0.1
 
   async-lock@1.4.1: {}
+
+  async-mutex@0.5.0:
+    dependencies:
+      tslib: 2.8.1
 
   async@3.2.6: {}
 
