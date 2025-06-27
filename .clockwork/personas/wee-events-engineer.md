@@ -147,7 +147,7 @@ export const accountService = ServiceDescription.create(
 - Chain `.reducer()` calls for each event type
 - Call `.description()` to finalize
 
-### DespatcherDescription
+### DispatcherDescription
 - Chain `.handler()` calls for each command type
 - Each handler validates and emits events
 - Call `.description()` to finalize
