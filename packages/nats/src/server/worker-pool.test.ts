@@ -1,18 +1,18 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { WorkerPool, WorkerPoolConfig } from "./worker-pool";
+import { WorkerPool, WorkerPoolShutdownError, WorkerPoolTimeoutError } from "./worker-pool";
 
 describe("WorkerPool", () => {
   let pool: WorkerPool<string>;
 
   beforeEach(() => {
-    pool = new WorkerPool<string>();
+    pool = new WorkerPool<string>(5, 1000);
   });
 
-  describe("withCapacity", () => {
+  describe("execute", () => {
     it("should execute work when capacity is available", async () => {
       const work = vi.fn(async () => "result");
       
-      const result = await pool.withCapacity(work);
+      const result = await pool.execute(work);
       
       expect(result).toBe("result");
       expect(work).toHaveBeenCalledOnce();
@@ -25,15 +25,13 @@ describe("WorkerPool", () => {
         return "result";
       });
       
-      await pool.withCapacity(work);
+      await pool.execute(work);
       
       expect(work).toHaveBeenCalledOnce();
     });
 
     it("should respect concurrency limits", async () => {
-      const config = WorkerPoolConfig.create();
-      config.concurrency = 2;
-      pool = new WorkerPool(config);
+      pool = new WorkerPool(2, 1000);
 
       const blockedWork = vi.fn(
         () => new Promise<string>(resolve => setTimeout(() => resolve("blocked"), 100))
@@ -41,11 +39,11 @@ describe("WorkerPool", () => {
       const quickWork = vi.fn(async () => "quick");
 
       // Start 2 blocking tasks (fills capacity)
-      const promise1 = pool.withCapacity(blockedWork);
-      const promise2 = pool.withCapacity(blockedWork);
+      const promise1 = pool.execute(blockedWork);
+      const promise2 = pool.execute(blockedWork);
 
       // Third task should wait for capacity
-      const promise3 = pool.withCapacity(quickWork);
+      const promise3 = pool.execute(quickWork);
 
       // Wait a bit to ensure third task is waiting
       await new Promise(resolve => setTimeout(resolve, 10));
@@ -64,40 +62,35 @@ describe("WorkerPool", () => {
         throw error;
       });
 
-      await expect(pool.withCapacity(work)).rejects.toThrow("Work failed");
+      await expect(pool.execute(work)).rejects.toThrow("Work failed");
       expect(work).toHaveBeenCalledOnce();
     });
 
-    it("should return 'timeout' when work exceeds timeout", async () => {
+    it("should throw WorkerPoolTimeoutError when work exceeds timeout", async () => {
       const work = vi.fn(
         () => new Promise<string>(resolve => setTimeout(() => resolve("late"), 200))
       );
 
-      const result = await pool.withCapacity(work, { timeout: 50 });
-
-      expect(result).toBe("timeout");
+      await expect(pool.execute(work, { timeout: 50 })).rejects.toThrowError(WorkerPoolTimeoutError);
       expect(work).toHaveBeenCalledOnce();
     });
 
-    it("should return 'shutting-down' when pool is shutting down", async () => {
+    it("should throw WorkerPoolShutdownError when pool is shutting down", async () => {
       const work = vi.fn(async () => "result");
 
       // Start shutdown
       const shutdownPromise = pool.shutdown();
 
       // Try to execute work while shutting down
-      const result = await pool.withCapacity(work);
+      await expect(pool.execute(work)).rejects.toThrowError(WorkerPoolShutdownError);
 
-      expect(result).toBe("shutting-down");
       expect(work).not.toHaveBeenCalled();
 
       await shutdownPromise;
     });
 
     it("should notify waiting tasks when capacity becomes available", async () => {
-      const config = WorkerPoolConfig.create();
-      config.concurrency = 1;
-      pool = new WorkerPool(config);
+      pool = new WorkerPool(1, 1000);
 
       let resolveFirst: () => void = () => {};
       const firstWork = vi.fn(
@@ -108,10 +101,10 @@ describe("WorkerPool", () => {
       const secondWork = vi.fn(async () => "second");
 
       // Start first task (fills capacity)
-      const firstPromise = pool.withCapacity(firstWork);
+      const firstPromise = pool.execute(firstWork);
 
       // Start second task (should wait)
-      const secondPromise = pool.withCapacity(secondWork);
+      const secondPromise = pool.execute(secondWork);
 
       // Verify second task is waiting
       await new Promise(resolve => setTimeout(resolve, 10));
@@ -140,78 +133,68 @@ describe("WorkerPool", () => {
     it("should wait for active activities to complete", async () => {
       let resolveWork: () => void = () => {};
       const work = vi.fn(
-        () => new Promise<string>(resolve => {
-          resolveWork = () => resolve("completed");
-        })
+        () =>
+          new Promise<string>((resolve) => {
+            resolveWork = () => resolve("completed");
+          })
       );
 
       // Start work
-      const workPromise = pool.withCapacity(work);
+      const workPromise = pool.execute(work);
 
       // Start shutdown
       const shutdownPromise = pool.shutdown();
 
       // Wait a bit - shutdown should be waiting
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Complete the work
       resolveWork();
-      await workPromise;
 
       // Shutdown should now complete
       await shutdownPromise;
 
+      // The work promise should resolve successfully
+      await expect(workPromise).resolves.toBe("completed");
+
       expect(work).toHaveBeenCalledOnce();
     });
 
-    it("should wake up waiting tasks and return 'shutting-down'", async () => {
-      const config = WorkerPoolConfig.create();
-      config.concurrency = 1;
-      pool = new WorkerPool(config);
+    it("should wake up waiting tasks and throw WorkerPoolShutdownError", async () => {
+      pool = new WorkerPool(1, 1000);
 
-      let resolveFirst: () => void = () => {};
-      const firstWork = vi.fn(
-        () => new Promise<string>(resolve => {
-          resolveFirst = () => resolve("first");
-        })
-      );
+      const firstWork = vi.fn(() => new Promise<string>(() => {})); // A promise that never resolves
       const secondWork = vi.fn(async () => "second");
 
       // Start first task (fills capacity)
-      const firstPromise = pool.withCapacity(firstWork);
+      pool.execute(firstWork);
 
       // Start second task (should wait)
-      const secondPromise = pool.withCapacity(secondWork);
+      const secondPromise = pool.execute(secondWork);
 
       // Start shutdown
-      const shutdownPromise = pool.shutdown();
+      pool.shutdown();
 
-      // Second task should wake up and return 'shutting-down'
-      const secondResult = await secondPromise;
-      expect(secondResult).toBe("shutting-down");
+      // Second task should wake up and throw
+      await expect(secondPromise).rejects.toThrowError(WorkerPoolShutdownError);
       expect(secondWork).not.toHaveBeenCalled();
-
-      // Complete first task
-      resolveFirst();
-      await firstPromise;
-
-      // Shutdown should complete
-      await shutdownPromise;
     });
 
     it("should timeout if activities don't complete within shutdownTimeout", async () => {
-      const config = WorkerPoolConfig.create();
-      config.shutdownTimeout = 50; // Short timeout for test
-      pool = new WorkerPool(config);
+      pool = new WorkerPool(5, 50);
 
       const work = vi.fn(
-        () => new Promise<string>(() => {
-          // Never resolves
-        })
+        () =>
+          new Promise<string>(() => {
+            // Never resolves
+          })
       );
 
       // Start long-running work
-      pool.withCapacity(work);
+      pool.execute(work);
+
+      // Add a small delay to ensure the activity is registered
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Shutdown should timeout
       const startTime = Date.now();
@@ -220,27 +203,6 @@ describe("WorkerPool", () => {
 
       expect(duration).toBeGreaterThanOrEqual(45); // Allow some timing variance
       expect(duration).toBeLessThan(100); // But not too much variance
-    });
-  });
-
-  describe("WorkerPoolConfig", () => {
-    it("should create default config", () => {
-      const config = WorkerPoolConfig.create();
-
-      expect(config.concurrency).toBe(5);
-      expect(config.shutdownTimeout).toBe(30000);
-    });
-
-    it("should accept custom config", () => {
-      const customConfig: WorkerPoolConfig = {
-        concurrency: 10,
-        shutdownTimeout: 60000,
-      };
-
-      pool = new WorkerPool(customConfig);
-
-      // Test that custom config is used
-      expect(pool).toBeInstanceOf(WorkerPool);
     });
   });
 
@@ -260,16 +222,11 @@ describe("WorkerPool", () => {
         () => new Promise<string>(resolve => setTimeout(() => resolve("result"), 50))
       );
 
-      const result = await pool.withCapacity(work, { timeout: 50 });
-
-      // This is timing-dependent, could be either result or timeout
-      expect(result === "result" || result === "timeout").toBe(true);
+      await expect(pool.execute(work, { timeout: 50 })).rejects.toThrowError(WorkerPoolTimeoutError);
     });
 
     it("should clean up activities properly even when work throws", async () => {
-      const config = WorkerPoolConfig.create();
-      config.concurrency = 1;
-      pool = new WorkerPool(config);
+      pool = new WorkerPool(1, 1000);
 
       const failingWork = vi.fn(async () => {
         throw new Error("Work failed");
@@ -277,10 +234,10 @@ describe("WorkerPool", () => {
       const successWork = vi.fn(async () => "success");
 
       // First work fails
-      await expect(pool.withCapacity(failingWork)).rejects.toThrow("Work failed");
+      await expect(pool.execute(failingWork)).rejects.toThrow("Work failed");
 
       // Second work should still be able to execute (capacity was cleaned up)
-      const result = await pool.withCapacity(successWork);
+      const result = await pool.execute(successWork);
       expect(result).toBe("success");
     });
   });

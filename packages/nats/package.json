@@ -30,6 +30,8 @@
     "@opentelemetry/sdk-logs": "catalog:",
     "@opentelemetry/sdk-node": "catalog:",
     "@weegigs/events-core": "workspace:^",
+    "@weegigs/events-common": "workspace:^",
+    "async-mutex": "catalog:",
     "cockatiel": "catalog:",
     "lodash": "catalog:",
     "ulid": "catalog:",

@@ -1,112 +1,103 @@
-export type WorkerPoolConfig = {
-  concurrency: number;
-  shutdownTimeout: number;
-};
+import { Semaphore } from "async-mutex";
 
-export namespace WorkerPoolConfig {
-  export const create = (): WorkerPoolConfig => ({
-    concurrency: 5,
-    shutdownTimeout: 30000,
-  });
+export class WorkerPoolShutdownError extends Error {
+  constructor() {
+    super("Worker pool is shutting down");
+    this.name = "WorkerPoolShutdownError";
+  }
 }
 
-type Deferred<T> = {
-  promise: Promise<T>;
-  resolve: (value: T) => void;
-  reject: (reason?: unknown) => void;
-};
-
-namespace Deferred {
-  export function create<T>(): Deferred<T> {
-    let resolve!: (value: T) => void;
-    let reject!: (reason?: unknown) => void;
-    const promise = new Promise<T>((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
-    return { promise, resolve, reject };
+export class WorkerPoolTimeoutError extends Error {
+  constructor(timeout: number) {
+    super(`Operation timed out after ${timeout}ms`);
+    this.name = "WorkerPoolTimeoutError";
   }
 }
 
 export class WorkerPool<R> {
   private activities = new Set<Promise<R>>();
   private isShuttingDown = false;
-  private waitingForCapacity: Deferred<void>[] = [];
+  private semaphore: Semaphore;
 
-  constructor(private readonly config: WorkerPoolConfig = WorkerPoolConfig.create()) {}
-
-  /**
-   * Execute work with guaranteed capacity and cleanup
-   * Returns result, 'shutting-down', or 'timeout'
-   */
-  async withCapacity(
-    work: (signal: AbortSignal) => Promise<R>,
-    options: { timeout: number } = { timeout: 30000 }
-  ): Promise<R | "shutting-down" | "timeout"> {
-    // Wait for capacity
-    while (this.activities.size >= this.config.concurrency && !this.isShuttingDown) {
-      const deferred = Deferred.create<void>();
-      this.waitingForCapacity.push(deferred);
-      await deferred.promise;
-    }
-
-    if (this.isShuttingDown) {
-      return "shutting-down";
-    }
-
-    // Create abort controller for timeout and cancellation
-    const controller = new AbortController();
-
-    const timeout = setTimeout(() => {
-      controller.abort();
-    }, options.timeout);
-
-    // Execute work with guaranteed cleanup
-    const activity = work(controller.signal);
-    this.activities.add(activity);
-
-    try {
-      const result = await activity;
-      clearTimeout(timeout);
-
-      if (controller.signal.aborted) {
-        return "timeout";
-      }
-
-      return result;
-    } catch (error) {
-      clearTimeout(timeout);
-      throw error;
-    } finally {
-      this.activities.delete(activity);
-      this.notifyCapacityAvailable();
-    }
+  constructor(
+    concurrency: number = 5,
+    private readonly shutdownTimeout: number = 30000
+  ) {
+    this.semaphore = new Semaphore(concurrency);
   }
 
-  private notifyCapacityAvailable(): void {
-    if (this.waitingForCapacity.length > 0 && this.activities.size < this.config.concurrency) {
-      const deferred = this.waitingForCapacity.shift();
-      if (deferred) {
-        deferred.resolve();
+  /**
+   * Executes a unit of work within the pool's capacity limits.
+   *
+   * @param work The async function to execute.
+   * @param options Configuration for the execution, like timeout.
+   * @returns A promise that resolves with the result of the work.
+   *
+   * @throws {WorkerPoolShutdownError} If the pool is in the process of shutting down.
+   * @throws {WorkerPoolTimeoutError} If the work does not complete within the specified timeout.
+   */
+  async execute(
+    work: (signal: AbortSignal) => Promise<R>,
+    options: { timeout: number } = { timeout: 30000 }
+  ): Promise<R> {
+    if (this.isShuttingDown) {
+      throw new WorkerPoolShutdownError();
+    }
+
+    let release: () => void;
+    try {
+      [, release] = await this.semaphore.acquire();
+    } catch (error) {
+      if (error instanceof Error && error.message === "request for lock canceled") {
+        throw new WorkerPoolShutdownError();
       }
+      throw error;
+    }
+
+    try {
+      const controller = new AbortController();
+      let timedOut = false;
+
+      const timeout = setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+      }, options.timeout);
+
+      const activity = work(controller.signal);
+      this.activities.add(activity);
+
+      try {
+        const result = await activity;
+
+        if (timedOut) {
+          throw new WorkerPoolTimeoutError(options.timeout);
+        }
+
+        return result;
+      } catch (error) {
+        if (timedOut) {
+          throw new WorkerPoolTimeoutError(options.timeout);
+        }
+        throw error;
+      } finally {
+        clearTimeout(timeout); // Always clean up timer
+        this.activities.delete(activity);
+      }
+    } finally {
+      release();
     }
   }
 
   async shutdown(): Promise<void> {
     this.isShuttingDown = true;
-
-    // Wake up all waiting callers - they'll see isShuttingDown = true
-    for (const deferred of this.waitingForCapacity) {
-      deferred.resolve();
-    }
-    this.waitingForCapacity.length = 0;
+    this.semaphore.cancel();
 
     if (this.activities.size === 0) {
       return;
     }
 
     const timeoutPromise = new Promise<void>((resolve) => {
-      setTimeout(resolve, this.config.shutdownTimeout);
+      setTimeout(resolve, this.shutdownTimeout);
     });
 
     await Promise.race([Promise.allSettled(this.activities), timeoutPromise]);
