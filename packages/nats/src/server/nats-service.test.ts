@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { NatsService } from "./nats-service";
 import { MemoryStore } from "@weegigs/events-core";
 import * as events from "@weegigs/events-core";
+import { Signal } from "@weegigs/events-common";
 
 // Mock NATS dependencies
 vi.mock("@nats-io/nats-core", () => ({
@@ -37,7 +38,7 @@ const createTestDescription = () => {
 };
 
 describe("NatsService", () => {
-  describe("Deferred shutdown signal implementation", () => {
+  describe("Signal shutdown signal implementation", () => {
     it("should create shutdown signal with proper type", async () => {
       // This is more of a compilation test to ensure types are correct
       const description = createTestDescription();
@@ -63,10 +64,10 @@ describe("NatsService", () => {
       await new Promise(resolve => setTimeout(resolve, 10));
 
       expect(service).toBeDefined();
-      expect(service.shutdownSignal).toBeDefined();
+      expect(service.shutdownSignal).toBeInstanceOf(Signal);
     });
 
-    it("should resolve shutdown signal with null", async () => {
+    it("should trigger shutdown signal with null", async () => {
       const description = createTestDescription();
       const mockNats = {
         addGroup: vi.fn().mockReturnValue({
@@ -107,9 +108,9 @@ describe("NatsService", () => {
   describe("Iterator processor simulation", () => {
     it("should demonstrate Promise.race pattern", async () => {
       // Simulate the iterator.next() vs shutdown signal race
-      let resolveShutdown: (value: null) => void = () => {};
+      let triggerShutdown: (value: null) => void = () => {};
       const shutdownSignal = new Promise<null>(resolve => {
-        resolveShutdown = resolve;
+        triggerShutdown = resolve;
       });
 
       const iteratorNext = new Promise<string>(() => {
@@ -120,7 +121,7 @@ describe("NatsService", () => {
       const racePromise = Promise.race([iteratorNext, shutdownSignal]);
 
       // Resolve shutdown signal first
-      resolveShutdown(null);
+      triggerShutdown(null);
 
       const result = await racePromise;
       expect(result).toBeNull();
@@ -150,7 +151,7 @@ describe("NatsService", () => {
   });
 
   describe("Shutdown sequence", () => {
-    it("should call shutdown signal resolve before nats.stop", async () => {
+    it("should call shutdown signal trigger before nats.stop", async () => {
       const description = createTestDescription();
       const mockNats = {
         addGroup: vi.fn().mockReturnValue({
@@ -181,10 +182,10 @@ describe("NatsService", () => {
       // Track call order
       const calls: string[] = [];
       
-      const originalResolve = service.shutdownSignal.resolve;
-      service.shutdownSignal.resolve = vi.fn((value) => {
+      const originalTrigger = service.shutdownSignal.trigger;
+      service.shutdownSignal.trigger = vi.fn((value: null) => {
         calls.push("shutdown-signal");
-        return originalResolve(value);
+        originalTrigger.call(service.shutdownSignal, value);
       });
 
       mockNats.stop.mockImplementation(async () => {
@@ -194,7 +195,7 @@ describe("NatsService", () => {
       await service.shutdown();
 
       expect(calls).toEqual(["shutdown-signal", "nats-stop"]);
-      expect(service.shutdownSignal.resolve).toHaveBeenCalledWith(null);
+      expect(service.shutdownSignal.trigger).toHaveBeenCalledWith(null);
       expect(mockNats.stop).toHaveBeenCalledOnce();
     });
 
@@ -334,7 +335,7 @@ describe("NatsService", () => {
       expect(mockNats.stop).toHaveBeenCalled();
     });
 
-    it("should handle shutdown signal resolve being called multiple times", async () => {
+    it("should handle shutdown signal trigger being called multiple times", async () => {
       const description = createTestDescription();
       const mockNats = {
         addGroup: vi.fn().mockReturnValue({
@@ -361,10 +362,10 @@ describe("NatsService", () => {
         shutdown: vi.fn().mockResolvedValue(undefined),
       };
 
-      // Manually resolve shutdown signal multiple times
-      service.shutdownSignal.resolve(null);
-      service.shutdownSignal.resolve(null);
-      service.shutdownSignal.resolve(null);
+      // Manually trigger shutdown signal multiple times
+      service.shutdownSignal.trigger(null);
+      service.shutdownSignal.trigger(null);
+      service.shutdownSignal.trigger(null);
 
       // Should still be able to shutdown normally
       await service.shutdown();

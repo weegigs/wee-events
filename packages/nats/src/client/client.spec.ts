@@ -88,7 +88,7 @@ describe("NatsClient Integration Tests", () => {
 
   beforeAll(async () => {
     // Start NATS server in Docker
-    natsContainer = await new GenericContainer("nats:latest")
+    natsContainer = await new GenericContainer("nats:2.9-alpine")
       .withExposedPorts(4222)
       .withCommand(["-js", "-m", "8222"])
       .withWaitStrategy(Wait.forLogMessage("Server is ready"))
