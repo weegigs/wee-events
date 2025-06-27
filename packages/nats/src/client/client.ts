@@ -59,7 +59,7 @@ export class NatsClient<S extends State = State> {
       throw new InvalidCommandPayloadError(command, validation.error.message);
     }
 
-    const subject = `${this.type}.commands.${command}`;
+    const subject = `${this.type}.execute`;
 
     const request: ExecuteRequest.Type = {
       target: {

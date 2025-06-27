@@ -197,8 +197,8 @@ Enables structured JSON logging with trace context propagation. Logs include:
 ### Subject Structure
 
 ```
-{serviceName}.command.{aggregateType}.{commandName}
-{serviceName}.query.{aggregateType}.get
+{serviceName}.execute
+{serviceName}.fetch
 {serviceName}.events.{aggregateType}.{eventType}
 {serviceName}.$SRV.INFO
 {serviceName}.$SRV.STATS
@@ -385,8 +385,8 @@ console.log(info);
 //   version: "1.0.0", 
 //   description: "User management service",
 //   endpoints: [
-//     { name: "GetUser", subject: "user-service.query.user.get" },
-//     { name: "CreateUser", subject: "user-service.command.user.create" },
+//     { name: "execute", subject: "user-service.execute" },
+//     { name: "fetch", subject: "user-service.fetch" },
 //     ...
 //   ]
 // }

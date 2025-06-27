@@ -51,12 +51,9 @@ export class NatsService<S extends events.State> {
 
     // Set up service group with service name (type)
     const serviceGroup = this.nats.addGroup(info.entity.type);
-    
-    // Set up command endpoints under service group
-    const commands = serviceGroup.addGroup("commands");
-    for (const [command] of Object.entries(description.commands())) {
-      this.registerCommand(commands, command);
-    }
+
+    // Set up command endpoint under service group
+    this.registerCommandEndpoint(serviceGroup);
 
     // Set up fetch endpoint under service group
     serviceGroup.addEndpoint("fetch", async (err, msg) => {
@@ -91,16 +88,16 @@ export class NatsService<S extends events.State> {
     });
   }
 
-  private registerCommand(commands: ServiceGroup, command: string): void {
-    const iterator = commands.addEndpoint(command); // No callback = returns iterator
-    const processor = this.processCommandIterator(command, iterator);
+  private registerCommandEndpoint(group: ServiceGroup): void {
+    const iterator = group.addEndpoint("execute"); // No callback = returns iterator
+    const processor = this.processCommandIterator(iterator);
     this.iteratorProcessors.add(processor);
     processor.finally(() => {
       this.iteratorProcessors.delete(processor);
     });
   }
 
-  private async processCommandIterator(command: string, queue: QueuedIterator<ServiceMsg>): Promise<void> {
+  private async processCommandIterator(queue: QueuedIterator<ServiceMsg>): Promise<void> {
     // Convert to manual iterator for capacity-controlled pulling
     const iterator = syncIterator(queue);
 
@@ -122,7 +119,7 @@ export class NatsService<S extends events.State> {
       }
     } catch (error) {
       // Iterator error - log but don't crash service
-      console.error(`Iterator error for command ${command}:`, error);
+      console.error(`Iterator error for command endpoint:`, error);
     }
   }
 
