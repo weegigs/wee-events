@@ -1,4 +1,4 @@
-import { NatsConnection, RequestOptions } from "@nats-io/nats-core";
+import { NatsConnection, RequestOptions, headers } from "@nats-io/nats-core";
 import { connect } from "@nats-io/transport-node";
 import { AggregateId, Entity, ServiceDescription, Environment, State, Command, Service } from "@weegigs/events-core";
 import { ulid } from "ulid";
@@ -6,8 +6,32 @@ import { ulid } from "ulid";
 import { ExecuteRequest, ExecuteResponse, LoadRequest, LoadResponse } from "../messages";
 import { mapNatsError, UnknownCommandError, InvalidCommandPayloadError, InvalidResponseFormatError } from "./errors";
 
+export type RequestOptionsModifier = (options: RequestOptions) => RequestOptions;
+
 /**
- * Base NATS client for event service communication that implements the core Service interface
+ * NATS client that implements the core Service interface with transport-specific fluent options.
+ * 
+ * Uses function composition pattern with RequestOptionsModifier to configure transport-level
+ * options like timeout and headers. Application-level concerns (retries, circuit breakers, 
+ * metrics) should be handled externally using libraries like Cockatiel.
+ * 
+ * @example
+ * ```typescript
+ * // Basic usage (Service interface compliance)
+ * await client.execute("create-user", userId, userData);
+ * await client.load(userId);
+ * 
+ * // Transport-level configuration
+ * await client
+ *   .withTimeout(10000)
+ *   .withHeader("x-trace-id", "123")
+ *   .execute("create-user", userId, userData);
+ * 
+ * // Application-level policies (external)
+ * const resilientClient = Policy.retry().execute(() =>
+ *   client.execute("create-user", userId, userData)
+ * );
+ * ```
  */
 export class NatsClient<S extends State = State> implements Service<S> {
   public static create<S extends State = State>(description: ServiceDescription<Environment, S>) {
@@ -31,7 +55,8 @@ export class NatsClient<S extends State = State> implements Service<S> {
 
   constructor(
     private readonly connection: NatsConnection,
-    description: ServiceDescription<Environment, S>
+    description: ServiceDescription<Environment, S>,
+    private readonly modifiers: RequestOptionsModifier[] = []
   ) {
     this.type = description.info().entity.type;
     this.commands = description.commands();
@@ -41,43 +66,23 @@ export class NatsClient<S extends State = State> implements Service<S> {
   /**
    * Execute a command on an aggregate (core Service interface)
    */
-  async execute(
-    name: string,
-    target: AggregateId,
-    command: Command
-  ): Promise<Entity<S>> {
-    return this.executeWithOptions(name, target, command, { timeout: 5000 });
-  }
-
-  /**
-   * Internal method that handles execute with explicit options
-   */
-  public async executeWithOptions(
-    command: string,
-    aggregateId: AggregateId,
-    payload: Command,
-    options: Pick<RequestOptions, "timeout">
-  ): Promise<Entity<S>> {
-    // Validate command exists
-    if (!(command in this.commands)) {
-      throw new UnknownCommandError(command, Object.keys(this.commands));
+  async execute(name: string, target: AggregateId, command: Command): Promise<Entity<S>> {
+    if (!(name in this.commands)) {
+      throw new UnknownCommandError(name, Object.keys(this.commands));
     }
 
     // Validate command payload against schema
-    const schema = this.commands[command];
-    const validation = schema.safeParse(payload);
+    const schema = this.commands[name];
+    const validation = schema.safeParse(command);
     if (!validation.success) {
-      throw new InvalidCommandPayloadError(command, validation.error.message);
+      throw new InvalidCommandPayloadError(name, validation.error.message);
     }
 
     const subject = `${this.type}.execute`;
 
     const request: ExecuteRequest.Type = {
-      target: {
-        type: aggregateId.type,
-        key: aggregateId.key,
-      },
-      command,
+      target,
+      command: name,
       payload: validation.data,
       metadata: {
         messageId: ulid(),
@@ -86,6 +91,7 @@ export class NatsClient<S extends State = State> implements Service<S> {
     };
 
     try {
+      const options = this.modifiers.reduce((options, modifier) => modifier(options), { timeout: 5000 });
       const response = await this.connection.request(subject, JSON.stringify(request), options);
 
       // Parse response - NATS services automatically throws for error responses
@@ -113,28 +119,30 @@ export class NatsClient<S extends State = State> implements Service<S> {
   }
 
   /**
-   * Load an entity by aggregate ID (core Service interface)
+   * Apply a custom RequestOptions modifier to create a new client instance.
+   * 
+   * This is the core composition method that enables the fluent API. Each modifier
+   * function receives the current RequestOptions and returns modified options.
+   * 
+   * @param modifier Function that transforms RequestOptions
+   * @returns New NatsClient instance with the modifier applied
    */
-  async load(
-    aggregate: AggregateId
-  ): Promise<Entity<S>> {
-    return this.loadWithOptions(aggregate, { timeout: 5000 });
+  public withModifier(modifier: RequestOptionsModifier): NatsClient<S> {
+    return new NatsClient(this.connection, this.description, [...this.modifiers, modifier]);
   }
 
   /**
-   * Internal method that handles load with explicit options
+   * Load an entity by aggregate ID (core Service interface)
    */
-  public async loadWithOptions(
-    aggregateId: AggregateId,
-    options: Pick<RequestOptions, "timeout">
-  ): Promise<Entity<S>> {
+  async load(aggregate: AggregateId): Promise<Entity<S>> {
     const subject = `${this.type}.load`;
 
     const request: LoadRequest.Type = {
-      aggregateId,
+      aggregateId: aggregate,
     };
 
     try {
+      const options = this.modifiers.reduce((options, modifier) => modifier(options), { timeout: 5000 });
       const response = await this.connection.request(subject, JSON.stringify(request), options);
 
       // Parse response - NATS services automatically throws for error responses
@@ -162,25 +170,31 @@ export class NatsClient<S extends State = State> implements Service<S> {
   }
 
   /**
-   * Create a new client with custom timeout
+   * Create a new client with custom NATS request timeout (transport-level).
+   * 
+   * @param ms Timeout in milliseconds for NATS requests
+   * @returns New NatsClient instance with timeout applied
    */
-  withTimeout(ms: number): Service<S> {
-    return new TimeoutNatsClient(this, ms);
+  withTimeout(ms: number): NatsClient<S> {
+    return this.withModifier((options) => ({ ...options, timeout: ms }));
   }
 
   /**
-   * Create a new client with custom headers (placeholder)
+   * Create a new client with an additional NATS header (transport-level).
+   * 
+   * Headers are sent with the NATS request and can be used for tracing,
+   * authentication, or other transport-level metadata.
+   * 
+   * @param key Header name (any printable ASCII except ':')
+   * @param value Header value (any ASCII except '\r' or '\n')
+   * @returns New NatsClient instance with header applied
    */
-  withHeaders(_headers: Record<string, string>): Service<S> {
-    // TODO: Implement headers support
-    return this;
-  }
-
-  /**
-   * Create a new client with custom retry settings
-   */
-  withRetries(maxRetries: number): Service<S> {
-    return new RetriesNatsClient(this, maxRetries);
+  withHeader(key: string, value: string): NatsClient<S> {
+    return this.withModifier((options) => {
+      const current = options.headers ?? headers();
+      current.append(key, value);
+      return { ...options, headers: current };
+    });
   }
 
   /**
@@ -188,105 +202,5 @@ export class NatsClient<S extends State = State> implements Service<S> {
    */
   async close(): Promise<void> {
     await this.connection.close();
-  }
-}
-
-/**
- * Timeout decorator that applies custom timeout to all requests
- */
-class TimeoutNatsClient<S extends State> implements Service<S> {
-  constructor(
-    private readonly client: NatsClient<S>,
-    private readonly timeoutMs: number
-  ) {}
-
-  async execute(name: string, target: AggregateId, command: Command): Promise<Entity<S>> {
-    return this.client.executeWithOptions(name, target, command, { timeout: this.timeoutMs });
-  }
-
-  async load(aggregate: AggregateId): Promise<Entity<S>> {
-    return this.client.loadWithOptions(aggregate, { timeout: this.timeoutMs });
-  }
-
-  withTimeout(ms: number): Service<S> {
-    return new TimeoutNatsClient(this.client, ms);
-  }
-
-  withHeaders(_headers: Record<string, string>): Service<S> {
-    // TODO: Implement headers + timeout combination
-    return this;
-  }
-
-  withRetries(maxRetries: number): Service<S> {
-    return new RetriesTimeoutNatsClient(this.client, this.timeoutMs, maxRetries);
-  }
-}
-
-// TODO: Implement headers decorators when NATS headers support is added
-
-/**
- * Retries decorator (placeholder - retry logic would be implemented here)
- */
-class RetriesNatsClient<S extends State> implements Service<S> {
-  constructor(
-    private readonly client: NatsClient<S>,
-    private readonly maxRetries: number
-  ) {}
-
-  async execute(name: string, target: AggregateId, command: Command): Promise<Entity<S>> {
-    // TODO: Implement retry logic
-    return this.client.execute(name, target, command);
-  }
-
-  async load(aggregate: AggregateId): Promise<Entity<S>> {
-    // TODO: Implement retry logic
-    return this.client.load(aggregate);
-  }
-
-  withTimeout(ms: number): Service<S> {
-    return new RetriesTimeoutNatsClient(this.client, ms, this.maxRetries);
-  }
-
-  withHeaders(_headers: Record<string, string>): Service<S> {
-    // TODO: Implement headers + retries combination
-    return this;
-  }
-
-  withRetries(maxRetries: number): Service<S> {
-    return new RetriesNatsClient(this.client, maxRetries);
-  }
-}
-
-/**
- * Combined retries and timeout decorator
- */
-class RetriesTimeoutNatsClient<S extends State> implements Service<S> {
-  constructor(
-    private readonly client: NatsClient<S>,
-    private readonly timeoutMs: number,
-    private readonly maxRetries: number
-  ) {}
-
-  async execute(name: string, target: AggregateId, command: Command): Promise<Entity<S>> {
-    // TODO: Implement retry logic with timeout
-    return this.client.executeWithOptions(name, target, command, { timeout: this.timeoutMs });
-  }
-
-  async load(aggregate: AggregateId): Promise<Entity<S>> {
-    // TODO: Implement retry logic with timeout
-    return this.client.loadWithOptions(aggregate, { timeout: this.timeoutMs });
-  }
-
-  withTimeout(ms: number): Service<S> {
-    return new RetriesTimeoutNatsClient(this.client, ms, this.maxRetries);
-  }
-
-  withHeaders(_headers: Record<string, string>): Service<S> {
-    // TODO: Implement headers + retries + timeout combination
-    return this;
-  }
-
-  withRetries(maxRetries: number): Service<S> {
-    return new RetriesTimeoutNatsClient(this.client, this.timeoutMs, maxRetries);
   }
 }

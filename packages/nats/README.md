@@ -139,35 +139,51 @@ const result = await client
 
 ## Client Fluent API
 
-The NATS client implements the core `Service<S>` interface with additional fluent methods for transport-specific configuration:
+The NATS client implements the core `Service<S>` interface with additional fluent methods for transport-specific configuration using function composition:
 
 ```typescript
 // Basic usage (implements Service<S> interface)
 await client.execute(commandName, aggregateId, payload);
 await client.load(aggregateId);
 
-// Custom timeout
+// Custom timeout (transport-level)
 await client.withTimeout(10000).execute(commandName, aggregateId, payload);
 
-// Custom headers (when implemented)
-await client.withHeaders({ "x-trace-id": "123" }).load(aggregateId);
+// Custom headers (transport-level)
+await client.withHeader("x-trace-id", "123").load(aggregateId);
 
-// Custom retries (when implemented) 
-await client.withRetries(3).execute(commandName, aggregateId, payload);
-
-// Chaining multiple options
+// Chaining multiple transport options
 await client
   .withTimeout(15000)
-  .withRetries(3)
+  .withHeader("x-user-id", "456")
+  .withHeader("x-service", "user-management")
   .execute(commandName, aggregateId, payload);
+
+// Application-level concerns handled externally (recommended)
+import { retry, circuitBreaker, Policy } from 'cockatiel';
+
+const resilientExecute = Policy
+  .handle(Error)
+  .retry().attempts(3)
+  .pipe(Policy.circuitBreaker({ halfOpenAfter: 10_000 }))
+  .pipe(Policy.timeout(30_000));
+
+// Combine transport and application concerns
+const result = await resilientExecute.execute(() =>
+  client
+    .withTimeout(5000)              // NATS transport timeout
+    .withHeader("x-trace-id", "123") // NATS transport header
+    .execute(commandName, aggregateId, payload)
+);
 ```
 
 ### Design Principles
 
-- **Open-Closed Principle**: Base client is closed for modification, open for extension through decorators
+- **Function Composition**: Uses RequestOptionsModifier functions instead of decorator classes
+- **Separation of Concerns**: Transport-level (timeout, headers) vs Application-level (retries, circuit breakers)
 - **Service Interface Compliance**: Implements exact `Service<S>` interface for transport-agnostic code
 - **Immutable Operations**: Each fluent method returns a new client instance
-- **Type Safety**: Full TypeScript support with method chaining
+- **External Application Policies**: Use proven libraries like Cockatiel for resilience patterns
 
 ## Configuration Options
 
