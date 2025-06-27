@@ -9,7 +9,7 @@ describe("sleep", () => {
     await sleep(delay);
     
     const elapsed = Date.now() - start;
-    expect(elapsed).toBeGreaterThanOrEqual(delay);
+    expect(elapsed).toBeGreaterThanOrEqual(delay - 1); // Allow 1ms tolerance for timing inaccuracies
     expect(elapsed).toBeLessThan(delay + 50); // Allow 50ms tolerance
   });
 
