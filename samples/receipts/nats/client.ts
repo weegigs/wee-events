@@ -28,8 +28,8 @@ async function runClient() {
       quantity: 1,
     });
 
-    // Fetch current state
-    const receipt1 = await client.fetch(receiptId);
+    // Load current state
+    const receipt1 = await client.load(receiptId);
     console.log("Current receipt:", JSON.stringify(receipt1.state, null, 2));
 
     // Remove an item
@@ -39,7 +39,7 @@ async function runClient() {
     });
 
     // Check state again
-    const receipt2 = await client.fetch(receiptId);
+    const receipt2 = await client.load(receiptId);
     console.log("Receipt after removal:", JSON.stringify(receipt2.state, null, 2));
 
     // Finalize the receipt
@@ -47,7 +47,7 @@ async function runClient() {
     await client.execute("finalize", receiptId, {});
 
     // Final state
-    const finalReceipt = await client.fetch(receiptId);
+    const finalReceipt = await client.load(receiptId);
     console.log("Final receipt:", JSON.stringify(finalReceipt.state, null, 2));
 
     console.log("\n=== Done ===");

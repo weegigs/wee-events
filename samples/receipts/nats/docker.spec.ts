@@ -86,8 +86,8 @@ describe("Receipt Service NATS Integration Tests", () => {
         quantity: 1,
       });
 
-      // Fetch receipt
-      const receipt = await client.fetch(receiptId);
+      // Load receipt
+      const receipt = await client.load(receiptId);
       expect(receipt.state.status).toBe("open");
       expect(receipt.state.items).toHaveLength(2);
       expect(receipt.state.total).toBe(12.25); // (4.50 * 2) + 3.25
@@ -96,7 +96,7 @@ describe("Receipt Service NATS Integration Tests", () => {
       await client.execute("remove-item", receiptId, { name: "Coffee" });
 
       // Verify removal
-      const updatedReceipt = await client.fetch(receiptId);
+      const updatedReceipt = await client.load(receiptId);
       expect(updatedReceipt.state.items).toHaveLength(1);
       expect(updatedReceipt.state.total).toBe(3.25);
 
@@ -104,7 +104,7 @@ describe("Receipt Service NATS Integration Tests", () => {
       await client.execute("finalize", receiptId, {});
 
       // Verify finalized
-      const finalReceipt = await client.fetch(receiptId);
+      const finalReceipt = await client.load(receiptId);
       expect(finalReceipt.state.status).toBe("closed");
     });
 
@@ -112,8 +112,8 @@ describe("Receipt Service NATS Integration Tests", () => {
     it("should handle business rule violations", async () => {
       const receiptId = AggregateId.create("receipt", "error-test");
 
-      // Fetch non-existent receipt should create it with default values
-      const emptyReceipt = await client.fetch(receiptId);
+      // Load non-existent receipt should create it with default values
+      const emptyReceipt = await client.load(receiptId);
       expect(emptyReceipt.aggregate.key).toBe("error-test");
       expect(emptyReceipt.state.status).toBe("open");
       expect(emptyReceipt.state.items).toEqual([]);
@@ -193,8 +193,8 @@ describe("Receipt Service NATS Integration Tests", () => {
       await client.execute("add-item", receiptId, { name: "Muffin", price: 3.25, quantity: 1 });
       await client.execute("add-item", receiptId, { name: "Tea", price: 2.0, quantity: 1 });
 
-      // Fetch - should see all items since store is shared between service instances
-      const receipt = await client.fetch(receiptId);
+      // Load - should see all items since store is shared between service instances
+      const receipt = await client.load(receiptId);
       
       expect(receipt.state.items).toHaveLength(3);
       expect(receipt.state.items.map(item => item.name)).toEqual(
@@ -207,7 +207,7 @@ describe("Receipt Service NATS Integration Tests", () => {
       await client.execute("remove-item", receiptId, { name: "Muffin" });
 
       // Verify removal
-      const updatedReceipt = await client.fetch(receiptId);
+      const updatedReceipt = await client.load(receiptId);
       expect(updatedReceipt.state.items).toHaveLength(2);
       expect(updatedReceipt.state.total).toBe(6.5); // 4.5 + 2.0
     });

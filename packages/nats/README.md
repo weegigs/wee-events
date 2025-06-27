@@ -76,7 +76,7 @@ const userServiceDescription: ServiceDescription<{}, User> = {
       // Your business logic here
     },
     
-    // Query handler
+    // Query handler  
     load: async (aggregateId) => {
       // Your query logic here
     }
@@ -112,32 +112,62 @@ console.log("User service running!");
 ### 3. Create a NATS Client
 
 ```typescript
-import { createClient } from "@weegigs/events-nats";
+import { NatsClient } from "@weegigs/events-nats";
 
 // Create type-safe client
-const client = createClient(userServiceDescription, {
-  serviceName: "user-service",
-  serviceVersion: "1.0.0",
-  natsUrl: "nats://localhost:4222",
-});
-
-await client.connect();
+const client = await NatsClient.create(userServiceDescription)
+  .connect("nats://localhost:4222");
 
 // Execute commands
-const result = await client.execute("create", "user-123", {
+const result = await client.execute("create", { type: "user", key: "user-123" }, {
   name: "John Doe",
   email: "john@example.com",
 });
 
-// Fetch state
-const user = await client.fetch("user-123");
+// Load state
+const user = await client.load({ type: "user", key: "user-123" });
 console.log(user.state); // { id: "user-123", name: "John Doe", ... }
 
-// Subscribe to events
-await client.subscribeToEvents("created", async (event) => {
-  console.log("User created:", event.data);
-});
+// Use fluent API for custom options
+const result = await client
+  .withTimeout(10000)
+  .execute("create", { type: "user", key: "user-456" }, {
+    name: "Jane Doe",
+    email: "jane@example.com",
+  });
 ```
+
+## Client Fluent API
+
+The NATS client implements the core `Service<S>` interface with additional fluent methods for transport-specific configuration:
+
+```typescript
+// Basic usage (implements Service<S> interface)
+await client.execute(commandName, aggregateId, payload);
+await client.load(aggregateId);
+
+// Custom timeout
+await client.withTimeout(10000).execute(commandName, aggregateId, payload);
+
+// Custom headers (when implemented)
+await client.withHeaders({ "x-trace-id": "123" }).load(aggregateId);
+
+// Custom retries (when implemented) 
+await client.withRetries(3).execute(commandName, aggregateId, payload);
+
+// Chaining multiple options
+await client
+  .withTimeout(15000)
+  .withRetries(3)
+  .execute(commandName, aggregateId, payload);
+```
+
+### Design Principles
+
+- **Open-Closed Principle**: Base client is closed for modification, open for extension through decorators
+- **Service Interface Compliance**: Implements exact `Service<S>` interface for transport-agnostic code
+- **Immutable Operations**: Each fluent method returns a new client instance
+- **Type Safety**: Full TypeScript support with method chaining
 
 ## Configuration Options
 
@@ -198,7 +228,7 @@ Enables structured JSON logging with trace context propagation. Logs include:
 
 ```
 {serviceName}.execute
-{serviceName}.fetch
+{serviceName}.load
 {serviceName}.events.{aggregateType}.{eventType}
 {serviceName}.$SRV.INFO
 {serviceName}.$SRV.STATS
@@ -386,7 +416,7 @@ console.log(info);
 //   description: "User management service",
 //   endpoints: [
 //     { name: "execute", subject: "user-service.execute" },
-//     { name: "fetch", subject: "user-service.fetch" },
+//     { name: "load", subject: "user-service.load" },
 //     ...
 //   ]
 // }

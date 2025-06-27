@@ -150,7 +150,7 @@ describe("NatsClient Integration Tests", () => {
     it("should create client using static factory method", async () => {
       expect(client).toBeDefined();
       expect(typeof client.execute).toBe("function");
-      expect(typeof client.fetch).toBe("function");
+      expect(typeof client.load).toBe("function");
       expect(typeof client.close).toBe("function");
     });
 
@@ -164,14 +164,14 @@ describe("NatsClient Integration Tests", () => {
       expect(result.state.value).toBe(42);
     });
 
-    it("should fetch entities", async () => {
+    it("should load entities", async () => {
       const aggregateId: AggregateId = { type: "test-entity", key: "test-2" };
       
       // First execute a command to create some state
       await client.execute(SetValue.name, aggregateId, { value: 100 });
       
-      // Then fetch the entity
-      const entity = await client.fetch(aggregateId);
+      // Then load the entity
+      const entity = await client.load(aggregateId);
       
       expect(entity).toBeDefined();
       expect(entity.aggregate).toEqual(aggregateId);
@@ -186,7 +186,7 @@ describe("NatsClient Integration Tests", () => {
       await client.execute(SetStatus.name, aggregateId, { status: "inactive" });
       await client.execute(SetValue.name, aggregateId, { value: 20 });
       
-      const entity = await client.fetch(aggregateId);
+      const entity = await client.load(aggregateId);
       expect(entity.state.value).toBe(20);
     });
 
@@ -226,10 +226,10 @@ describe("NatsClient Integration Tests", () => {
       ).rejects.toThrow();
     });
 
-    it("should handle fetch for non-existent entity", async () => {
+    it("should handle load for non-existent entity", async () => {
       const aggregateId: AggregateId = { type: "test-entity", key: "non-existent" };
       
-      const entity = await client.fetch(aggregateId);
+      const entity = await client.load(aggregateId);
       
       expect(entity).toBeDefined();
       expect(entity.aggregate).toEqual(aggregateId);
@@ -239,11 +239,10 @@ describe("NatsClient Integration Tests", () => {
     it("should handle custom request options", async () => {
       const aggregateId: AggregateId = { type: "test-entity", key: "test-8" };
       
-      const result = await client.execute(
+      const result = await client.withTimeout(10000).execute(
         SetValue.name, 
         aggregateId, 
-        { value: 999 },
-        { timeout: 10000 }
+        { value: 999 }
       );
       
       expect(result.state.value).toBe(999);

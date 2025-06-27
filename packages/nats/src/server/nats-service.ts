@@ -3,7 +3,7 @@ import { Svcm, Service, ServiceMsg, ServiceGroup } from "@nats-io/services";
 import * as events from "@weegigs/events-core";
 import { Signal } from "@weegigs/events-common";
 import { WorkerPool, WorkerPoolShutdownError, WorkerPoolTimeoutError } from "./worker-pool";
-import { ExecuteRequest, FetchRequest, FetchResponse } from "../messages";
+import { ExecuteRequest, LoadRequest, LoadResponse } from "../messages";
 import { NatsServiceErrorCodes, NatsServiceErrorPayload, NatsServiceErrorCode } from "../errors";
 import { z } from "zod";
 
@@ -55,14 +55,14 @@ export class NatsService<S extends events.State> {
     // Set up command endpoint under service group
     this.registerCommandEndpoint(serviceGroup);
 
-    // Set up fetch endpoint under service group
-    serviceGroup.addEndpoint("fetch", async (err, msg) => {
+    // Set up load endpoint under service group
+    serviceGroup.addEndpoint("load", async (err, msg) => {
       if (err) return;
 
       try {
         // Parse and validate request
         const request = msg.json();
-        const parsed = FetchRequest.schema.safeParse(request);
+        const parsed = LoadRequest.schema.safeParse(request);
 
         if (!parsed.success) {
           const payload: NatsServiceErrorPayload = {
@@ -80,7 +80,7 @@ export class NatsService<S extends events.State> {
         const entity = await this.service.load(parsed.data.aggregateId);
 
         // Send successful response
-        const response: FetchResponse.Type<z.ZodType<S>> = { entity };
+        const response: LoadResponse.Type<z.ZodType<S>> = { entity };
         msg.respond(JSON.stringify(response));
       } catch (error) {
         this.handleError(msg, error);

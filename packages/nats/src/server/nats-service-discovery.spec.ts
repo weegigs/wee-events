@@ -118,13 +118,13 @@ describe("NATS Service Discovery", () => {
     
     expect(infoData.name).toBe("receipt");
     expect(infoData.version).toBe("1.0.0");
-    expect(infoData.endpoints).toHaveLength(2); // 1 execute command + 1 fetch
+    expect(infoData.endpoints).toHaveLength(2); // 1 execute command + 1 load
     
     // Verify expected endpoints are present with service prefix
     expect(infoData.endpoints).toBeDefined();
     const endpointSubjects = infoData.endpoints?.map((ep: { subject: string }) => ep.subject) ?? [];
     expect(endpointSubjects).toContain("receipt.execute");
-    expect(endpointSubjects).toContain("receipt.fetch");
+    expect(endpointSubjects).toContain("receipt.load");
   });
 
   it("should respond to $SRV.STATS with service statistics", async () => {
@@ -151,10 +151,10 @@ describe("NATS Service Discovery", () => {
     
     // Verify expected endpoints are present with service prefix
     expect(endpointSubjects).toContain("receipt.execute");
-    expect(endpointSubjects).toContain("receipt.fetch");
+    expect(endpointSubjects).toContain("receipt.load");
     
     // Verify direct endpoints (without service prefix) are NOT present
     expect(endpointSubjects).not.toContain("execute");
-    expect(endpointSubjects).not.toContain("fetch");
+    expect(endpointSubjects).not.toContain("load");
   });
 });

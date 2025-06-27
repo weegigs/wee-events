@@ -41,7 +41,7 @@ export namespace ExecuteResponse {
   export type Type<S extends z.ZodTypeAny> = z.infer<ReturnType<typeof schema<S>>>;
 }
 
-export namespace FetchRequest {
+export namespace LoadRequest {
   export const schema = z
     .object({
       aggregateId: z
@@ -56,7 +56,7 @@ export namespace FetchRequest {
   export type Type = z.infer<typeof schema>;
 }
 
-export namespace FetchResponse {
+export namespace LoadResponse {
   export const schema = <S extends z.ZodTypeAny>(stateSchema: S) =>
     z
       .object({
