@@ -101,6 +101,20 @@ This is a **pnpm workspace monorepo** using **pnpm** for package management and 
 - No broken validation logic accepted as "working"
 - Performance improvements that don't break functionality
 
+## Debugging Protocol
+
+All agents must adhere to the debugging protocol defined in this repository. This protocol provides a systematic approach to identifying and resolving issues.
+
+**Before attempting to fix any bug, you MUST read and follow the steps outlined in:**
+- **[AI Agent Debugging Protocol](./.clockwork/tasks/debugging-protocol.md)**
+
+This protocol is the source of truth for all debugging activities. Key principles include:
+- **OBSERVE FIRST, ACT SECOND:** Never make changes without a verifiable hypothesis.
+- **THE ERROR IS A SYMPTOM, NOT THE CAUSE:** Trace execution backward to find the origin.
+- **ONE CHANGE AT A TIME:** Isolate every modification and run full verification. Revert if it fails.
+- **PROVE THE HYPOTHESIS:** Use diagnostic tools to test your theory in isolation before applying a fix.
+- **A "FIX" THAT CREATES A NEW ERROR IS A FAILURE:** Swapping one error for another indicates a flawed hypothesis. Revert and restart analysis.
+
 ## Task Completion Standards
 
 ### NEVER Declare Completion When:
