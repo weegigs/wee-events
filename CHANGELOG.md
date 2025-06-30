@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+* chore: add force release commands for overriding version detection (788453b)
+* chore: replace unreliable dry-run with reliable preview command (e2c8147)
+
 ## [0.19.0](https://github.com/weegigs/wee-events/compare/v0.18.4...v0.19.0) (2025-06-30)
 
 
