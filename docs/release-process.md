@@ -1,17 +1,16 @@
 # Release Process
 
-This document describes the comprehensive release process for the wee-events monorepo using Changesets and mise automation.
+This document describes the comprehensive release process for the wee-events monorepo using release-it with conventional commits and mise automation.
 
 ## Overview
 
-The release process is designed with multiple safety checkpoints and validation steps to ensure reliable, safe releases. It consists of 6 main phases:
+The release process is designed with multiple safety checkpoints and validation steps to ensure reliable, safe releases. It leverages conventional commit messages to automatically determine version bumps and generate changelogs. The process consists of 6 main phases:
 
 1. **Preflight** - Comprehensive validation before any changes
 2. **Dry Run** - Full simulation without modifications  
-3. **Version** - Update package versions and generate changelogs
-4. **Publish** - Publish packages to npm registry
-5. **Verify** - Post-release validation
-6. **Rollback** - Emergency rollback procedures
+3. **Version** - Automated version bumping, changelog generation, and publishing
+4. **Verify** - Post-release validation
+5. **Rollback** - Emergency rollback procedures
 
 ## Release Tasks
 
@@ -21,10 +20,10 @@ The release process is designed with multiple safety checkpoints and validation 
 **What it does**:
 - ✅ Validates git repository state (clean, on main, up-to-date)
 - 🔒 Runs security audit for high/critical vulnerabilities  
-- 📦 Ensures changesets are present for release
+- 📦 Uses conventional commits for versioning (no manual changesets needed)
 - 🏗️ Validates build system with frozen lockfile
 - 🧪 Runs full test suite, build, and linting
-- 📊 Shows changeset status
+- 📊 Shows recent conventional commits
 
 **When to use**: Always run this first before any release
 
@@ -36,11 +35,11 @@ The release process is designed with multiple safety checkpoints and validation 
 **Purpose**: Full release simulation without any changes
 
 **What it does**:
-- 📋 Shows what packages would be updated
+- 📋 Analyzes conventional commits to determine version bumps
+- 📝 Simulates version updates using `release-it --dry-run`
 - 🏗️ Tests clean build from scratch
 - 🧪 Runs full test suite
-- 🔍 Validates code quality  
-- 📦 Simulates package publication (--dry-run)
+- 🔍 Validates code quality
 
 **When to use**: After preflight passes, to validate the release
 
@@ -49,37 +48,36 @@ The release process is designed with multiple safety checkpoints and validation 
 ---
 
 ### `mise run release-version`
-**Purpose**: Update package versions and generate changelogs
+**Purpose**: Complete automated release with version bumping, changelog generation, and publishing
 
 **What it does**:
-- ⚠️ **MODIFIES FILES**: Updates package.json versions
-- 📝 Generates/updates CHANGELOG.md files
-- 📊 Shows all changes made
-- 📋 Displays version changes clearly
+- 🔄 Runs `release-it` which automatically:
+  - Analyzes conventional commits to determine version bumps
+  - Updates all package.json versions (synchronized across workspace)
+  - Generates/updates CHANGELOG.md files
+  - Creates git commit and tags
+  - Publishes packages to npm registry
+  - Creates GitHub releases
 
-**When to use**: After dry-run succeeds and you're ready to version
+**When to use**: After dry-run succeeds and you're ready to release
 
-**Safe to run**: ⚠️ **NO** - modifies package.json and CHANGELOG files
+**Safe to run**: ⚠️ **NO** - modifies files, creates commits, publishes packages
 
-**Next step**: Review changes, commit them, then run release-publish
+**Next step**: Run release-verify to confirm publication
 
 ---
 
 ### `mise run release-publish`
-**Purpose**: Publish packages to npm registry with full validation
+**Purpose**: Information about the new integrated workflow
 
 **What it does**:
-- 🔍 Validates git state and npm connectivity
-- 🔑 Checks npm authentication
-- 🧪 Final build and test validation
-- 📦 **PUBLISHES** packages to npm registry
-- 🏷️ Commits changes and pushes to git
+- 📝 Explains that publishing is now integrated into `release-version`
+- 📋 Shows available release commands
+- ✅ No separate publish step needed
 
-**When to use**: After version step and reviewing changes
+**When to use**: For information only
 
-**Safe to run**: ⚠️ **NO** - publishes to npm and pushes to git
-
-**Prerequisites**: Must run `git add . && git commit -m "Version packages"` first
+**Safe to run**: ✅ Yes - informational only
 
 ---
 
@@ -91,7 +89,7 @@ The release process is designed with multiple safety checkpoints and validation 
 - 📊 Shows release summary and git tags
 - ✅ Confirms successful publication
 
-**When to use**: After publish completes
+**When to use**: After release-version completes
 
 **Safe to run**: ✅ Yes - verification only
 
@@ -117,7 +115,7 @@ The release process is designed with multiple safety checkpoints and validation 
 **What it does**:
 - 🚀 Runs entire release pipeline automatically
 - ⚠️ Includes 10-second countdown to cancel
-- ⏸️ Pauses before publish for manual confirmation
+- 🔄 Uses `release-it --ci` for full automation
 - 🎉 Completes full release process
 
 **When to use**: When you want fully automated release
@@ -136,10 +134,15 @@ The release process is designed with multiple safety checkpoints and validation 
    git status  # Should be clean
    ```
 
-2. **Create changeset** (if not already done):
+2. **Ensure conventional commits** (no manual changesets needed):
    ```bash
-   pnpm changeset
-   # Follow prompts to describe changes
+   # Your commits should follow conventional format:
+   # feat: add new feature
+   # fix: resolve bug
+   # BREAKING CHANGE: major change
+   
+   # Check recent commits
+   git log --oneline --grep='feat\|fix\|BREAKING CHANGE' -10
    ```
 
 3. **Validation phase**:
@@ -151,51 +154,80 @@ The release process is designed with multiple safety checkpoints and validation 
 4. **Simulation phase**:
    ```bash
    mise run release-dry-run  
-   # Verify everything works without changes
+   # Verify version bumps and changes without modifications
    ```
 
-5. **Version phase**:
+5. **Release phase**:
    ```bash
    mise run release-version
-   # This modifies files - review carefully!
+   # This does everything: version, changelog, commit, tag, publish
    ```
 
-6. **Review and commit**:
-   ```bash
-   # Review all changes
-   git diff
-   find packages -name CHANGELOG.md -exec echo "=== {} ===" \; -exec head -20 {} \;
-   
-   # Commit version changes
-   git add .
-   git commit -m "chore: version packages for v0.19.0"
-   ```
-
-7. **Publication phase**:
-   ```bash
-   mise run release-publish
-   # This publishes to npm and pushes to git
-   ```
-
-8. **Verification phase**:
+6. **Verification phase**:
    ```bash
    mise run release-verify
-   # Confirm packages are available
+   # Confirm packages are available on npm
    ```
 
 ### Quick Automated Release
 
-For experienced users who want automation:
+For experienced users who want full automation:
 
 ```bash
 mise run release-full
 # Includes all phases with safety pauses
 ```
 
+### Manual Release Commands
+
+You can also use the underlying release-it commands directly:
+
+```bash
+# Interactive release (choose version manually)
+pnpm run release
+
+# Dry run to see what would happen
+pnpm run release:dry
+
+# Automated release using conventional commits
+pnpm run release:ci
+```
+
+## Conventional Commit Format
+
+The release process uses conventional commit messages to automatically determine version bumps:
+
+- `fix:` → patch version (0.18.4 → 0.18.5)
+- `feat:` → minor version (0.18.4 → 0.19.0)
+- `feat!:` or `BREAKING CHANGE:` → major version (0.18.4 → 1.0.0)
+
+Examples:
+```bash
+git commit -m "fix: resolve memory leak in event processing"
+git commit -m "feat: add support for batch event processing"
+git commit -m "feat!: change event schema format
+
+BREAKING CHANGE: Event schema now requires 'version' field"
+```
+
+## Git Hook Setup
+
+Conventional commit enforcement is automatically set up when you enter the project directory (via mise enter hook). The Git hooks will:
+
+- Validate commit messages follow conventional format
+- Run linting on staged files
+
+To manually validate commits when needed:
+```bash
+# Manual validation
+pnpx commitlint --edit
+```
+
 ## Safety Features
 
 - **Multi-stage validation**: Each phase validates different aspects
-- **No automatic file modification**: Explicit steps for destructive operations  
+- **Conventional commit automation**: No manual changeset creation needed
+- **Synchronized versioning**: All packages maintain same version number
 - **Clear output**: Emojis and section headers for easy progress tracking
 - **Rollback guidance**: Emergency procedures documented
 - **Git state validation**: Ensures clean repository state
@@ -217,6 +249,7 @@ Common issues:
 - Failed tests → fix failing tests
 - npm authentication → run `npm login`
 - Security vulnerabilities → update dependencies
+- Missing conventional commits → ensure proper commit message format
 
 ## Emergency Rollback
 
@@ -233,17 +266,18 @@ If a release needs to be rolled back:
 
 - **Always run preflight first** - catches issues early
 - **Use dry-run to validate** - safe simulation
-- **Review version changes carefully** - check CHANGELOGs and version numbers
+- **Write good conventional commits** - they determine version bumps
 - **Test in development environment** - verify packages work after installation
 - **Communicate releases** - notify team of new versions
 - **Monitor after release** - watch for issues in production
 
 ## Troubleshooting
 
-### "No changesets present"
+### "No conventional commits found"
 ```bash
-# Create a changeset
-pnpm changeset
+# Ensure commits follow conventional format
+git commit -m "feat: add new feature"
+git commit -m "fix: resolve issue"
 ```
 
 ### "Working directory not clean"  
@@ -269,4 +303,11 @@ pnpm audit
 pnpm audit --fix
 ```
 
-This process ensures reliable, safe releases with multiple validation checkpoints and clear rollback procedures.
+### "release-it version conflicts"
+```bash
+# Check if versions are already published
+npm view @weegigs/events-core versions --json
+# Use --no-increment to skip version bump if needed
+```
+
+This process ensures reliable, safe releases with automated version detection from conventional commits and multiple validation checkpoints.

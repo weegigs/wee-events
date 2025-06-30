@@ -4,6 +4,10 @@ _.file = ".env"
 [tools]
 pnpm = "10.2.1"
 node = "22.15.1"
+lefthook = "latest"
+
+[hooks]
+enter = "lefthook install"
 
 [tasks.clean-rebuild]
 description = "Full clean and rebuild of the entire monorepo"
@@ -27,7 +31,7 @@ run = [
     "pnpm audit || (echo '❌ High/critical security vulnerabilities found' && exit 1)",
     "echo '✅ No high/critical security vulnerabilities'",
     "echo '📦 3. Package validation:'",
-    "pnpm changeset status | grep -q 'No changesets present' && echo '❌ No changesets found for release' && exit 1 || echo '✅ Changesets present'",
+    "echo '✅ Using conventional commits for versioning'",
     "echo '🏗️  4. Build system validation:'",
     "pnpm run clean || echo 'Clean failed, continuing...'",
     "pnpm install --frozen-lockfile || (echo '❌ Failed to install with frozen lockfile' && exit 1)",
@@ -40,7 +44,8 @@ run = [
     "pnpm run lint || (echo '❌ Linting failed' && exit 1)",
     "echo '✅ Linting passed'",
     "echo '📊 6. Release validation:'",
-    "pnpm changeset status",
+    "echo '📊 Recent commits:'",
+    "git log --oneline --grep='feat\\|fix\\|BREAKING CHANGE' -10 || echo 'No conventional commits found'",
     "echo '🎯 === PREFLIGHT COMPLETE ==='",
     "echo '✅ All validations passed. Safe to proceed with release.'",
     "echo '📝 Next: mise run release-dry-run'",
@@ -50,11 +55,10 @@ run = [
 description = "Full release simulation without any changes"
 run = [
     "echo '🧪 === RELEASE DRY RUN ==='",
-    "echo '📋 Current changeset status:'",
-    "pnpm changeset status",
+    "echo '📋 Analyzing conventional commits:'",
+    "git log --oneline --grep='feat\\|fix\\|BREAKING CHANGE' -10 || echo 'No conventional commits found'",
     "echo '📝 Simulating version updates:'",
-    "echo 'The following packages would be updated:'",
-    "pnpm changeset status | grep -E '^  @weegigs/' || echo 'No packages to update'",
+    "pnpm run release:dry",
     "echo '🏗️  Testing clean build from scratch:'",
     "pnpm run clean",
     "pnpm install --frozen-lockfile",
@@ -63,8 +67,6 @@ run = [
     "pnpm run test",
     "echo '🔍 Validating code quality:'",
     "pnpm lint",
-    "echo '📦 Simulating package publication:'",
-    "pnpm changeset publish --dry-run",
     "echo '🎯 === DRY RUN COMPLETE ==='",
     "echo '✅ Dry run successful! Release would succeed.'",
     "echo '📝 Next: mise run release-version'",
@@ -77,47 +79,26 @@ run = [
     "echo '⚠️  This will modify package.json files and generate CHANGELOGs'",
     "echo '📝 Current git status:'",
     "git status --short",
-    "echo '🔄 Running changeset version...'",
-    "pnpm changeset version",
-    "echo '📊 Changes made:'",
-    "git status --short",
-    "git diff --name-only",
-    "echo '📋 Version changes:'",
-    "git diff --unified=0 packages/*/package.json | grep '^[+-].*\"version\"'",
+    "echo '🔄 Running release-it...'",
+    "pnpm run release",
     "echo '🎯 === VERSION UPDATE COMPLETE ==='",
-    "echo '✅ Versions updated successfully'",
-    "echo '⚠️  IMPORTANT: Review the changes above carefully'",
-    "echo '📝 Review CHANGELOGs: find packages -name CHANGELOG.md -exec echo \"=== {} ===\" \\; -exec head -20 {} \\;'",
-    "echo '📝 Next: git add . && git commit -m \"Version packages\" && mise run release-publish'",
+    "echo '✅ Release completed successfully'",
+    "echo '📝 Next: mise run release-verify'",
 ]
 
 [tasks.release-publish]
-description = "Publish packages to npm registry with full validation"
+description = "NOTE: Publishing is now handled by release-version task with release-it"
 run = [
-    "echo '📦 === PUBLICATION PHASE ==='",
-    "echo '🔍 Final pre-publish validation:'",
-    "git status --porcelain | grep -q . && echo '⚠️  Uncommitted changes detected' || echo '✅ All changes committed'",
-    "echo '🌐 Testing npm registry connectivity:'",
-    "npm ping || (echo '❌ Cannot reach npm registry' && exit 1)",
-    "echo '✅ npm registry accessible'",
-    "echo '🔑 Validating npm authentication:'",
-    "npm whoami || (echo '❌ Not logged into npm. Run: npm login' && exit 1)",
-    "echo '✅ npm authentication valid'",
-    "echo '🧪 Final build validation:'",
-    "pnpm run build",
-    "pnpm run test",
-    "echo '📦 Publishing packages...'",
-    "pnpm changeset publish",
-    "echo '🏷️  Creating git tag and pushing:'",
-    "git add .",
-    "git diff --cached --quiet || git commit -m 'chore: release packages'",
-    "LATEST_VERSION=$(jq -r '.version' packages/core/package.json)",
-    "git tag v$LATEST_VERSION",
-    "git push origin main",
-    "git push origin v$LATEST_VERSION",
-    "echo '🎯 === PUBLICATION COMPLETE ==='",
-    "echo '🎉 Release published successfully!'",
-    "echo '📝 Next: mise run release-verify'",
+    "echo '📦 === PUBLICATION NOTICE ==='",
+    "echo '✅ Publishing is now integrated into the release-version task'",
+    "echo '📝 release-it handles the entire release process:'",
+    "echo '   - Version bumping'", 
+    "echo '   - Changelog generation'",
+    "echo '   - Git tagging'",
+    "echo '   - NPM publishing'",
+    "echo '   - GitHub releases'",
+    "echo '📝 Use: mise run release-version for complete release'",
+    "echo '📝 Or: pnpm run release:ci for automated release'",
 ]
 
 [tasks.release-verify]
@@ -155,20 +136,16 @@ run = [
 ]
 
 [tasks.release-full]
-description = "Complete automated release pipeline (USE WITH CAUTION)"
+description = "Complete automated release pipeline using release-it (USE WITH CAUTION)"
 run = [
     "echo '🚀 === FULL AUTOMATED RELEASE ==='",
     "echo '⚠️  WARNING: This will execute the complete release pipeline'",
     "echo '⏱️  You have 10 seconds to cancel (Ctrl+C)...'",
     "sleep 10",
     "mise run release-preflight",
-    "mise run release-dry-run",
-    "mise run release-version",
-    "echo '⚠️  Pausing before publish. Review changes and press Enter to continue...'",
-    "read -p 'Continue with publish? (y/N): ' confirm",
-    "[ \"$confirm\" = \"y\" ] || [ \"$confirm\" = \"Y\" ] || (echo 'Cancelled.' && exit 1)",
-    "git add . && git commit -m 'chore: version packages'",
-    "mise run release-publish",
+    "mise run release-dry-run", 
+    "echo '⚠️  Proceeding with automated release using release-it...'",
+    "pnpm run release:ci",
     "mise run release-verify",
     "echo '🎉 === FULL RELEASE COMPLETE ==='",
     "echo '✅ Automated release pipeline finished successfully!'",
