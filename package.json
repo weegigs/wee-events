@@ -30,13 +30,11 @@
     "pnpm": ">=10.2.1"
   },
   "devDependencies": {
-    "@release-it/conventional-changelog": "catalog:",
-    "@release-it-plugins/workspaces": "catalog:",
-    "release-it": "catalog:",
-    "release-it-pnpm": "catalog:",
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
     "@eslint/js": "catalog:",
+    "@release-it-plugins/workspaces": "catalog:",
+    "@release-it/conventional-changelog": "catalog:",
     "@tsconfig/node22": "catalog:",
     "@types/lodash": "catalog:",
     "@types/node": "catalog:",
@@ -47,6 +45,7 @@
     "globals": "catalog:",
     "lodash": "catalog:",
     "prettier": "catalog:",
+    "release-it": "catalog:",
     "rimraf": "catalog:",
     "ts-node": "catalog:",
     "turbo": "catalog:",

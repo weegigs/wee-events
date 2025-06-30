@@ -15,7 +15,6 @@ catalog:
   "@release-it/conventional-changelog": "8.0.2"
   "@release-it-plugins/workspaces": "5.0.3"
   "release-it": "17.9.0"
-  "release-it-pnpm": "4.6.6"
   "@commitlint/cli": "19.8.1"
   "@commitlint/config-conventional": "19.8.1"
   "@effect/platform": "0.85.2"

@@ -18,7 +18,6 @@
       "infile": "CHANGELOG.md",
       "header": "# Changelog\n\nAll notable changes to this project will be documented in this file."
     },
-    "release-it-pnpm": {},
     "@release-it-plugins/workspaces": {
       "workspaces": [
         "packages/common",

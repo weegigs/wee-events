@@ -3,9 +3,7 @@ pre-commit:
   commands:
     lint:
       glob: "*.{js,ts,tsx,jsx}"
-      run: just lint
-    commitlint:
-      run: pnpx commitlint --edit
+      run: pnpm exec eslint --fix {staged_files}
 
 commit-msg:
   commands:
