@@ -56,17 +56,18 @@ The release process automatically determines version bumps from conventional com
 
 ---
 
-### `mise run release-dry-run`
-**Purpose**: Simulate release without making any changes
+### `just preview`
+**Purpose**: Preview what would be released without making any changes
 
 **What it does**:
-- 📋 Analyzes conventional commits to show proposed version bumps
-- 📝 Simulates version updates using `release-it --dry-run`
-- 🏗️ Builds and validates project
+- 📦 Shows current version and packages
+- 📋 Lists commits since last release
+- 🏷️ Highlights conventional commits that will trigger version bumps
+- 📋 Shows which packages would be published
 
 **When to use**: To preview what a release would do
 
-**Safe to run**: ✅ **YES** - simulation only
+**Safe to run**: ✅ **YES** - preview only, no changes
 
 ---
 
@@ -134,7 +135,7 @@ The release process automatically determines version bumps from conventional com
 
 **Just preview the release**:
 ```bash
-just release-dry
+just preview
 # See what would happen without making changes
 ```
 
@@ -272,8 +273,8 @@ npm view @weegigs/events-core versions --json
 
 The release process is designed to be simple and safe:
 
-1. **Most of the time**: Just run `mise run release`
-2. **To preview**: Use `mise run release-dry-run`  
-3. **For automation**: Use `mise run release-ci`
+1. **Most of the time**: Just run `just release`
+2. **To preview**: Use `just preview`  
+3. **For automation**: Use `just release-ci`
 
 The process handles version detection, validation, publishing, and verification automatically while giving you control over when changes are actually made.

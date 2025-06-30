@@ -9,7 +9,7 @@ default:
     @echo "  just build          # Build if needed"
     @echo "  just test           # Run tests" 
     @echo "  just release        # Release interactively"
-    @echo "  just release-dry    # Preview release"
+    @echo "  just preview        # Preview release"
     @echo ""
     @echo "📝 You can also use: mise run release"
 
@@ -26,11 +26,14 @@ build: install
     pnpm run build
 
 # Run tests (builds first if needed)
-test: build
+test: compile
     pnpm run test
 
+compile:
+    pnpm run compile
+
 # Run linting (builds first if needed)  
-lint: build
+lint: compile
     pnpm run lint
 
 # Validate everything is ready for release
@@ -64,9 +67,57 @@ validate: build test lint
     
     echo "✅ All validations passed"
 
-# Dry run release (shows what would happen)
-release-dry: validate
-    pnpm run release:dry
+# Preview what would be released without publishing
+preview:
+    #!/bin/bash
+    set -e
+    echo "🔍 PREVIEW: What would be released..."
+    echo ""
+    CURRENT_VERSION=$(grep '"version"' package.json | head -1 | cut -d'"' -f4)
+    echo "📦 Current version: v${CURRENT_VERSION}"
+    echo ""
+    
+    # Check if there are any commits since last release
+    COMMIT_COUNT=$(git rev-list --count v${CURRENT_VERSION}..HEAD 2>/dev/null || echo "0")
+    
+    if [ "$COMMIT_COUNT" -eq 0 ]; then
+        echo "✅ No changes since last release"
+        echo ""
+        echo "📦 All packages are up to date at v${CURRENT_VERSION}"
+        echo ""
+        echo "💡 No release needed - make some commits first!"
+        exit 0
+    fi
+    
+    echo "📋 Commits since last release (v${CURRENT_VERSION}): ${COMMIT_COUNT} commits"
+    git log --oneline --pretty=format:"%h %s" v${CURRENT_VERSION}..HEAD 2>/dev/null | head -20
+    echo ""
+    
+    echo "🏷️  Conventional commits (will trigger version bumps):"
+    CONVENTIONAL_COMMITS=$(git log --oneline --grep='feat\|fix\|BREAKING CHANGE' v${CURRENT_VERSION}..HEAD 2>/dev/null)
+    if [ -n "$CONVENTIONAL_COMMITS" ]; then
+        echo "$CONVENTIONAL_COMMITS"
+        echo ""
+    else
+        echo "⚠️  No conventional commits found - release will not bump version"
+        echo ""
+    fi
+    
+    echo "📦 Packages that would be published:"
+    for pkg in packages/*/package.json; do
+        if [ -f "$pkg" ]; then
+            pkg_name=$(basename $(dirname $pkg))
+            pkg_version=$(grep '"version"' "$pkg" | head -1 | cut -d'"' -f4)
+            echo "  - ${pkg_name} v${pkg_version}"
+        fi
+    done
+    echo ""
+    
+    if [ -n "$CONVENTIONAL_COMMITS" ]; then
+        echo "💡 To release: just release"
+    else
+        echo "💡 Add conventional commits (feat:, fix:) then: just release"
+    fi
 
 # Interactive release process
 release: validate

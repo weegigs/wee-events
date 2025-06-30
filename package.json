@@ -21,7 +21,6 @@
     "fix:typescript-references": "pnpm dlx @monorepo-utils/workspaces-to-typescript-project-references workspaces-to-typescript-project-references --root --includesRoot",
     "prepublish": "turbo build --force",
     "release": "release-it",
-    "release:dry": "release-it --dry-run",
     "release:ci": "release-it --ci",
     "deps:outdated": "pnpm outdated --recursive",
     "deps:update": "pnpm update -r"

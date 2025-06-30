@@ -3,7 +3,7 @@ pre-commit:
   commands:
     lint:
       glob: "*.{js,ts,tsx,jsx}"
-      run: pnpm run lint --fix
+      run: just lint
     commitlint:
       run: pnpx commitlint --edit
 
