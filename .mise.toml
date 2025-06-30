@@ -2,7 +2,7 @@
 _.file = ".env"
 
 [tools]
-pnpm = "10.2.1"
+pnpm = "10.12.4"
 node = "22.15.1"
 lefthook = "latest"
 just = "latest"
