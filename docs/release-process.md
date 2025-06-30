@@ -56,6 +56,21 @@ The release process automatically determines version bumps from conventional com
 
 ---
 
+### `just release-patch`, `just release-minor`, `just release-major`
+**Purpose**: Force specific version bumps regardless of conventional commits
+
+**What it does**:
+- 🚫 Ignores conventional commit analysis
+- 📈 Forces the specified version increment
+- 📦 Same validation, publishing, and verification as normal release
+- 👤 Still prompts for confirmation before proceeding
+
+**When to use**: When you need to release but don't have conventional commits, or want to override automatic version detection
+
+**Safe to run**: ⚠️ **NO** - makes real changes after confirmation
+
+---
+
 ### `just preview`
 **Purpose**: Preview what would be released without making any changes
 
@@ -143,6 +158,13 @@ just preview
 ```bash
 just release-ci
 # No prompts, fully automated
+```
+
+**Force specific version bump** (ignores conventional commits):
+```bash
+just release-patch    # Force patch: 0.19.0 → 0.19.1
+just release-minor    # Force minor: 0.19.0 → 0.20.0  
+just release-major    # Force major: 0.19.0 → 1.0.0
 ```
 
 
@@ -240,9 +262,12 @@ If a release needs to be rolled back:
 
 ### "No conventional commits found"
 ```bash
-# Ensure recent commits follow conventional format
+# Option 1: Add conventional commits
 git commit -m "feat: add new feature"
 git commit -m "fix: resolve issue"
+
+# Option 2: Force a specific version bump
+just release-patch    # or release-minor/release-major
 ```
 
 ### "Working directory not clean"
@@ -276,5 +301,6 @@ The release process is designed to be simple and safe:
 1. **Most of the time**: Just run `just release`
 2. **To preview**: Use `just preview`  
 3. **For automation**: Use `just release-ci`
+4. **To force version**: Use `just release-patch/minor/major`
 
 The process handles version detection, validation, publishing, and verification automatically while giving you control over when changes are actually made.

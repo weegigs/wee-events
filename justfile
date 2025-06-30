@@ -10,6 +10,7 @@ default:
     @echo "  just test           # Run tests" 
     @echo "  just release        # Release interactively"
     @echo "  just preview        # Preview release"
+    @echo "  just release-patch  # Force patch release"
     @echo ""
     @echo "📝 You can also use: mise run release"
 
@@ -139,6 +140,16 @@ release-ci: validate
     echo "🤖 Running automated release..."
     pnpm run release:ci
     just verify
+
+# Force release with specific version bump
+release-patch: validate
+    pnpm run release -- --increment=patch
+
+release-minor: validate
+    pnpm run release -- --increment=minor
+
+release-major: validate
+    pnpm run release -- --increment=major
 
 # Verify published packages
 verify:
