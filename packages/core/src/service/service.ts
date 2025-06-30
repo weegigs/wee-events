@@ -13,11 +13,11 @@ export type ServiceInfo<S extends Payload> = {
   entity: EntityDescription<S>;
 };
 
-export type Service<S extends State> = {
+export interface Service<S extends State> {
   // TODO: KAO - execute needs to be enhanced with a context for cross cutting concerns like authorization.
   execute: (name: string, target: AggregateId, command: Command) => Promise<Entity<S>>;
   load: (aggregate: AggregateId) => Promise<Entity<S>>;
-};
+}
 
 export interface ServiceDescription<R extends Environment, S extends State> {
   info(): ServiceInfo<S>;
