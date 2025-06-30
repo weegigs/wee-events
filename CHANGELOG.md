@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+* chore: simplify npm configuration in release-it setup (f2730bf)
+* chore: fix double publishing issue (992f0d1)
+
 * chore: add force release commands for overriding version detection (788453b)
 * chore: replace unreliable dry-run with reliable preview command (e2c8147)
 
