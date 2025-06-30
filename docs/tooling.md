@@ -62,10 +62,9 @@ tools/
 
 **Commands**:
 ```bash
-pnpm install                              # Install all dependencies
-pnpm run build                           # Build all packages
-pnpm run --filter <package> build        # Build specific package
-pnpm run --filter <package> test         # Test specific package
+just install                              # Install all dependencies
+just build                           # Build all packages
+just test         # Test all packages
 ```
 
 ---
@@ -220,7 +219,7 @@ cd wee-events
 # mise automatically installs tools and runs lefthook install
 
 # Install dependencies
-pnpm install
+just install
 
 # Build everything
 just build
@@ -272,7 +271,7 @@ mise install                  # Reinstall all tools
 ### Build Issues
 ```bash
 just clean                    # Clean all build artifacts
-pnpm install --frozen-lockfile # Reinstall dependencies
+just install # Reinstall dependencies
 just build                    # Rebuild everything
 ```
 
@@ -298,5 +297,3 @@ pnpm audit --fix                    # Fix security issues
 4. **Follow conventional commits** - They drive automatic versioning
 5. **Test with real dependencies** - Use testcontainers over mocks
 6. **Keep packages focused** - Each package should have a single responsibility
-
-This tooling setup ensures consistent development environments, automated quality checks, and reliable release processes across the entire team.

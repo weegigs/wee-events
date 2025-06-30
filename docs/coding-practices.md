@@ -178,7 +178,7 @@ class Client<T> {
 ### Compilation and Linting
 - **Zero Errors**: Code must compile with zero TypeScript errors and pass all linting checks.
 - **Fix Immediately**: Do not accumulate technical debt. Fix all build and lint errors as they appear.
-- **Verify Locally**: Run `pnpm run build` and `pnpm run lint` before claiming a task is complete.
+- **Verify Locally**: Run `just build` before claiming a task is complete.
 
 ### Testing
 - **Co-location**: Tests are located in the same directory as the source files they cover.
@@ -201,7 +201,7 @@ class Client<T> {
 
 1.  **Before Starting**: Read and acknowledge these practices. Understand the existing codebase and plan the minimal viable solution.
 2.  **During Development**: Start with tests, types and interfaces. Implement incrementally and validate your work continuously (compile, test, lint).
-3.  **Before Completion**: Run the full quality pipeline (`pnpm run build`, `pnpm run test`, `pnpm run lint`) and verify that all checks pass and the results are logically correct.
+3.  **Before Completion**: Run the full quality pipeline (`just build`) and verify that all checks pass and the results are logically correct.
 
 ---
 

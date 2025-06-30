@@ -28,11 +28,11 @@ This project uses **mise** for tool version management. The `.mise.toml` file de
 ## Development Commands
 
 ### Build and Test
-- `pnpm install --frozen-lockfile` - Install dependencies (uses frozen lockfile)
-- `pnpm run build` - Build all packages
-- `pnpm run test` - Compile and run Jest tests with coverage
-- `pnpm run lint` - Run ESLint across all packages
-- `pnpm run compile` - Compile TypeScript without running tests
+- `just install` - Install dependencies (uses frozen lockfile)
+- `just build` - Build all packages
+- `just test` - Compile and run Jest tests with coverage
+- `just lint` - Run ESLint across all packages
+- `just compile` - Compile TypeScript without running tests
 
 ### Cleaning and Maintenance
 - `pnpm run clean` - Clean all packages recursively
