@@ -1,126 +1,100 @@
 # Release Process
 
-This document describes the comprehensive release process for the wee-events monorepo using release-it with conventional commits and mise automation.
+This document describes the release process for the wee-events monorepo using release-it with conventional commits and mise automation.
+
+## Quick Start
+
+**Default release process:**
+```bash
+just release
+# or: mise run release
+```
+
+This interactive command handles the complete release workflow with validation, confirmation prompts, and verification.
 
 ## Overview
 
-The release process is designed with multiple safety checkpoints and validation steps to ensure reliable, safe releases. It leverages conventional commit messages to automatically determine version bumps and generate changelogs. The process consists of 6 main phases:
+The release process automatically determines version bumps from conventional commit messages and includes comprehensive validation to ensure reliable, safe releases. 
 
-1. **Preflight** - Comprehensive validation before any changes
-2. **Dry Run** - Full simulation without modifications  
-3. **Version** - Automated version bumping, changelog generation, and publishing
-4. **Verify** - Post-release validation
-5. **Rollback** - Emergency rollback procedures
+### Key Features
+- 🤖 **Automatic version detection** from conventional commits
+- 🔒 **Security validation** (fails only on high/critical vulnerabilities)  
+- ✅ **Comprehensive testing** and validation before release
+- 👤 **Interactive confirmation** of version and changes
+- 📦 **Synchronized versioning** across all packages
+- 🔍 **Post-release verification** of published packages
 
-## Release Tasks
+## Release Commands
 
-### `mise run release-preflight`
-**Purpose**: Comprehensive pre-release validation and safety checks
+### `mise run release` ⭐ **Recommended**
+**Purpose**: Interactive release process with validation and verification
 
 **What it does**:
-- ✅ Validates git repository state (clean, on main, up-to-date)
-- 🔒 Runs security audit for high/critical vulnerabilities  
-- 📦 Uses conventional commits for versioning (no manual changesets needed)
-- 🏗️ Validates build system with frozen lockfile
-- 🧪 Runs full test suite, build, and linting
-- 📊 Shows recent conventional commits
+- ✅ Runs preflight validation (git state, security, build, tests)
+- 🧪 Shows dry run simulation with proposed version bumps
+- 👤 **Prompts you to review and confirm** changes before proceeding
+- 📦 Executes release (version bump, changelog, commit, tag, publish)
+- ✅ Verifies packages are available on npm registry
 
-**When to use**: Always run this first before any release
+**When to use**: Default choice for local releases
 
-**Safe to run**: ✅ Yes - no modifications made
+**Safe to run**: ⚠️ **NO** - makes real changes after confirmation
+
+---
+
+### `mise run release-ci`
+**Purpose**: Automated release process (non-interactive)
+
+**What it does**:
+- Same as `mise run release` but **no interactive prompts**
+- Automatically proceeds based on conventional commit analysis
+- Uses `release-it --ci` for full automation
+
+**When to use**: CI/CD pipelines or when you're confident about the release
+
+**Safe to run**: ⚠️ **NO** - fully automated release
 
 ---
 
 ### `mise run release-dry-run`
-**Purpose**: Full release simulation without any changes
+**Purpose**: Simulate release without making any changes
 
 **What it does**:
-- 📋 Analyzes conventional commits to determine version bumps
+- 📋 Analyzes conventional commits to show proposed version bumps
 - 📝 Simulates version updates using `release-it --dry-run`
-- 🏗️ Tests clean build from scratch
-- 🧪 Runs full test suite
-- 🔍 Validates code quality
+- 🏗️ Builds and validates project
 
-**When to use**: After preflight passes, to validate the release
+**When to use**: To preview what a release would do
 
-**Safe to run**: ✅ Yes - simulation only
-
----
-
-### `mise run release-version`
-**Purpose**: Complete automated release with version bumping, changelog generation, and publishing
-
-**What it does**:
-- 🔄 Runs `release-it` which automatically:
-  - Analyzes conventional commits to determine version bumps
-  - Updates all package.json versions (synchronized across workspace)
-  - Generates/updates CHANGELOG.md files
-  - Creates git commit and tags
-  - Publishes packages to npm registry
-  - Creates GitHub releases
-
-**When to use**: After dry-run succeeds and you're ready to release
-
-**Safe to run**: ⚠️ **NO** - modifies files, creates commits, publishes packages
-
-**Next step**: Run release-verify to confirm publication
-
----
-
-### `mise run release-publish`
-**Purpose**: Information about the new integrated workflow
-
-**What it does**:
-- 📝 Explains that publishing is now integrated into `release-version`
-- 📋 Shows available release commands
-- ✅ No separate publish step needed
-
-**When to use**: For information only
-
-**Safe to run**: ✅ Yes - informational only
+**Safe to run**: ✅ **YES** - simulation only
 
 ---
 
 ### `mise run release-verify`
-**Purpose**: Post-release verification and validation
+**Purpose**: Verify published packages after release
 
 **What it does**:
-- 🔍 Verifies packages are available on npm registry
+- 🔍 Checks that packages are available on npm registry
 - 📊 Shows release summary and git tags
 - ✅ Confirms successful publication
 
-**When to use**: After release-version completes
+**When to use**: After a release to confirm everything worked
 
-**Safe to run**: ✅ Yes - verification only
+**Safe to run**: ✅ **YES** - verification only
 
 ---
 
 ### `mise run release-rollback`
-**Purpose**: Emergency rollback procedures
+**Purpose**: Emergency rollback guidance
 
 **What it does**:
-- 🚨 Provides rollback guidance and commands
+- 🚨 Provides rollback instructions and commands
 - 📝 Shows manual steps required for rollback
 - ❌ **Manual intervention required**
 
 **When to use**: Only in emergency situations
 
-**Safe to run**: ✅ Yes - guidance only, no automatic actions
-
----
-
-### `mise run release-full`
-**Purpose**: Complete automated release pipeline
-
-**What it does**:
-- 🚀 Runs entire release pipeline automatically
-- ⚠️ Includes 10-second countdown to cancel
-- 🔄 Uses `release-it --ci` for full automation
-- 🎉 Completes full release process
-
-**When to use**: When you want fully automated release
-
-**Safe to run**: ⚠️ **NO** - full release automation
+**Safe to run**: ✅ **YES** - guidance only
 
 ## Recommended Workflow
 
@@ -134,74 +108,55 @@ The release process is designed with multiple safety checkpoints and validation 
    git status  # Should be clean
    ```
 
-2. **Ensure conventional commits** (no manual changesets needed):
+2. **Ensure conventional commits**:
    ```bash
-   # Your commits should follow conventional format:
-   # feat: add new feature
-   # fix: resolve bug
-   # BREAKING CHANGE: major change
+   # Your recent commits should follow conventional format:
+   # feat: add new feature        → minor version bump
+   # fix: resolve bug            → patch version bump  
+   # feat!: breaking change      → major version bump
    
    # Check recent commits
    git log --oneline --grep='feat\|fix\|BREAKING CHANGE' -10
    ```
 
-3. **Validation phase**:
+3. **Run the release**:
    ```bash
-   mise run release-preflight
-   # Wait for all checks to pass
+   just release
+   # This will:
+   # 1. Validate everything is ready
+   # 2. Show you what version will be released
+   # 3. Ask for your confirmation
+   # 4. Execute the release
+   # 5. Verify publication
    ```
 
-4. **Simulation phase**:
-   ```bash
-   mise run release-dry-run  
-   # Verify version bumps and changes without modifications
-   ```
+### Alternative Workflows
 
-5. **Release phase**:
-   ```bash
-   mise run release-version
-   # This does everything: version, changelog, commit, tag, publish
-   ```
-
-6. **Verification phase**:
-   ```bash
-   mise run release-verify
-   # Confirm packages are available on npm
-   ```
-
-### Quick Automated Release
-
-For experienced users who want full automation:
-
+**Just preview the release**:
 ```bash
-mise run release-full
-# Includes all phases with safety pauses
+just release-dry
+# See what would happen without making changes
 ```
 
-### Manual Release Commands
-
-You can also use the underlying release-it commands directly:
-
+**Automated release** (for CI or confident releases):
 ```bash
-# Interactive release (choose version manually)
-pnpm run release
-
-# Dry run to see what would happen
-pnpm run release:dry
-
-# Automated release using conventional commits
-pnpm run release:ci
+just release-ci
+# No prompts, fully automated
 ```
+
+
 
 ## Conventional Commit Format
 
 The release process uses conventional commit messages to automatically determine version bumps:
 
-- `fix:` → patch version (0.18.4 → 0.18.5)
-- `feat:` → minor version (0.18.4 → 0.19.0)
-- `feat!:` or `BREAKING CHANGE:` → major version (0.18.4 → 1.0.0)
+| Commit Type | Version Bump | Example |
+|-------------|--------------|---------|
+| `fix:` | Patch (0.18.4 → 0.18.5) | `fix: resolve memory leak in event processing` |
+| `feat:` | Minor (0.18.4 → 0.19.0) | `feat: add support for batch event processing` |
+| `feat!:` or `BREAKING CHANGE:` | Major (0.18.4 → 1.0.0) | `feat!: change event schema format` |
 
-Examples:
+**Examples**:
 ```bash
 git commit -m "fix: resolve memory leak in event processing"
 git commit -m "feat: add support for batch event processing"
@@ -217,23 +172,20 @@ Conventional commit enforcement is automatically set up when you enter the proje
 - Validate commit messages follow conventional format
 - Run linting on staged files
 
-To manually validate commits when needed:
+To manually validate commits:
 ```bash
-# Manual validation
 pnpx commitlint --edit
 ```
 
 ## Safety Features
 
-- **Multi-stage validation**: Each phase validates different aspects
+- **Multi-stage validation**: Git state, security, build, tests, and linting
+- **Interactive confirmation**: Review version bumps before proceeding
 - **Conventional commit automation**: No manual changeset creation needed
 - **Synchronized versioning**: All packages maintain same version number
-- **Clear output**: Emojis and section headers for easy progress tracking
+- **Security auditing**: Only fails on high/critical vulnerabilities (allows moderate)
+- **Post-release verification**: Confirms packages are available on npm
 - **Rollback guidance**: Emergency procedures documented
-- **Git state validation**: Ensures clean repository state
-- **npm connectivity checks**: Validates registry access before publishing
-- **Security auditing**: Checks for vulnerabilities before release
-- **Test coverage**: Full test suite runs multiple times
 
 ## Error Handling
 
@@ -241,73 +193,87 @@ If any step fails:
 
 1. **Read the error message carefully**
 2. **Fix the underlying issue** (tests, linting, security, etc.)
-3. **Start over from release-preflight**
+3. **Re-run the release process**
 4. **Do not skip validation steps**
 
-Common issues:
-- Dirty git working directory → commit or stash changes
-- Failed tests → fix failing tests
-- npm authentication → run `npm login`
-- Security vulnerabilities → update dependencies
-- Missing conventional commits → ensure proper commit message format
+**Common issues**:
+
+| Problem | Solution |
+|---------|----------|
+| Dirty git working directory | `git add . && git commit` or `git stash` |
+| Failed tests | Fix failing tests and re-run |
+| npm authentication | `npm login` then `npm whoami` to verify |
+| High/critical security vulnerabilities | `pnpm audit --fix` or update dependencies |
+| Missing conventional commits | Ensure recent commits follow conventional format |
 
 ## Emergency Rollback
 
 If a release needs to be rolled back:
 
-1. **Run**: `mise run release-rollback` for guidance
+1. **Run**: `mise run release-rollback` for detailed guidance
 2. **Manual steps required**:
-   - Unpublish packages: `npm unpublish <package>@<version>`
-   - Revert commits: `git revert HEAD`
-   - Delete git tags: `git tag -d <tag> && git push origin :refs/tags/<tag>`
-   - Notify stakeholders
+   ```bash
+   # Unpublish packages (within 72 hours of publish)
+   npm unpublish <package>@<version>
+   
+   # Revert commits
+   git revert HEAD
+   
+   # Delete git tags
+   git tag -d <tag>
+   git push origin :refs/tags/<tag>
+   
+   # Notify stakeholders
+   ```
 
 ## Best Practices
 
-- **Always run preflight first** - catches issues early
-- **Use dry-run to validate** - safe simulation
-- **Write good conventional commits** - they determine version bumps
-- **Test in development environment** - verify packages work after installation
-- **Communicate releases** - notify team of new versions
-- **Monitor after release** - watch for issues in production
+- ✅ **Use the default `mise run release`** for interactive releases
+- ✅ **Write good conventional commits** - they determine version bumps
+- ✅ **Test packages after installation** - verify they work in development
+- ✅ **Communicate releases** - notify team of new versions
+- ✅ **Monitor after release** - watch for issues in production
+- ❌ **Don't skip the validation** - let the process catch issues early
 
 ## Troubleshooting
 
 ### "No conventional commits found"
 ```bash
-# Ensure commits follow conventional format
+# Ensure recent commits follow conventional format
 git commit -m "feat: add new feature"
 git commit -m "fix: resolve issue"
 ```
 
-### "Working directory not clean"  
+### "Working directory not clean"
 ```bash
-# Check what's uncommitted
-git status
-# Commit or stash changes
+git status                    # Check what's uncommitted
 git add . && git commit -m "prepare for release"
 ```
 
 ### "npm authentication failed"
 ```bash
-# Login to npm
-npm login
-# Verify authentication  
-npm whoami
+npm login                     # Login to npm
+npm whoami                    # Verify authentication
 ```
 
 ### "Security vulnerabilities found"
 ```bash
-# Review and fix vulnerabilities
-pnpm audit
-pnpm audit --fix
+pnpm audit                    # Review vulnerabilities
+pnpm audit --fix              # Fix auto-fixable issues
 ```
 
 ### "release-it version conflicts"
 ```bash
-# Check if versions are already published
+# Check if version is already published
 npm view @weegigs/events-core versions --json
-# Use --no-increment to skip version bump if needed
 ```
 
-This process ensures reliable, safe releases with automated version detection from conventional commits and multiple validation checkpoints.
+## Summary
+
+The release process is designed to be simple and safe:
+
+1. **Most of the time**: Just run `mise run release`
+2. **To preview**: Use `mise run release-dry-run`  
+3. **For automation**: Use `mise run release-ci`
+
+The process handles version detection, validation, publishing, and verification automatically while giving you control over when changes are actually made.
