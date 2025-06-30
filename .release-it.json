@@ -5,9 +5,7 @@
     "tagName": "v${version}",
     "requireCleanWorkingDir": false
   },
-  "npm": {
-    "publish": false
-  },
+  "npm": false,
   "github": {
     "release": true,
     "releaseName": "v${version}"
