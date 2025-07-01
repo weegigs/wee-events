@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.20.0 (2025-07-01)
+
+* refactor: change Service type to interface for consistency ([f63f9d4](https://github.com/weegigs/wee-events/commit/f63f9d4))
+* refactor: enhanced NatsService testability by injecting dependencies ([5601c59](https://github.com/weegigs/wee-events/commit/5601c59))
+* feat: made service info available in the service ([5b5c303](https://github.com/weegigs/wee-events/commit/5b5c303))
+* chore: updated dependencies ([249d501](https://github.com/weegigs/wee-events/commit/249d501))
+* docs: update development guides to use 'just' for consistency ([12949d4](https://github.com/weegigs/wee-events/commit/12949d4))
+
 * chore: simplify npm configuration in release-it setup (f2730bf)
 * chore: fix double publishing issue (992f0d1)
 

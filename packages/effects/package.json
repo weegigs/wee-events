@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-effects",
-  "version": "0.19.2",
+  "version": "0.20.0",
   "description": "Effects utilities for Wee Events",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

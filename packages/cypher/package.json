@@ -1,6 +1,6 @@
 {
   "name": "@weegigs/events-cypher",
-  "version": "0.19.2",
+  "version": "0.20.0",
   "description": "Cypher Utilities for Wee Events",
   "author": "Kevin O'Neill <kevin@weegigs.com.au>",
   "license": "MIT",
