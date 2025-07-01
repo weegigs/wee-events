@@ -14,43 +14,40 @@ export class NatsService<S extends events.State> {
   ) {
     return {
       async connect(connection: NatsConnection, store: events.EventStore, environment: Omit<R, "publish">) {
-        const info = description.info();
-
-        // Create NATS microservice (async part)
-        const svcm = new Svcm(connection);
-        const nats = await svcm.add({
-          name: info.entity.type,
-          version: info.version,
-          description: info.description ?? "",
-        });
-
-        return new NatsService(description, nats, store, environment);
+        const service = description.service(store, environment);
+        return await NatsService.wrap(service).connect(connection);
       },
     };
   }
 
-  private readonly service: events.Service<S>;
-  private readonly pool: WorkerPool<events.Entity<S>>;
+  public static wrap<S extends events.State>(service: events.Service<S>) {
+    // Create NATS microservice (async part)
+    return {
+      async connect(connection: NatsConnection) {
+        const svcm = new Svcm(connection);
+        const nats = await svcm.add({
+          name: service.info.entity.type,
+          version: service.info.version,
+          description: service.info.description ?? "",
+        });
+
+        return new NatsService(nats, service, new WorkerPool(), new Signal<null>());
+      },
+    };
+  }
+
   private readonly iteratorProcessors = new Set<Promise<void>>();
-  private readonly shutdownSignal = new Signal<null>();
 
   constructor(
-    description: events.ServiceDescription<events.Environment, S>,
     private readonly nats: Service,
-    store: events.EventStore,
-    environment: Omit<events.Environment, "publish">
+    private readonly service: events.Service<S>,
+    private readonly pool: WorkerPool<events.Entity<S>>,
+    private readonly shutdownSignal: Signal<null>
   ) {
     // Create core service
-    this.service = description.service(store, environment);
-
-    // Create worker pool
-    this.pool = new WorkerPool();
-
-    // Get service info
-    const info = description.info();
 
     // Set up service group with service name (type)
-    const serviceGroup = this.nats.addGroup(info.entity.type);
+    const serviceGroup = this.nats.addGroup(service.info.entity.type);
 
     // Set up command endpoint under service group
     this.registerCommandEndpoint(serviceGroup);
@@ -104,10 +101,7 @@ export class NatsService<S extends events.State> {
     try {
       while (true) {
         // Race iterator.next() with shutdown signal to avoid hanging
-        const result = await Promise.race([
-          iterator.next(),
-          this.shutdownSignal.promise
-        ]);
+        const result = await Promise.race([iterator.next(), this.shutdownSignal.promise]);
 
         if (result === null) {
           // Either iterator closed or shutdown signaled
@@ -180,7 +174,11 @@ export class NatsService<S extends events.State> {
       return;
     }
 
-    if (error instanceof Error && 'toJSON' in error && typeof (error as { toJSON: () => Record<string, unknown> }).toJSON === 'function') {
+    if (
+      error instanceof Error &&
+      "toJSON" in error &&
+      typeof (error as { toJSON: () => Record<string, unknown> }).toJSON === "function"
+    ) {
       const payload: NatsServiceErrorPayload = {
         error: {
           name: error.name,
@@ -226,7 +224,7 @@ export class NatsService<S extends events.State> {
   async shutdown(): Promise<void> {
     // Signal all iterators to exit immediately
     this.shutdownSignal.trigger(null);
-    
+
     // Stop accepting new messages
     await this.nats.stop();
 

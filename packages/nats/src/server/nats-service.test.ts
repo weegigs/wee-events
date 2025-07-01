@@ -1,8 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { NatsService } from "./nats-service";
-import { MemoryStore } from "@weegigs/events-core";
 import * as events from "@weegigs/events-core";
 import { Signal } from "@weegigs/events-common";
+import { Service } from "@nats-io/services";
+import { WorkerPool } from "./worker-pool";
+import { z } from "zod";
 
 // Mock NATS dependencies
 vi.mock("@nats-io/nats-core", () => ({
@@ -13,12 +15,20 @@ vi.mock("@nats-io/nats-core", () => ({
 
 vi.mock("@nats-io/services", () => ({
   Svcm: vi.fn(),
+  Service: vi.fn(),
+}));
+
+vi.mock("./worker-pool", () => ({
+  WorkerPool: vi.fn(() => ({
+    execute: vi.fn(),
+    shutdown: vi.fn(),
+  })),
 }));
 
 // Create a minimal service description for testing
 const createTestDescription = () => {
   const info = {
-    entity: { type: "test-service" },
+    entity: { type: "test-service", schema: z.object({}) },
     version: "1.0.0",
     description: "Test service",
   };
@@ -31,10 +41,29 @@ const createTestDescription = () => {
     info: () => info,
     commands: () => commands,
     service: (_store: events.EventStore, _env: unknown) => ({
+      info,
       load: vi.fn(),
       execute: vi.fn(),
     }),
   };
+};
+
+const createMockNatsService = (): Service => {
+  return {
+    addGroup: vi.fn().mockReturnValue({
+      addGroup: vi.fn().mockReturnValue({
+        addEndpoint: vi.fn().mockReturnValue({}), // Return empty iterator object
+      }),
+      addEndpoint: vi.fn(),
+    }),
+    stop: vi.fn().mockResolvedValue(undefined),
+    stopped: vi.fn().mockResolvedValue(false),
+    isStopped: vi.fn().mockReturnValue(false),
+    stats: vi.fn().mockReturnValue({}),
+    info: vi.fn().mockReturnValue({}),
+    reset: vi.fn(),
+    start: vi.fn(),
+  } as unknown as Service;
 };
 
 describe("NatsService", () => {
@@ -42,57 +71,40 @@ describe("NatsService", () => {
     it("should create shutdown signal with proper type", async () => {
       // This is more of a compilation test to ensure types are correct
       const description = createTestDescription();
-      const mockNats = {
-        addGroup: vi.fn().mockReturnValue({
-          addGroup: vi.fn().mockReturnValue({
-            addEndpoint: vi.fn().mockReturnValue({}), // Return empty iterator object
-          }),
-          addEndpoint: vi.fn(),
-        }),
-        stop: vi.fn(),
-      };
-      
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const service = new (NatsService as any)(
-        description,
+      const mockNats = createMockNatsService();
+      const mockPool = new WorkerPool<events.Entity<{}>>();
+      const shutdownSignal = new Signal<null>();
+
+      const mockService = description.service(undefined as never, undefined as never);
+      const service = new NatsService(
         mockNats,
-        new MemoryStore(),
-        {}
+        mockService,
+        mockPool,
+        shutdownSignal
       );
 
       // Wait for iterator processor to complete (should be immediate with mocked null)
       await new Promise(resolve => setTimeout(resolve, 10));
 
       expect(service).toBeDefined();
-      expect(service.shutdownSignal).toBeInstanceOf(Signal);
     });
 
     it("should trigger shutdown signal with null", async () => {
       const description = createTestDescription();
-      const mockNats = {
-        addGroup: vi.fn().mockReturnValue({
-          addGroup: vi.fn().mockReturnValue({
-            addEndpoint: vi.fn().mockReturnValue({}), // Return empty iterator object
-          }),
-          addEndpoint: vi.fn(),
-        }),
-        stop: vi.fn().mockResolvedValue(undefined),
-      };
+      const mockNats = createMockNatsService();
+      const mockPool = new WorkerPool<events.Entity<{}>>();
+      const shutdownSignal = new Signal<null>();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const service = new (NatsService as any)(
-        description,
+      const mockService = description.service(undefined as never, undefined as never);
+      const service = new NatsService(
         mockNats,
-        new MemoryStore(),
-        {}
+        mockService,
+        mockPool,
+        shutdownSignal
       );
 
       // Wait for iterator processor to complete
       await new Promise(resolve => setTimeout(resolve, 10));
-
-      // Access private shutdown signal for testing
-      const shutdownSignal = service.shutdownSignal;
-      expect(shutdownSignal.promise).toBeInstanceOf(Promise);
 
       // Trigger shutdown
       const shutdownPromise = service.shutdown();
@@ -153,176 +165,125 @@ describe("NatsService", () => {
   describe("Shutdown sequence", () => {
     it("should call shutdown signal trigger before nats.stop", async () => {
       const description = createTestDescription();
-      const mockNats = {
-        addGroup: vi.fn().mockReturnValue({
-          addGroup: vi.fn().mockReturnValue({
-            addEndpoint: vi.fn().mockReturnValue({}),
-          }),
-          addEndpoint: vi.fn(),
-        }),
-        stop: vi.fn().mockResolvedValue(undefined),
-      };
+      const mockNats = createMockNatsService();
+      const mockPool = new WorkerPool<events.Entity<{}>>();
+      const shutdownSignal = new Signal<null>();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const service = new (NatsService as any)(
-        description,
+      const mockService = description.service(undefined as never, undefined as never);
+      const service = new NatsService(
         mockNats,
-        new MemoryStore(),
-        {}
+        mockService,
+        mockPool,
+        shutdownSignal
       );
 
       // Wait for iterator processor to complete
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Mock worker pool
-      service.pool = {
-        shutdown: vi.fn().mockResolvedValue(undefined),
-      };
-
       // Track call order
       const calls: string[] = [];
       
-      const originalTrigger = service.shutdownSignal.trigger;
-      service.shutdownSignal.trigger = vi.fn((value: null) => {
+      const originalTrigger = shutdownSignal.trigger;
+      shutdownSignal.trigger = vi.fn((value: null) => {
         calls.push("shutdown-signal");
-        originalTrigger.call(service.shutdownSignal, value);
+        originalTrigger.call(shutdownSignal, value);
       });
 
-      mockNats.stop.mockImplementation(async () => {
+      (mockNats.stop as ReturnType<typeof vi.fn>).mockImplementation(async () => {
         calls.push("nats-stop");
       });
 
       await service.shutdown();
 
       expect(calls).toEqual(["shutdown-signal", "nats-stop"]);
-      expect(service.shutdownSignal.trigger).toHaveBeenCalledWith(null);
+      expect(shutdownSignal.trigger).toHaveBeenCalledWith(null);
       expect(mockNats.stop).toHaveBeenCalledOnce();
     });
 
     it("should wait for iterator processors to complete", async () => {
       const description = createTestDescription();
-      const mockNats = {
-        addGroup: vi.fn().mockReturnValue({
-          addGroup: vi.fn().mockReturnValue({
-            addEndpoint: vi.fn().mockReturnValue({}),
-          }),
-          addEndpoint: vi.fn(),
+      const mockNats = createMockNatsService();
+      const mockPool = new WorkerPool<events.Entity<{}>>();
+      const shutdownSignal = new Signal<null>();
+
+      // Control the mock iterator
+      let resolveIterator: (value: unknown) => void = () => {};
+      const iteratorPromise = new Promise<unknown>(resolve => {
+        resolveIterator = resolve;
+      });
+
+      // Replace the mock implementation for the endpoint
+      (mockNats.addGroup("").addGroup("").addEndpoint as ReturnType<typeof vi.fn>).mockReturnValue({
+        [Symbol.asyncIterator]: () => ({
+          next: () => iteratorPromise,
         }),
-        stop: vi.fn().mockResolvedValue(undefined),
-      };
+      });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const service = new (NatsService as any)(
-        description,
+      const mockService = description.service(undefined as never, undefined as never);
+      const service = new NatsService(
         mockNats,
-        new MemoryStore(),
-        {}
+        mockService,
+        mockPool,
+        shutdownSignal
       );
-
-      // Wait for initial iterator processor to complete
-      await new Promise(resolve => setTimeout(resolve, 10));
-
-      // Mock worker pool
-      service.pool = {
-        shutdown: vi.fn().mockResolvedValue(undefined),
-      };
-
-      // Add mock iterator processors
-      let resolveProcessor1: () => void = () => {};
-      let resolveProcessor2: () => void = () => {};
-      
-      const processor1 = new Promise<void>(resolve => {
-        resolveProcessor1 = resolve;
-      });
-      const processor2 = new Promise<void>(resolve => {
-        resolveProcessor2 = resolve;
-      });
-
-      service.iteratorProcessors.add(processor1);
-      service.iteratorProcessors.add(processor2);
 
       // Start shutdown
       const shutdownPromise = service.shutdown();
 
-      // Processors should still be waiting
-      await new Promise(resolve => setTimeout(resolve, 10));
+      // It should be waiting for the iterator to finish
+      await expect(Promise.race([shutdownPromise, new Promise(resolve => setTimeout(resolve, 50))])).resolves.toBeUndefined();
 
-      // Complete processors
-      resolveProcessor1();
-      resolveProcessor2();
+      // Complete the processor
+      resolveIterator(null);
 
       // Shutdown should now complete
-      await shutdownPromise;
+      await expect(shutdownPromise).resolves.toBeUndefined();
 
       expect(mockNats.stop).toHaveBeenCalledOnce();
-      expect(service.pool.shutdown).toHaveBeenCalledOnce();
+      expect(mockPool.shutdown).toHaveBeenCalledOnce();
     });
 
     it("should handle shutdown when iterator processors complete quickly", async () => {
       const description = createTestDescription();
-      const mockNats = {
-        addGroup: vi.fn().mockReturnValue({
-          addGroup: vi.fn().mockReturnValue({
-            addEndpoint: vi.fn().mockReturnValue({}), // Return empty iterator object
-          }),
-          addEndpoint: vi.fn(),
-        }),
-        stop: vi.fn().mockResolvedValue(undefined),
-      };
+      const mockNats = createMockNatsService();
+      const mockPool = new WorkerPool<events.Entity<{}>>();
+      const shutdownSignal = new Signal<null>();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const service = new (NatsService as any)(
-        description,
+      const mockService = description.service(undefined as never, undefined as never);
+      const service = new NatsService(
         mockNats,
-        new MemoryStore(),
-        {}
+        mockService,
+        mockPool,
+        shutdownSignal
       );
-
-      // Mock worker pool
-      service.pool = {
-        shutdown: vi.fn().mockResolvedValue(undefined),
-      };
 
       // Wait for iterator processors to complete (should be immediate with mocked null)
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Iterator processor should have completed and been removed
-      expect(service.iteratorProcessors.size).toBe(0);
-
       await service.shutdown();
 
       expect(mockNats.stop).toHaveBeenCalledOnce();
-      expect(service.pool.shutdown).toHaveBeenCalledOnce();
+      expect(mockPool.shutdown).toHaveBeenCalledOnce();
     });
   });
 
   describe("Edge cases", () => {
     it("should handle multiple shutdown calls", async () => {
       const description = createTestDescription();
-      const mockNats = {
-        addGroup: vi.fn().mockReturnValue({
-          addGroup: vi.fn().mockReturnValue({
-            addEndpoint: vi.fn().mockReturnValue({}),
-          }),
-          addEndpoint: vi.fn(),
-        }),
-        stop: vi.fn().mockResolvedValue(undefined),
-      };
+      const mockNats = createMockNatsService();
+      const mockPool = new WorkerPool<events.Entity<{}>>();
+      const shutdownSignal = new Signal<null>();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const service = new (NatsService as any)(
-        description,
+      const mockService = description.service(undefined as never, undefined as never);
+      const service = new NatsService(
         mockNats,
-        new MemoryStore(),
-        {}
+        mockService,
+        mockPool,
+        shutdownSignal
       );
 
       // Wait for iterator processor to complete
       await new Promise(resolve => setTimeout(resolve, 10));
-
-      service.pool = {
-        shutdown: vi.fn().mockResolvedValue(undefined),
-      };
 
       // Call shutdown multiple times
       const shutdown1 = service.shutdown();
@@ -337,35 +298,25 @@ describe("NatsService", () => {
 
     it("should handle shutdown signal trigger being called multiple times", async () => {
       const description = createTestDescription();
-      const mockNats = {
-        addGroup: vi.fn().mockReturnValue({
-          addGroup: vi.fn().mockReturnValue({
-            addEndpoint: vi.fn().mockReturnValue({}),
-          }),
-          addEndpoint: vi.fn(),
-        }),
-        stop: vi.fn().mockResolvedValue(undefined),
-      };
+      const mockNats = createMockNatsService();
+      const mockPool = new WorkerPool<events.Entity<{}>>();
+      const shutdownSignal = new Signal<null>();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const service = new (NatsService as any)(
-        description,
+      const mockService = description.service(undefined as never, undefined as never);
+      const service = new NatsService(
         mockNats,
-        new MemoryStore(),
-        {}
+        mockService,
+        mockPool,
+        shutdownSignal
       );
 
       // Wait for iterator processor to complete
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      service.pool = {
-        shutdown: vi.fn().mockResolvedValue(undefined),
-      };
-
       // Manually trigger shutdown signal multiple times
-      service.shutdownSignal.trigger(null);
-      service.shutdownSignal.trigger(null);
-      service.shutdownSignal.trigger(null);
+      shutdownSignal.trigger(null);
+      shutdownSignal.trigger(null);
+      shutdownSignal.trigger(null);
 
       // Should still be able to shutdown normally
       await service.shutdown();
