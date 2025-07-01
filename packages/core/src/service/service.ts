@@ -14,7 +14,10 @@ export type ServiceInfo<S extends Payload> = {
 };
 
 export interface Service<S extends State> {
+  readonly info: ServiceInfo<S>;
+
   // TODO: KAO - execute needs to be enhanced with a context for cross cutting concerns like authorization.
+
   execute: (name: string, target: AggregateId, command: Command) => Promise<Entity<S>>;
   load: (aggregate: AggregateId) => Promise<Entity<S>>;
 }
@@ -58,11 +61,13 @@ export namespace ServiceDescription {
     loader: LoaderDescription<S>,
     dispatcher: DispatcherDescription<R, S>
   ): ServiceDescription<R, S> {
+    const i = {
+      ...info,
+      entity: loader.entity(),
+    };
+
     return {
-      info: () => ({
-        ...info,
-        entity: loader.entity(),
-      }),
+      info: () => i,
       commands: dispatcher.commands,
       events: loader.events,
       service: (store: EventStore, environment: Omit<R, "publish">): Service<S> => {
@@ -82,6 +87,7 @@ export namespace ServiceDescription {
         };
 
         return {
+          info: i,
           execute,
           load,
         };
